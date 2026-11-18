@@ -159,6 +159,15 @@
     .callout strong { display: block; margin-bottom: 4px; }
     .callout.warn { background: var(--warn-bg); border-color: var(--warn-bd); color: var(--warn-ink); }
     .callout.info { background: var(--info-bg); border-color: var(--info-bd); color: var(--info-ink); }
+    .callout.expired { background: #fdecec; border-color: #e8b4b4; color: #7a1f1f; }
+    .expired-ref {
+      border: 2px dashed #c45c5c;
+      border-radius: 14px;
+      padding: 4px 10px 8px;
+      margin-top: 8px;
+      background: repeating-linear-gradient(-45deg, rgba(196,92,92,0.05), rgba(196,92,92,0.05) 12px, transparent 12px, transparent 24px);
+    }
+    .expired-ref .metric .lab { color: #7a1f1f; }
     .metrics {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -274,7 +283,7 @@
     <footer class="note">כלי פנימי להצעת מחיר ממחירון. התעריפים כפופים לתוקף, למקום פנוי ולתנאי החברה.</footer>
   </div>
   <noscript><p class="wrap">יש להפעיל JavaScript כדי להשתמש במחשבון.</p></noscript>
-  <script src="data.js"></script>
+  <script src="data.js?v=msc-20261118"></script>
   <script>
 (function () {
   const DATA = window.QUOTE_DATA;
@@ -395,6 +404,9 @@
       "VIETNAM HCP": "HO CHI MINH",
       "MANILA NORTH HARBOUR": "MANILA",
       "MANILA SOUTH HARBOUR": "MANILA",
+      "VIZAKHAPATNAH": "VISAKHAPATNAM",
+      "VISAKHAPATNAH": "VISAKHAPATNAM",
+      "VIZAG": "VISAKHAPATNAM",
     };
     if (aliases[s]) return aliases[s];
     if (s.includes(",")) return s.split(",")[0].trim();
@@ -412,6 +424,7 @@
         return q.ref + " · חוזה " + q.contract + " · Trade " + q.tradeId;
       }
     }
+    if (!carrier.ref) return "לא צוין מספר הסכם או filing במחירון";
     return carrier.version ? "הסכם " + carrier.ref + " (גרסה " + carrier.version + ")" : carrier.ref;
   }
   function bookingLine(carrier) {
@@ -516,9 +529,14 @@
     if (pod.startsWith("HAIFA")) return "חיפה";
     return pod;
   }
-  function quoteText(carrier, origin, destName, rate, qty, markup, shipDate) {
+  function quoteText(carrier, origin, destName, rate, qty, markup, shipDate, expired) {
     const t = totalsOf(rate, qty);
     const lines = [];
+    if (expired) {
+      lines.push("*** המחירון פג תוקף — לעיון בלבד, לא הצעת מחיר בתוקף ***");
+      lines.push("תוקף המחירון: " + fmtDate(rate.vf) + "–" + fmtDate(rate.vt) + " · תאריך השילוח שנבחר: " + fmtDate(shipDate) + " (מחוץ לחלון התוקף).");
+      lines.push("");
+    }
     lines.push(carrier.nameHe);
     lines.push(quoteLabel(carrier, rate) + " · " + carrier.party);
     if (origin.kind === "inland") {
@@ -758,6 +776,11 @@
         "<p>הסוכן: Israel Scandinavian Maritime Agency Ltd (סוכן בלבד ל-OOCL). פניות: isma-sales@israscan.co.il, www.Israscan.co.il, טל׳ (972) 4-8680777. חיפה: 2 Khayat Sq., POB 33557. אשדוד: Haorgim 35, room 602, P.O.B 4060. תנאי התעריף וה-B/L ב-www.OOCL.com. התעריפים כפופים לשינוי (V.A.T.O.S). אינם כוללים ביטוח, שחרור מכס, אגרות ומיסים. המוביל רשאי לנתב דרך סואץ או כף התקווה הטובה (COGH) בלי הודעה. זמני ההפלגה משוערים.</p>" +
         "<p>לפי האקסל: התעריף מבוסס על הניתוב שצוין (Rates from NON BASE PORTS); ניתוב אחר עלול לשנות את המחיר. B/L שימוזגו עם B/L אחר יהיו כפופים ל-roll over. לפי הטקסט הנלווה (לא בתאי האקסל): Foshan, Jiangmen ו-Huangpu דרך טרמינלים מסוימים בלבד — לפנות לסוכן; וכן אם נדרש תעריף מ-POL אחר.</p>";
     }
+    if (displayCarrier.id === "msc-india-sl-aug-oct-2026") {
+      return "<p><strong>שימו לב: תוקף המחירון 16.08.2026–31.10.2026, ולפי תאריך השילוח היום הוא פג תוקף.</strong> הכותרת במחירון: Updated rate offer Ex India + Sri Lanka as from 16.08.2026 till 31.10.2026* (F.A.K HARMLESS) To Haifa/Ashdod — Updated 15.09.26. הערת הכוכבית: Effective last container Received for export at train depots, terminals or POL'S. הצד במכתב: MEDITERRANEAN SHIPPING CO. (Israel) Ltd. לא נמצא במחירון מספר הסכם, filing או חוזה. במייל צוין שההסכם כבר הוגש לפי שורת הנושא, אבל המספר אינו מופיע בקובץ ולא הומצא.</p>" +
+        "<p>התעריפים הם F.A.K. harmless ליעדי חיפה ואשדוד (אותו מחיר לשני היעדים). 40DV ו-40HC באותו מחיר. DTHC: 275$/20׳ ו-400$/40׳. EFS IN USD - SEP: 156$ × TEU (156$/20׳, 312$/40׳) — נוסף לסה״כ לפי הטבלה, בלי להמציא סכום אחר. OVW כלול בתעריף ל-20׳. 14 ימי demurrage חינם ביעד, אלא אם צוין אחרת. Origin THC משולם על ידי השולח. כפוף לדמי D/O ולהוצאות מקומיות (סכומים לא צוינו — לא הומצאו). כפוף לתוספות במועד השילוח. תנאי ההובלה: <span class=\"ltr\">https://www.msc.com/che/contract-of-carriage</span>.</p>" +
+        "<p>לא נוספו אוטומטית (מותנים / ציוד מיוחד / מסוכן, והמחירון הוא FAK harmless): EIS 50$/מכולה ל-Coir pith/Flammable (הסכם נפרד) ולמטען עם סכנת בעירה ספונטנית; FTS 14$/TEU ל-FlexiTank/FlexiBag; SWB FEE 35$ לסוכן/שולח ב-POL שאינו אשראי; דמי HAZ ב-POL (בלי VIZAK ו-GOA): 500/150/250$ ל-TEU לפי PG 1/3/2; OTS 500$ ל-20׳ Open Top ו-1000$ ל-40׳ Open Top/High; Israel THC למסוכן/ציוד מיוחד 320$/20׳ ו-460$/40׳; SOC FEE 500$ × TEU. ביטול הזמנה: 200$/מכולה. לא מקבלים Granite Blocks. הובלה יבשתית עד מחסן הלקוח הוצעה במייל בנפרד ולא תומחרה במחירון. לא צוין במחירון דוא״ל להזמנה.</p>";
+    }
     if (displayCarrier.id === "yml-nov-2026") {
       return "<p>שתי הצעות YML הוטענו: PQ26YML005163 (חוזה EMW1721467, Trade ID MEDW40753000) ו־PQ26YML005151 (חוזה EMW1721484, Trade ID MEDW02099000). שתיהן בתוקף 16.11.2026–30.11.2026, והוצאו ל־Mayan Logistics (1977) Ltd. הסוכן במחירון: Konmart (ships agent) ltd, as agents for Yang Ming Lines. לא צוין במסמכים דוא״ל להזמנה.</p>" +
         "<p>תנאי תשלום: COLLECT. התעריפים כפופים לתוספות החלות במועד השילוח, בלי הודעה מוקדמת; אינם כוללים שחרור מכס וחיובים מקומיים; כפופים לדמי דמורג׳; וההובלה הימית חלה לפי ETB/ETD המקורי בכפוף להוראות POL/POD. יש לפנות למשרד לאימות התוקף לפחות שבוע לפני פקיעת ההצעה. זמן ההגעה עשוי להשתנות בגלל עומס בטרמינל, מזג אוויר או עיכובים בכלי השיט וברכבת.</p>" +
@@ -817,16 +840,19 @@
     const windowRates = typedRates.filter((r) => r.haz === effectiveHaz);
     const validRates = shipIso ? windowRates.filter((r) => isValidOn(r, shipIso)) : [];
     const validRate = validRates.slice().sort((a, b) => a.frt - b.frt)[0];
+    const quoteRate = validRate || (windowRates.length ? windowRates.slice().sort((a, b) => a.frt - b.frt)[0] : null);
+    const isExpiredRef = !!(quoteRate && shipIso && !validRate && windowRates.every((r) => r.vt < shipIso));
+    const isNotYetValid = !!(quoteRate && shipIso && !validRate && windowRates.every((r) => r.vf > shipIso));
     const altQuotes = validRates.filter((r) => r !== validRate);
-    const otherWindows = windowRates.filter((r) => !isValidOn(r, shipIso || ""));
+    const otherWindows = windowRates.filter((r) => r !== quoteRate && !isValidOn(r, shipIso || ""));
 
     let displayCarrier = carrier;
-    if (isCompare && validRate) {
+    if (isCompare && quoteRate) {
       for (const x of allByCarrier) {
         if (x.rates.some((r) =>
-          r.pol === validRate.pol && r.pod === validRate.pod && r.typ === validRate.typ &&
-          r.frt === validRate.frt && r.vf === validRate.vf && r.vt === validRate.vt &&
-          r.quoteIdx === validRate.quoteIdx && r.haz === validRate.haz
+          r.pol === quoteRate.pol && r.pod === quoteRate.pod && r.typ === quoteRate.typ &&
+          r.frt === quoteRate.frt && r.vf === quoteRate.vf && r.vt === quoteRate.vt &&
+          r.quoteIdx === quoteRate.quoteIdx && r.haz === quoteRate.haz
         )) { displayCarrier = x.c; break; }
       }
     }
@@ -847,26 +873,59 @@
         for (const rate of hits) peerQuotes.push({ c: x.c, rate });
       }
     }
-    const t = validRate ? totalsOf(validRate, qty) : null;
+    const expiredPeerQuotes = [];
+    if (selectedOrigin && effectiveTyp && shipIso) {
+      const key = bareKey(selectedOrigin.name);
+      for (const x of allByCarrier) {
+        if (!isCompare && x.c.id === carrier.id) continue;
+        if (peerQuotes.some((p) => p.c.id === x.c.id)) continue;
+        const hits = x.rates
+          .filter((r) =>
+            bareKey(r.origin ?? r.pol) === key &&
+            r.pod === state.dest &&
+            r.typ === effectiveTyp &&
+            r.haz === effectiveHaz &&
+            !isValidOn(r, shipIso) &&
+            !(quoteRate && r.pol === quoteRate.pol && r.pod === quoteRate.pod && r.typ === quoteRate.typ && r.frt === quoteRate.frt && r.vf === quoteRate.vf && r.vt === quoteRate.vt && r.haz === quoteRate.haz)
+          )
+          .sort((a, b) => a.frt - b.frt);
+        if (hits[0]) expiredPeerQuotes.push({ c: x.c, rate: hits[0] });
+      }
+    }
+    const t = quoteRate ? totalsOf(quoteRate, qty) : null;
     const saleUsd = t ? (t.shipment.USD || 0) + markup * qty : 0;
 
-    const carrierOptions = carriers.map((c) =>
-      '<option value="' + esc(c.id) + '"' + (!isCompare && carrier.id === c.id ? " selected" : "") + ">" + esc(c.nameHe) + "</option>"
-    ).join("") + '<option value="' + COMPARE_ID + '"' + (isCompare ? " selected" : "") + ">השוואה בין חברות</option>";
+    const carrierOptions = carriers.map((c) => {
+      const expiredBadge = shipIso && addDays(c.vt) < shipIso ? " — פג תוקף" : "";
+      return '<option value="' + esc(c.id) + '"' + (!isCompare && carrier.id === c.id ? " selected" : "") + ">" + esc(c.nameHe + expiredBadge) + "</option>";
+    }).join("") + '<option value="' + COMPARE_ID + '"' + (isCompare ? " selected" : "") + ">השוואה בין חברות</option>";
 
     let carrierMeta = "";
     if (isCompare) {
-      carrierMeta = '<p class="hint">מציגים תעריף מכל חברה שיש לה שורה למסלול שנבחר. YML ו־OOCL חופפים במסלולי מזרח אסיה לאשדוד; צים מכסה בעיקר אירופה, אמריקה ואוסטרליה. וריאנטי ניתוב (כמו Qingdao או Xiamen) מוצגים בנפרד.</p>';
+      carrierMeta = '<p class="hint">מציגים תעריף מכל חברה שיש לה שורה למסלול שנבחר. YML ו־OOCL חופפים במסלולי מזרח אסיה לאשדוד; צים מכסה בעיקר אירופה, אמריקה ואוסטרליה; MSC מכסה הודו וסרי לנקה לחיפה ולאשדוד (המחירון שנטען פג ב-31.10.2026 ומוצג לעיון בלבד כשהתאריך מחוץ לחלון). וריאנטי ניתוב (כמו Qingdao או Xiamen) מוצגים בנפרד. אין כרגע חפיפת מוצא בין MSC לבין שלוש החברות האחרות.</p>';
     } else {
-      const headHtml = (carrier.quotes && carrier.quotes.length)
-        ? "הצעות " + carrier.quotes.map((q) => ltrHtml(q.ref)).join(" / ") + " · " + ltrHtml(carrier.party)
-        : "הסכם " + ltrHtml(carrier.ref) + (carrier.version ? " · גרסה " + ltrHtml(carrier.version) : "") + " · " + ltrHtml(carrier.party);
+      let headHtml;
+      if (carrier.quotes && carrier.quotes.length) {
+        headHtml = "הצעות " + carrier.quotes.map((q) => ltrHtml(q.ref)).join(" / ") + " · " + ltrHtml(carrier.party);
+      } else if (!carrier.ref) {
+        headHtml = (carrier.offerTitle ? ltrHtml(carrier.offerTitle) + " · " : "") + ltrHtml(carrier.party) + " · לא צוין מספר הסכם במחירון";
+      } else {
+        headHtml = "הסכם " + ltrHtml(carrier.ref) + (carrier.version ? " · גרסה " + ltrHtml(carrier.version) : "") + " · " + ltrHtml(carrier.party);
+      }
       let line2Html = "תוקף כללי: " + fmtDate(addDays(carrier.vf)) + "–" + fmtDate(addDays(carrier.vt));
+      if (shipIso && addDays(carrier.vt) < shipIso) line2Html += " · המחירון פג תוקף";
+      else if (shipIso && addDays(carrier.vf) > shipIso) line2Html += " · עדיין לא בתוקף לתאריך שנבחר";
       if (bookingLine(carrier)) {
         line2Html += carrier.email ? " · הזמנות: " + ltrHtml(carrier.email) : " · " + ltrHtml(bookingLine(carrier));
       }
       if (carrier.paymentTerms) line2Html += " · תשלום: " + esc(carrier.paymentTerms);
       carrierMeta = '<p class="meta">' + headHtml + '</p><p class="meta">' + line2Html + '</p>';
+      if (shipIso && addDays(carrier.vt) < shipIso) {
+        carrierMeta += '<div class="callout expired"><strong>המחירון פג תוקף</strong>תוקף המחירון: ' +
+          esc(fmtDate(addDays(carrier.vf)) + "–" + fmtDate(addDays(carrier.vt))) +
+          ". תאריך השילוח שנבחר (" + esc(fmtDate(shipIso)) +
+          ") מחוץ לחלון. אפשר עדיין לעיין בתעריפים למטה — הם מסומנים בבירור כעיון בלבד, ולא כהצעת מחיר בתוקף.</div>";
+      }
     }
 
     const typOpts = '<option value="">' + (state.originId ? "בחרו סוג מכולה" : "בחרו קודם נמל מוצא") + "</option>" +
@@ -896,26 +955,39 @@
       quoteHtml = '<div class="callout info"><strong>מוכנים להתחיל</strong>בחרו נמל מוצא, יעד וסוג מכולה. התעריף שייך לשורה התקפה בתאריך השילוח.</div>';
     } else if (!shipIso) {
       quoteHtml = "<p>יש לתקן את תאריך השילוח כדי לשלוף תעריף בתוקף.</p>";
-    } else if (!validRate && windowRates.length > 0) {
-      quoteHtml = '<div class="callout warn"><strong>אין תעריף בתוקף לתאריך שנבחר</strong>למסלול ' +
-        esc((selectedOrigin && selectedOrigin.name) || "") + " → " + esc(destHe(state.dest)) + " (" + esc(TYPE_HE[effectiveTyp] || effectiveTyp) +
-        (effectiveHaz ? ", מטען מסוכן" : "") + ") אין שורה שחלה ב־" + esc(fmtDate(shipIso)) +
-        ". החלונות הקיימים במחירון מוצגים למטה — לא משתמשים בהם כמחיר נוכחי.</div>" + windowsTableHtml(windowRates);
-    } else if (!validRate) {
+    } else if (!quoteRate) {
       quoteHtml = '<div class="callout warn"><strong>אין שורה במחירון</strong>אין תעריף למסלול הזה בסוג המכולה' +
         (effectiveHaz ? " ולמטען מסוכן" : "") + " שנבחרו.</div>";
     } else {
       const pathVal = selectedOrigin.kind === "inland"
         ? selectedOrigin.name + " → " + destHe(state.dest) + " (דרך " + selectedOrigin.pol + ")"
         : selectedOrigin.name + " → " + destHe(state.dest);
-      const recv = validRate.mode + (validRate.mot ? " / " + validRate.mot : "") + (validRate.thru === "EX" ? " · Thru rate (EX)" : "");
+      let expiredBanner = "";
+      if (!validRate && isExpiredRef) {
+        expiredBanner = '<div class="callout expired"><strong>המחירון פג תוקף</strong>תוקף המחירון: ' +
+          esc(fmtDate(quoteRate.vf) + "–" + fmtDate(quoteRate.vt)) +
+          ". למסלול " + esc((selectedOrigin && selectedOrigin.name) || "") + " → " + esc(destHe(state.dest)) +
+          " (" + esc(TYPE_HE[effectiveTyp] || effectiveTyp) + (effectiveHaz ? ", מטען מסוכן" : "") +
+          ") אין תעריף שחל ב־" + esc(fmtDate(shipIso)) +
+          ". המספרים למטה הם לעיון בלבד, ולא הצעת מחיר בתוקף.</div>";
+      } else if (!validRate && isNotYetValid) {
+        expiredBanner = '<div class="callout warn"><strong>המחירון עדיין לא בתוקף לתאריך שנבחר</strong>תוקף המחירון: ' +
+          esc(fmtDate(quoteRate.vf) + "–" + fmtDate(quoteRate.vt)) +
+          ". תאריך השילוח (" + esc(fmtDate(shipIso)) + ") מוקדם מתחילת החלון. מוצג לעיון בלבד, לא כהצעת מחיר בתוקף.</div>";
+      } else if (!validRate) {
+        expiredBanner = '<div class="callout warn"><strong>אין תעריף בתוקף לתאריך שנבחר</strong>למסלול ' +
+          esc((selectedOrigin && selectedOrigin.name) || "") + " → " + esc(destHe(state.dest)) + " (" + esc(TYPE_HE[effectiveTyp] || effectiveTyp) +
+          (effectiveHaz ? ", מטען מסוכן" : "") + ") אין שורה שחלה ב־" + esc(fmtDate(shipIso)) +
+          ". החלונות הקיימים מוצגים למטה לעיון — לא משתמשים בהם כמחיר נוכחי.</div>";
+      }
+      const recv = quoteRate.mode + (quoteRate.mot ? " / " + quoteRate.mot : "") + (quoteRate.thru === "EX" ? " · Thru rate (EX)" : "");
       let props = "<dl class='props'>" +
         "<dt>חברה</dt><dd>" + esc(displayCarrier.nameHe) + "</dd>" +
         "<dt>מסלול</dt><dd>" + esc(pathVal) + "</dd>" +
-        "<dt>סוג</dt><dd>" + esc((TYPE_HE[validRate.typ] || validRate.typ) + (validRate.haz ? " · מטען מסוכן" : "")) + "</dd>" +
+        "<dt>סוג</dt><dd>" + esc((TYPE_HE[quoteRate.typ] || quoteRate.typ) + (quoteRate.haz ? " · מטען מסוכן" : "")) + "</dd>" +
         "<dt>קבלת מטען</dt><dd>" + esc(recv) + "</dd>";
-      if (routingOf(validRate)) props += "<dt>ניתוב</dt><dd>" + esc(routingOf(validRate)) + "</dd>";
-      props += "<dt>מספר הסכם / הצעה לציין בהזמנה</dt><dd>" + esc(quoteLabel(displayCarrier, validRate)) + "</dd>" +
+      if (routingOf(quoteRate)) props += "<dt>ניתוב</dt><dd>" + esc(routingOf(quoteRate)) + "</dd>";
+      props += "<dt>מספר הסכם / הצעה לציין בהזמנה</dt><dd>" + esc(quoteLabel(displayCarrier, quoteRate)) + "</dd>" +
         "<dt>" + (displayCarrier.email ? "דוא״ל הזמנות" : "גורם מטפל") + "</dt><dd>" +
         (bookingLine(displayCarrier) ? ltrHtml(bookingLine(displayCarrier)) : "לא צוין במחירון") + "</dd>";
       if (displayCarrier.paymentTerms) props += "<dt>תנאי תשלום</dt><dd>" + esc(displayCarrier.paymentTerms) + "</dd>";
@@ -924,21 +996,25 @@
       let metrics = '<div class="metrics">';
       for (const c of t.currencies) {
         metrics += '<div class="metric"><div class="val">' + moneyHtml(t.perCtr[c] || 0, c) + '</div><div class="lab">' +
-          esc(t.currencies.length > 1 ? "סה״כ למכולה · " + c : "סה״כ למכולה (All-in)") +
-          '</div><div class="det">הובלה + תוספות למכולה, בלי חיוב לשטר מטען</div></div>';
+          esc(!validRate
+            ? ("סה״כ למכולה לעיון בלבד" + (t.currencies.length > 1 ? " · " + c : "") + " — לא הצעת מחיר בתוקף")
+            : (t.currencies.length > 1 ? "סה״כ למכולה · " + c : "סה״כ למכולה (All-in)")) +
+          '</div><div class="det">' + esc(!validRate ? "חישוב מהמחירון שפג תוקפו, לעיון בלבד" : "הובלה + תוספות למכולה, בלי חיוב לשטר מטען") + "</div></div>";
       }
-      const ttDet = validRate.ett
+      const ttDet = quoteRate.ett
         ? "ETT לפי המחירון (טווח ימים משוער, ללא התחייבות)"
-        : validRate.tt >= 0
+        : quoteRate.tt >= 0
           ? "Est. T/T לפי המחירון, ללא התחייבות ללוח זמנים"
           : "זמן ההפלגה לא צוין במחירון";
-      metrics += '<div class="metric"><div class="val">' + esc(ttLabel(validRate)) + '</div><div class="lab">זמן הפלגה משוער</div><div class="det">' + esc(ttDet) + "</div></div>";
-      metrics += '<div class="metric"><div class="val">' + esc(fmtDate(validRate.vf) + "–" + fmtDate(validRate.vt)) + '</div><div class="lab">תוקף התעריף</div><div class="det">לפי תאריך השילוח שנבחר</div></div>';
+      metrics += '<div class="metric"><div class="val">' + esc(ttLabel(quoteRate)) + '</div><div class="lab">זמן הפלגה משוער</div><div class="det">' + esc(ttDet) + "</div></div>";
+      metrics += '<div class="metric"><div class="val">' + esc(fmtDate(quoteRate.vf) + "–" + fmtDate(quoteRate.vt)) + '</div><div class="lab">' +
+        esc(!validRate ? (isExpiredRef ? "תוקף התעריף (פג)" : "תוקף התעריף (לא חל בתאריך שנבחר)") : "תוקף התעריף") +
+        '</div><div class="det">' + esc(!validRate ? "התאריך שנבחר מחוץ לחלון — לעיון בלבד" : "לפי תאריך השילוח שנבחר") + "</div></div>";
       metrics += "</div>";
 
       let table = '<div class="table-wrap"><table><thead><tr><th>חיוב</th><th>סכום</th><th>בסיס</th><th>תשלום</th><th>סוג מחיר</th></tr></thead><tbody>';
-      table += "<tr><td>הובלה ימית (FRT)</td><td class='num'>" + esc(money(validRate.frt, "USD")) + "</td><td>למכולה</td><td>הובלה</td><td></td></tr>";
-      const scSorted = validRate.sc.slice().sort((a, b) => PAY_ORDER.indexOf(a.pay) - PAY_ORDER.indexOf(b.pay));
+      table += "<tr><td>הובלה ימית (FRT)</td><td class='num'>" + esc(money(quoteRate.frt, "USD")) + "</td><td>למכולה</td><td>הובלה</td><td></td></tr>";
+      const scSorted = quoteRate.sc.slice().sort((a, b) => PAY_ORDER.indexOf(a.pay) - PAY_ORDER.indexOf(b.pay));
       for (const s of scSorted) {
         table += "<tr><td>" + esc(surchargeLabel(s.code)) + "</td><td class='num'>" + esc(money(s.amount, s.currency)) + "</td><td>" +
           esc(s.basis === "BL" || s.basis === "B/L" ? "לשטר מטען (B/L)" : "למכולה") + "</td><td>" +
@@ -946,9 +1022,9 @@
       }
       table += "</tbody></table></div>";
 
-      let inclHtml = validRate.incl.length > 0
+      let inclHtml = quoteRate.incl.length > 0
         ? "<p>כלול במחיר ההובלה (Inclusive, בלי סכום נפרד): " +
-          esc(validRate.incl.map((c) => (SURCHARGE_HE[c] ? c + " — " + SURCHARGE_HE[c] : c)).join(" · ")) + ".</p>"
+          esc(quoteRate.incl.map((c) => (SURCHARGE_HE[c] ? c + " — " + SURCHARGE_HE[c] : c)).join(" · ")) + ".</p>"
         : "<p>בשורה הזו לא צוינו תוספות כלולות (Inclusive Surcharges).</p>";
 
       let how = "";
@@ -969,7 +1045,9 @@
         }
         if (markup > 0) {
           shipBlock += '<div class="metric"><div class="val">' + moneyHtml(markup, "USD") + '</div><div class="lab">רווח למכולה</div><div class="det">סה״כ רווח למשלוח ' + esc(money(markup * qty, "USD")) + "</div></div>";
-          shipBlock += '<div class="metric"><div class="val">' + moneyHtml(saleUsd, "USD") + '</div><div class="lab">מחיר מכירה למשלוח (USD)</div><div class="det">עלות ' + esc(money(t.shipment.USD || 0, "USD")) + " + רווח " + esc(money(markup * qty, "USD")) + "</div></div>";
+          shipBlock += '<div class="metric"><div class="val">' + moneyHtml(saleUsd, "USD") + '</div><div class="lab">' +
+            esc(!validRate ? "חישוב לעיון בלבד (USD) — לא הצעת מחיר בתוקף" : "מחיר מכירה למשלוח (USD)") +
+            '</div><div class="det">עלות ' + esc(money(t.shipment.USD || 0, "USD")) + " + רווח " + esc(money(markup * qty, "USD")) + "</div></div>";
         }
         shipBlock += "</div>";
       }
@@ -977,7 +1055,7 @@
       let nis = "";
       if (displayCarrier.localCharges && t) {
         const lc = displayCarrier.localCharges;
-        const agencyUsd = Math.round(validRate.frt * (lc.agencyPct / 100) * qty * 100) / 100;
+        const agencyUsd = Math.round(quoteRate.frt * (lc.agencyPct / 100) * qty * 100) / 100;
         nis = '<hr class="div"><p>חיובים מקומיים ביעד (₪) — מוצגים בנפרד, לא נכללים בסה״כ הדולרי, ולא הומרו (אין שער במחירון). תשלום הוצאות מקומיות בשקלים בלבד. אם משלמים את ההובלה בשקלים: שער בנק לאומי + 3.5%.</p>' +
           '<div class="table-wrap"><table><thead><tr><th>חיוב מקומי</th><th>סכום</th><th>הערה</th></tr></thead><tbody>' +
           "<tr><td>D/O fee</td><td class='num'>" + lc.doFeeNis + " ₪</td><td>לשטר מטען (פעם אחת למשלוח)</td></tr>" +
@@ -993,8 +1071,8 @@
           "</tbody></table></div>";
       }
 
-      let notes = validRate.notes
-        ? '<div class="callout warn"><strong>הערה מהמחירון — לציין ללקוח</strong>' + esc(validRate.notes) + "</div>"
+      let notes = quoteRate.notes
+        ? '<div class="callout warn"><strong>הערה מהמחירון — לציין ללקוח</strong>' + esc(quoteRate.notes) + "</div>"
         : "";
       let alts = "";
       if (altQuotes.length > 0) {
@@ -1021,8 +1099,21 @@
             "</td><td>" + esc(ttLabel(rate)) + "</td></tr>";
         }
         peers += "</tbody></table></div>";
-      } else if (!isCompare && selectedOrigin && effectiveTyp && shipIso) {
+      } else if (!isCompare && selectedOrigin && effectiveTyp && shipIso && expiredPeerQuotes.length === 0) {
         peers = "<p>" + esc(carriers.filter((c) => c.id !== carrier.id).map((c) => c.nameHe + ": אין תעריף למסלול זה במחירון שנטען").join(". ") + ".") + "</p>";
+      }
+      if (expiredPeerQuotes.length > 0) {
+        peers += '<div class="callout expired"><strong>מחירון שפג תוקפו במסלול זה (לעיון בלבד)</strong>התעריפים האלה אינם בתוקף לתאריך שנבחר, ומוצגים להשוואה היסטורית בלבד — לא כהצעת מחיר נוכחית.</div>';
+        peers += '<div class="table-wrap"><table><thead><tr><th>חברה</th><th>הצעה / הסכם</th><th>ניתוב</th><th>הובלה (FRT)</th><th>סה״כ למכולה</th><th>תוקף</th><th>זמן הפלגה</th></tr></thead><tbody>';
+        for (const { c, rate } of expiredPeerQuotes) {
+          const tot = totalsOf(rate, 1);
+          const allIn = tot.currencies.map((cur) => money(tot.perCtr[cur] || 0, cur)).join(" + ");
+          peers += "<tr><td>" + esc(c.nameHe) + " · פג תוקף</td><td>" + esc(quoteLabel(c, rate)) + "</td><td>" +
+            esc(routingOf(rate) || "—") + "</td><td class='num'>" + esc(money(rate.frt, "USD")) +
+            "</td><td class='num'>" + esc(allIn) + "</td><td>" + esc(fmtDate(rate.vf) + "–" + fmtDate(rate.vt)) +
+            "</td><td>" + esc(ttLabel(rate)) + "</td></tr>";
+        }
+        peers += "</tbody></table></div>";
       }
 
       const payNote = "<p>Prepaid משולם במוצא, Collect משולם ביעד, ו־FRT Terms הולכים אחרי תנאי התשלום של ההובלה. סכום שמסומן ״לפי תעריף״ עשוי להשתנות לפי התעריף התקף במועד השילוח; סכום ״קבוע״ נעול בהסכם.</p>";
@@ -1030,12 +1121,13 @@
         ? '<div class="copy-fallback"><label class="fld">סיכום להעתקה ידנית</label><textarea id="copy-text" readonly>' + esc(state.copyFallback) + "</textarea></div>"
         : "";
 
-      quoteHtml = props + metrics + table + inclHtml + how + shipBlock + nis + notes + alts + peers + payNote + fallback;
+      const inner = props + metrics + table + inclHtml + how + shipBlock + nis + notes + alts + peers + payNote + fallback;
+      quoteHtml = expiredBanner + (!validRate ? '<div class="expired-ref">' + inner + "</div>" : inner);
     }
 
-    const copyBtn = validRate
+    const copyBtn = quoteRate
       ? '<button type="button" class="btn' + (state.copied ? " ok" : "") + '" id="copy-btn">' +
-        (state.copied ? "הסיכום הועתק" : "העתק סיכום") + "</button>"
+        (state.copied ? "הסיכום הועתק" : (validRate ? "העתק סיכום" : "העתק סיכום לעיון (פג תוקף)")) + "</button>"
       : "";
 
     const app = document.getElementById("app");
@@ -1147,9 +1239,9 @@
       hazEl.addEventListener("change", (e) => { state.haz = e.target.checked; state.copied = false; render(); });
     }
     const copyBtnEl = $("copy-btn");
-    if (copyBtnEl && validRate && selectedOrigin && shipIso) {
+    if (copyBtnEl && quoteRate && selectedOrigin && shipIso) {
       copyBtnEl.addEventListener("click", async () => {
-        const text = quoteText(displayCarrier, selectedOrigin, destHe(state.dest), validRate, qty, markup, shipIso);
+        const text = quoteText(displayCarrier, selectedOrigin, destHe(state.dest), quoteRate, qty, markup, shipIso, !validRate);
         try {
           if (navigator.clipboard && navigator.clipboard.writeText) {
             await navigator.clipboard.writeText(text);
