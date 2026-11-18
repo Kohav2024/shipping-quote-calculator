@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="color-scheme" content="light">
   <title>מחשבון הצעת מחיר לשילוח</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2316314d'/%3E%3C/svg%3E">
   <style>
     :root {
       --bg: #f3f0e8;
@@ -512,6 +513,9 @@
   function moneyHtml(n, ccy) {
     return '<span class="ltr">' + esc(money(n, ccy)) + "</span>";
   }
+  function ltrHtml(s) {
+    return '<span class="ltr" dir="ltr">' + esc(s) + "</span>";
+  }
 
   const allByCarrier = carriers.map((c) => ({ c, rates: c.rows.map(unpackRow) }));
   const state = {
@@ -674,13 +678,15 @@
     if (isCompare) {
       carrierMeta = '<p class="hint">מציגים תעריף מכל חברה שיש לה שורה למסלול שנבחר. YML ו־OOCL חופפים במסלולי מזרח אסיה לאשדוד; צים מכסה בעיקר אירופה, אמריקה ואוסטרליה. וריאנטי ניתוב (כמו Qingdao או Xiamen) מוצגים בנפרד.</p>';
     } else {
-      const head = (carrier.quotes && carrier.quotes.length)
-        ? "הצעות " + carrier.quotes.map((q) => q.ref).join(" / ") + " · " + carrier.party
-        : "הסכם " + carrier.ref + (carrier.version ? " · גרסה " + carrier.version : "") + " · " + carrier.party;
-      let line2 = "תוקף כללי: " + fmtDate(addDays(carrier.vf)) + "–" + fmtDate(addDays(carrier.vt));
-      if (bookingLine(carrier)) line2 += carrier.email ? " · הזמנות: " + carrier.email : " · " + bookingLine(carrier);
-      if (carrier.paymentTerms) line2 += " · תשלום: " + carrier.paymentTerms;
-      carrierMeta = '<p class="meta">' + esc(head) + '</p><p class="meta">' + esc(line2) + '</p>';
+      const headHtml = (carrier.quotes && carrier.quotes.length)
+        ? "הצעות " + carrier.quotes.map((q) => ltrHtml(q.ref)).join(" / ") + " · " + ltrHtml(carrier.party)
+        : "הסכם " + ltrHtml(carrier.ref) + (carrier.version ? " · גרסה " + ltrHtml(carrier.version) : "") + " · " + ltrHtml(carrier.party);
+      let line2Html = "תוקף כללי: " + fmtDate(addDays(carrier.vf)) + "–" + fmtDate(addDays(carrier.vt));
+      if (bookingLine(carrier)) {
+        line2Html += carrier.email ? " · הזמנות: " + ltrHtml(carrier.email) : " · " + ltrHtml(bookingLine(carrier));
+      }
+      if (carrier.paymentTerms) line2Html += " · תשלום: " + esc(carrier.paymentTerms);
+      carrierMeta = '<p class="meta">' + headHtml + '</p><p class="meta">' + line2Html + '</p>';
     }
 
     const originLabelText = state.query.trim()
@@ -737,7 +743,8 @@
         "<dt>קבלת מטען</dt><dd>" + esc(recv) + "</dd>";
       if (routingOf(validRate)) props += "<dt>ניתוב</dt><dd>" + esc(routingOf(validRate)) + "</dd>";
       props += "<dt>מספר הסכם / הצעה לציין בהזמנה</dt><dd>" + esc(quoteLabel(displayCarrier, validRate)) + "</dd>" +
-        "<dt>" + (displayCarrier.email ? "דוא״ל הזמנות" : "גורם מטפל") + "</dt><dd>" + esc(bookingLine(displayCarrier) || "לא צוין במחירון") + "</dd>";
+        "<dt>" + (displayCarrier.email ? "דוא״ל הזמנות" : "גורם מטפל") + "</dt><dd>" +
+        (bookingLine(displayCarrier) ? ltrHtml(bookingLine(displayCarrier)) : "לא צוין במחירון") + "</dd>";
       if (displayCarrier.paymentTerms) props += "<dt>תנאי תשלום</dt><dd>" + esc(displayCarrier.paymentTerms) + "</dd>";
       props += "</dl>";
 
