@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="color-scheme" content="light">
+  <title>מחשבון הצעת מחיר לשילוח</title>
+  <style>
+    :root {
+      --bg: #f3f0e8;
+      --paper: #fffdf8;
+      --ink: #1c2430;
+      --muted: #5c6572;
+      --line: #e3ddd2;
+      --navy: #16314d;
+      --navy-2: #1e4a74;
+      --accent: #0d6b54;
+      --accent-soft: #e7f5f0;
+      --warn-bg: #fff6e5;
+      --warn-bd: #f0d9a8;
+      --warn-ink: #7a4200;
+      --info-bg: #eef5fb;
+      --info-bd: #c9dcea;
+      --info-ink: #1b4a6e;
+      --shadow: 0 1px 2px rgba(22, 49, 77, 0.05), 0 10px 28px rgba(22, 49, 77, 0.07);
+      --radius: 14px;
+      --font: "Segoe UI", "Assistant", "Heebo", "Arial Hebrew", Arial, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--ink);
+      line-height: 1.55;
+      min-height: 100vh;
+    }
+    .wrap { max-width: 980px; margin: 0 auto; padding: 20px 16px 48px; }
+    header.hero {
+      background: var(--navy);
+      color: #fff;
+      padding: 28px 16px 24px;
+    }
+    header.hero .wrap { padding-top: 0; padding-bottom: 0; }
+    header.hero h1 {
+      margin: 0 0 8px;
+      font-size: 1.55rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    header.hero p {
+      margin: 0;
+      color: rgba(255,255,255,0.82);
+      font-size: 0.98rem;
+      max-width: 46rem;
+    }
+    .card {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px 18px 20px;
+      margin: 16px 0 0;
+    }
+    .card h2 {
+      margin: 0 0 14px;
+      font-size: 1.15rem;
+      color: var(--navy);
+    }
+    .card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+    .card-head h2 { margin: 0; }
+    .grid { display: grid; gap: 12px; }
+    .grid-2 { grid-template-columns: 1fr 1fr; }
+    .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
+    label.fld, .fld-label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    input[type="text"], input[type="number"], select, textarea {
+      width: 100%;
+      font: inherit;
+      font-size: 16px;
+      color: var(--ink);
+      background: #fff;
+      border: 1px solid #cfc9bd;
+      border-radius: 10px;
+      padding: 10px 12px;
+      outline: none;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--navy-2);
+      box-shadow: 0 0 0 3px rgba(30, 74, 116, 0.15);
+    }
+    input:disabled, select:disabled { background: #f3f1eb; color: #8a8f97; }
+    .hint { font-size: 0.92rem; color: var(--muted); margin: 6px 0 0; }
+    .meta { font-size: 0.92rem; color: var(--ink); margin: 0 0 4px; }
+    .seg {
+      display: flex;
+      background: #efebe3;
+      border-radius: 10px;
+      padding: 3px;
+      gap: 3px;
+    }
+    .seg button {
+      flex: 1;
+      font: inherit;
+      font-weight: 600;
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      padding: 9px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .seg button[aria-pressed="true"] {
+      background: #fff;
+      color: var(--navy);
+      box-shadow: 0 1px 3px rgba(22, 49, 77, 0.12);
+    }
+    .toggle {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      margin-top: 12px;
+      font-size: 0.95rem;
+    }
+    .toggle input { margin-top: 4px; width: 18px; height: 18px; accent-color: var(--navy); }
+    .btn {
+      font: inherit;
+      font-weight: 700;
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 16px;
+      cursor: pointer;
+      background: var(--navy);
+      color: #fff;
+    }
+    .btn:hover { background: var(--navy-2); }
+    .btn.ok { background: var(--accent); }
+    .callout {
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin: 12px 0 0;
+      border: 1px solid;
+    }
+    .callout strong { display: block; margin-bottom: 4px; }
+    .callout.warn { background: var(--warn-bg); border-color: var(--warn-bd); color: var(--warn-ink); }
+    .callout.info { background: var(--info-bg); border-color: var(--info-bd); color: var(--info-ink); }
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 10px;
+      margin: 14px 0;
+    }
+    .metric {
+      background: var(--accent-soft);
+      border-radius: 12px;
+      padding: 12px 14px;
+    }
+    .metric .val { font-size: 1.15rem; font-weight: 700; color: var(--navy); }
+    .metric .lab { font-size: 0.82rem; color: var(--muted); margin-top: 2px; }
+    .metric .det { font-size: 0.78rem; color: var(--muted); margin-top: 4px; }
+    .props { display: grid; gap: 8px 16px; margin: 4px 0 12px; }
+    @media (min-width: 640px) { .props { grid-template-columns: 11rem 1fr; } }
+    .props dt { font-size: 0.82rem; font-weight: 600; color: var(--muted); margin: 0; }
+    .props dd { margin: 0; }
+    .table-wrap { overflow-x: auto; margin: 12px 0; -webkit-overflow-scrolling: touch; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+    th, td { text-align: start; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { font-size: 0.78rem; color: var(--muted); font-weight: 700; }
+    .num { text-align: end; font-variant-numeric: tabular-nums; direction: ltr; unicode-bidi: isolate; }
+    .ltr { direction: ltr; unicode-bidi: isolate; }
+    hr.div { border: 0; border-top: 1px solid var(--line); margin: 16px 0; }
+    details.terms { margin-top: 16px; }
+    details.terms summary {
+      cursor: pointer;
+      font-weight: 700;
+      color: var(--navy);
+      font-size: 1.15rem;
+      list-style: none;
+    }
+    details.terms summary::-webkit-details-marker { display: none; }
+    details.terms .card { margin-top: 10px; }
+    details.terms p { margin: 0 0 12px; }
+    details.terms p:last-child { margin-bottom: 0; }
+    footer.note {
+      margin-top: 22px;
+      font-size: 0.82rem;
+      color: var(--muted);
+      text-align: center;
+    }
+    .copy-fallback { margin-top: 12px; }
+    .copy-fallback textarea { min-height: 160px; }
+    @media (max-width: 720px) {
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      header.hero h1 { font-size: 1.35rem; }
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="wrap">
+      <h1>מחשבון הצעת מחיר לשילוח</h1>
+      <p>בחרו חברת ספנות, נמל מוצא, יעד, סוג מכולה ותאריך שילוח — והמחשבון ישלוף מהמחירון את ההובלה, התוספות, התוקף וזמן ההפלגה. אפשר גם להשוות בין החברות כשיש כיסוי לאותו מסלול. המספרים לקוחים מהמחירונים שצורפו, בלי המרה ובלי תוספות שלא רשומות.</p>
+    </div>
+  </header>
+  <div class="wrap">
+    <div id="app"><p class="hint">טוען את המחירון…</p></div>
+    <footer class="note">כלי פנימי להצעת מחיר ממחירון. התעריפים כפופים לתוקף, למקום פנוי ולתנאי החברה.</footer>
+  </div>
+  <noscript><p class="wrap">יש להפעיל JavaScript כדי להשתמש במחשבון.</p></noscript>
+  <script src="data.js"></script>
+  <script>
+(function () {
+  const DATA = window.QUOTE_DATA;
+  if (!DATA || !DATA.packed) {
+    document.getElementById("app").innerHTML = '<div class="callout warn"><strong>חסר קובץ המחירון</strong>לא נמצא data.js.</div>';
+    return;
+  }
+  const PACKED = DATA.packed;
+  const COUNTRY_HE = DATA.countryHe;
+  const COUNTRY_EN = DATA.countryEn;
+  const TYPE_HE = DATA.typeHe;
+  const SURCHARGE_HE = DATA.surchargeHe;
+  const PAY_HE = DATA.payHe;
+  const KIND_HE = DATA.kindHe;
+  const EPOCH = DATA.epochUtc || [2026, 10, 11];
+  const PAY_ORDER = ["prepaid", "frt_terms", "collect"];
+  const COMPARE_ID = "compare-all";
+  const carriers = PACKED.carriers;
+
+  function addDays(offset) {
+    const t = Date.UTC(EPOCH[0], EPOCH[1], EPOCH[2]) + offset * 86400000;
+    const d = new Date(t);
+    const y = d.getUTCFullYear();
+    const m = String(d.getUTCMonth() + 1).padStart(2, "0");
+    const day = String(d.getUTCDate()).padStart(2, "0");
+    return y + "-" + m + "-" + day;
+  }
+  function fmtDate(iso) {
+    const [y, m, d] = iso.split("-");
+    return d + "." + m + "." + y;
+  }
+  function parseDateInput(s) {
+    const t = String(s || "").trim();
+    let m = t.match(/^(\d{1,2})[.\/-](\d{1,2})[.\/-](\d{4})$/);
+    if (m) return m[3] + "-" + m[2].padStart(2, "0") + "-" + m[1].padStart(2, "0");
+    m = t.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (m) return t;
+    return null;
+  }
+  function todayText() {
+    const parts = new Intl.DateTimeFormat("en-GB", {
+      timeZone: "Asia/Jerusalem",
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    }).formatToParts(new Date());
+    const get = (t) => parts.find((p) => p.type === t).value;
+    return get("day") + "." + get("month") + "." + get("year");
+  }
+  function isoCountry(name) {
+    const m = name.match(/, ([A-Z]{2})$/);
+    return m ? m[1] : "";
+  }
+  function portBare(name) {
+    return name.replace(/, [A-Z]{2}$/, "").trim();
+  }
+  function money(n, ccy) {
+    const digits = Number.isInteger(n) ? 0 : 2;
+    const body = new Intl.NumberFormat("en-US", {
+      minimumFractionDigits: digits,
+      maximumFractionDigits: 2,
+    }).format(n);
+    return body + " " + ccy;
+  }
+  function surchargeLabel(code) {
+    if (code === "THC-IL") return "THC (ישראל) — טיפול טרמינל ביעד";
+    const he = SURCHARGE_HE[code];
+    return he ? code + " — " + he : code;
+  }
+  function unpackRow(row) {
+    const [o, pol, pod, typ, h, mode, mot, th, f, vf, vt, tt, n, i, sc, q, ettI] = row;
+    const inclStr = PACKED.incl[i] || "";
+    return {
+      origin: o < 0 ? null : PACKED.ports[o],
+      pol: PACKED.ports[pol],
+      pod: PACKED.ports[pod],
+      typ: PACKED.types[typ],
+      haz: h === 1,
+      mode: PACKED.modes[mode],
+      mot: mot < 0 ? null : PACKED.modes[mot],
+      thru: th ? th : null,
+      frt: f,
+      vf: addDays(vf),
+      vt: addDays(vt),
+      tt,
+      notes: n < 0 ? null : PACKED.notes[n],
+      incl: inclStr ? inclStr.split("/").filter(Boolean) : [],
+      sc: sc.map(([c, a, y, b, pk]) => ({
+        code: PACKED.codes[c],
+        amount: a,
+        currency: PACKED.curs[y],
+        basis: PACKED.bases[b],
+        pay: ["prepaid", "prepaid", "frt_terms", "frt_terms", "collect", "collect"][pk],
+        kind: pk % 2 === 0 ? "tariff" : "fixed",
+      })),
+      quoteIdx: q === undefined ? -2 : q,
+      ett: ettI !== undefined && ettI >= 0 && PACKED.ett ? PACKED.ett[ettI] || null : null,
+    };
+  }
+  function ttLabel(rateOrTt) {
+    if (typeof rateOrTt === "object") {
+      if (rateOrTt.ett) return rateOrTt.ett + " ימים";
+      if (rateOrTt.tt >= 0) return rateOrTt.tt + " ימים";
+      return "לא צוין במחירון";
+    }
+    return rateOrTt >= 0 ? rateOrTt + " ימים" : "לא צוין במחירון";
+  }
+  function normalizeOrigin(name) {
+    let s = portBare(name).toUpperCase().replace(/\s+/g, " ").trim();
+    s = s.replace(/\s*\([^)]*\)/g, "").replace(/\s+/g, " ").trim();
+    const aliases = {
+      "LELIU, SHUNDE, GUANGDONG": "LELIU SHUNDE",
+      "LELIU, SHUNDE": "LELIU SHUNDE",
+      "NANSHA NEW PORT": "NANSHA",
+      "XIALOAN": "XIAOLAN",
+      "HAI PHONG": "HAIPHONG",
+      "CAT LAI": "HO CHI MINH",
+      "VIETNAM HCP": "HO CHI MINH",
+      "MANILA NORTH HARBOUR": "MANILA",
+      "MANILA SOUTH HARBOUR": "MANILA",
+    };
+    if (aliases[s]) return aliases[s];
+    if (s.includes(",")) return s.split(",")[0].trim();
+    return s;
+  }
+  function bareKey(name) { return normalizeOrigin(name); }
+  function quoteLabel(carrier, rate) {
+    const qs = carrier.quotes;
+    if (qs && qs.length) {
+      if (rate.quoteIdx === -1) {
+        return qs.map((q) => q.ref + " (חוזה " + q.contract + ")").join(" וגם ");
+      }
+      if (rate.quoteIdx >= 0 && qs[rate.quoteIdx]) {
+        const q = qs[rate.quoteIdx];
+        return q.ref + " · חוזה " + q.contract + " · Trade " + q.tradeId;
+      }
+    }
+    return carrier.version ? "הסכם " + carrier.ref + " (גרסה " + carrier.version + ")" : carrier.ref;
+  }
+  function bookingLine(carrier) {
+    if (carrier.email) return carrier.email;
+    if (carrier.agent) return carrier.agent;
+    return "";
+  }
+  function routingOf(rate) {
+    if (rate.thru && rate.thru !== "EX") return rate.thru;
+    return null;
+  }
+  function originIdOf(rate) {
+    if (rate.origin) return "inland::" + rate.origin;
+    const route = routingOf(rate);
+    return route ? "port::" + rate.pol + "::" + route : "port::" + rate.pol;
+  }
+  function lookupUnlo(name) {
+    const hit = PACKED.unlo[portBare(name)];
+    if (!hit) return null;
+    return { code: hit[0], countryEn: hit[1] };
+  }
+  function buildOrigins(rates) {
+    const map = new Map();
+    for (const r of rates) {
+      const id = originIdOf(r);
+      if (map.has(id)) continue;
+      const name = r.origin ?? r.pol;
+      const iso = isoCountry(name);
+      const u = lookupUnlo(name);
+      map.set(id, {
+        id,
+        name,
+        pol: r.pol,
+        countryHe: COUNTRY_HE[iso] || iso,
+        countryEn: COUNTRY_EN[iso] || (u && u.countryEn) || "",
+        iso,
+        unlocode: (u && u.code) || "",
+        kind: r.origin ? "inland" : "port",
+        mode: r.mode,
+        mot: r.mot,
+        routing: routingOf(r),
+      });
+    }
+    return Array.from(map.values()).sort((a, b) => {
+      const c = a.countryHe.localeCompare(b.countryHe, "he");
+      if (c !== 0) return c;
+      return a.name.localeCompare(b.name, "en");
+    });
+  }
+  function originLabel(o) {
+    const loc = o.unlocode ? " · " + o.unlocode : "";
+    const route = o.routing ? " · " + o.routing : "";
+    if (o.kind === "inland") {
+      const how = [o.mode, o.mot].filter(Boolean).join(" / ");
+      return o.name + " — " + o.countryHe + " · " + how + " דרך " + o.pol + loc + route;
+    }
+    return o.name + " — " + o.countryHe + loc + route;
+  }
+  function matchesQuery(o, q) {
+    if (!q) return true;
+    const n = q.trim().toLowerCase();
+    const hay = [o.name, o.pol, o.countryHe, o.countryEn, o.iso, o.unlocode, o.mode, o.mot || "", o.routing || ""]
+      .join(" ")
+      .toLowerCase();
+    return n.split(/\s+/).every((part) => hay.includes(part));
+  }
+  function isValidOn(rate, iso) { return iso >= rate.vf && iso <= rate.vt; }
+  function totalsOf(rate, qty) {
+    const perCtr = { USD: rate.frt };
+    const perBl = {};
+    for (const s of rate.sc) {
+      const bag = s.basis === "BL" || s.basis === "B/L" ? perBl : perCtr;
+      bag[s.currency] = (bag[s.currency] || 0) + s.amount;
+    }
+    const order = ["USD", "EUR", "BRL"];
+    const currencies = Array.from(new Set([...Object.keys(perCtr), ...Object.keys(perBl)])).sort(
+      (a, b) => (order.indexOf(a) === -1 ? 99 : order.indexOf(a)) - (order.indexOf(b) === -1 ? 99 : order.indexOf(b)),
+    );
+    const shipment = {};
+    for (const c of currencies) shipment[c] = (perCtr[c] || 0) * qty + (perBl[c] || 0);
+    return { perCtr, perBl, currencies, shipment };
+  }
+  function destHe(pod) {
+    if (pod.startsWith("ASHDOD")) return "אשדוד";
+    if (pod.startsWith("HAIFA")) return "חיפה";
+    return pod;
+  }
+  function quoteText(carrier, origin, destName, rate, qty, markup, shipDate) {
+    const t = totalsOf(rate, qty);
+    const lines = [];
+    lines.push(carrier.nameHe);
+    lines.push(quoteLabel(carrier, rate) + " · " + carrier.party);
+    if (origin.kind === "inland") {
+      lines.push("מוצא: " + origin.name + " (" + origin.mode + (origin.mot ? " / " + origin.mot : "") + ") דרך " + origin.pol);
+    } else {
+      lines.push("מוצא: " + origin.name);
+    }
+    lines.push("יעד: " + destName);
+    lines.push("סוג מכולה: " + (TYPE_HE[rate.typ] || rate.typ) + " · " + (rate.haz ? "מטען מסוכן (HAZ)" : "לא מסוכן"));
+    lines.push("תאריך שילוח: " + fmtDate(shipDate) + " · תוקף התעריף: " + fmtDate(rate.vf) + "–" + fmtDate(rate.vt));
+    if (routingOf(rate)) lines.push("ניתוב: " + routingOf(rate));
+    lines.push("זמן הפלגה משוער: " + ttLabel(rate));
+    lines.push("");
+    lines.push("הובלה ימית (FRT): " + money(rate.frt, "USD") + " למכולה");
+    for (const s of rate.sc) {
+      const basis = s.basis === "BL" || s.basis === "B/L" ? "לשטר מטען" : "למכולה";
+      lines.push(surchargeLabel(s.code) + ": " + money(s.amount, s.currency) + " " + basis + " · " + PAY_HE[s.pay] + " · " + KIND_HE[s.kind]);
+    }
+    if (rate.incl.length) lines.push("כלול במחיר ההובלה: " + rate.incl.join(", "));
+    lines.push("");
+    for (const c of t.currencies) {
+      lines.push("סה״כ למכולה (" + c + "): " + money(t.perCtr[c] || 0, c));
+      if (t.perBl[c]) lines.push("חיוב לשטר מטען (" + c + "): " + money(t.perBl[c], c) + " (פעם אחת למשלוח)");
+    }
+    lines.push("מספר מכולות: " + qty);
+    for (const c of t.currencies) lines.push("סה״כ למשלוח (" + c + "): " + money(t.shipment[c], c));
+    if (markup > 0) {
+      lines.push("רווח: " + money(markup, "USD") + " למכולה · " + money(markup * qty, "USD") + " למשלוח");
+      lines.push("מחיר מכירה (USD): " + money((t.shipment.USD || 0) + markup * qty, "USD"));
+    }
+    if (rate.notes) {
+      lines.push("");
+      lines.push("הערות מהמחירון: " + rate.notes.replace(/\n/g, " | "));
+    }
+    lines.push("");
+    const book = bookingLine(carrier);
+    lines.push("להזמנה ציינו את " + quoteLabel(carrier, rate) + (book ? " ופנו אל " + book : ""));
+    if (carrier.paymentTerms) lines.push("תנאי תשלום לפי המחירון: " + carrier.paymentTerms);
+    const lc = carrier.localCharges;
+    if (lc) {
+      const agencyUsd = Math.round(rate.frt * (lc.agencyPct / 100) * qty * 100) / 100;
+      lines.push("");
+      lines.push("חיובים מקומיים ביעד (₪) — לא הומרו ולא נכללים בסה״כ הדולרי:");
+      lines.push("D/O fee: " + lc.doFeeNis + " ₪ לשטר מטען");
+      lines.push("Container Handling: " + lc.handlingNis + " ₪ למכולה · " + (lc.handlingNis * qty) + " ₪ למשלוח");
+      lines.push("דמי סוכנות: " + lc.agencyPct + "% מההובלה (FRT " + money(rate.frt, "USD") + ") = " + money(agencyUsd, "USD") + " למשלוח. המינימום 90 ₪ — לא הומר לשקלים (אין שער במחירון; תשלום הוצאות מקומיות בשקלים, ואם משלמים הובלה בשקלים: שער לאומי + 3.5%). יש להמיר ואז להחיל את רצפת 90 ₪.");
+      lines.push("העברה בנקאית ללקוח שאינו באשראי (רק בתשלום במטבע חוץ / מזומן): " + lc.bankTransferNis + " ₪ לשטר מטען");
+      lines.push("סכומי ₪ הידועים (בלי דמי הסוכנות): " + (lc.doFeeNis + lc.handlingNis * qty + lc.bankTransferNis) + " ₪");
+    }
+    return lines.join("\n");
+  }
+  function esc(s) {
+    return String(s == null ? "" : s)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+  function moneyHtml(n, ccy) {
+    return '<span class="ltr">' + esc(money(n, ccy)) + "</span>";
+  }
+
+  const allByCarrier = carriers.map((c) => ({ c, rates: c.rows.map(unpackRow) }));
+  const state = {
+    carrierId: carriers[0].id,
+    query: "",
+    originId: "",
+    dest: "ASHDOD, IL",
+    typ: "",
+    dateText: todayText(),
+    qtyText: "1",
+    markupText: "",
+    haz: false,
+    copied: false,
+    copyFallback: "",
+  };
+
+  function rematchOrigin(nextId, prevOriginId, prevOrigins) {
+    const prev = prevOrigins.find((o) => o.id === prevOriginId);
+    if (!prev) return "";
+    const key = bareKey(prev.name);
+    const nextIsCompare = nextId === COMPARE_ID;
+    const nextCarrier = carriers.find((c) => c.id === nextId);
+    const nextRates = nextIsCompare
+      ? allByCarrier.flatMap((x) => x.rates)
+      : nextCarrier
+        ? nextCarrier.rows.map(unpackRow)
+        : [];
+    const nextOrigins = nextIsCompare
+      ? buildOrigins(nextRates).map((o) => Object.assign({}, o, { id: "cmp::" + bareKey(o.name) }))
+      : buildOrigins(nextRates);
+    const match = nextOrigins.find((o) => bareKey(o.name) === key);
+    return match ? match.id : "";
+  }
+
+  function windowsTableHtml(rates) {
+    const sorted = rates.slice().sort((a, b) => a.vf.localeCompare(b.vf) || a.frt - b.frt);
+    const showRoute = sorted.some((r) => routingOf(r));
+    const head = showRoute
+      ? "<tr><th>תוקף</th><th>ניתוב</th><th>הובלה (FRT)</th><th>סה״כ למכולה</th><th>זמן הפלגה</th></tr>"
+      : "<tr><th>תוקף</th><th>הובלה (FRT)</th><th>סה״כ למכולה</th><th>זמן הפלגה</th></tr>";
+    const body = sorted.map((r) => {
+      const t = totalsOf(r, 1);
+      const allIn = t.currencies.map((c) => money(t.perCtr[c] || 0, c)).join(" + ");
+      const route = showRoute ? "<td>" + esc(routingOf(r) || "") + "</td>" : "";
+      return "<tr><td>" + esc(fmtDate(r.vf) + "–" + fmtDate(r.vt)) + "</td>" + route +
+        "<td class='num'>" + esc(money(r.frt, "USD")) + "</td>" +
+        "<td class='num'>" + esc(allIn) + "</td>" +
+        "<td>" + esc(ttLabel(r)) + "</td></tr>";
+    }).join("");
+    return '<div class="table-wrap"><table>' + head + body + "</table></div>";
+  }
+
+  function termsHtml(displayCarrier) {
+    if (displayCarrier.id === "oocl-nov-2026") {
+      return "<p>מספר חוזה / Filing לציין בהזמנה: 00007640 (יבש שאינו IMCO, וגם מטען מסוכן / ריפר / ציוד מיוחד — אותו מספר). תיקון מספר חוזה שגוי עולה 100$. ההובלה מתומחרת לפי תאריך הטעינה בשטר המטען (BL loading date) בלי חריגים. מטען כללי / non-IMCO, Freight Collect. תוקף 15.11.2026–30.11.2026. ההצעה תקפה לתשלום במזומן ולמטען בשווי נמוך מ-500,000$ למכולה, וכפופה למקום פנוי.</p>" +
+        "<p>הסוכן: Israel Scandinavian Maritime Agency Ltd (סוכן בלבד ל-OOCL). פניות: isma-sales@israscan.co.il, www.Israscan.co.il, טל׳ (972) 4-8680777. חיפה: 2 Khayat Sq., POB 33557. אשדוד: Haorgim 35, room 602, P.O.B 4060. תנאי התעריף וה-B/L ב-www.OOCL.com. התעריפים כפופים לשינוי (V.A.T.O.S). אינם כוללים ביטוח, שחרור מכס, אגרות ומיסים. המוביל רשאי לנתב דרך סואץ או כף התקווה הטובה (COGH) בלי הודעה. זמני ההפלגה משוערים.</p>" +
+        "<p>לפי האקסל: התעריף מבוסס על הניתוב שצוין (Rates from NON BASE PORTS); ניתוב אחר עלול לשנות את המחיר. B/L שימוזגו עם B/L אחר יהיו כפופים ל-roll over. לפי הטקסט הנלווה (לא בתאי האקסל): Foshan, Jiangmen ו-Huangpu דרך טרמינלים מסוימים בלבד — לפנות לסוכן; וכן אם נדרש תעריף מ-POL אחר.</p>";
+    }
+    if (displayCarrier.id === "yml-nov-2026") {
+      return "<p>שתי הצעות YML הוטענו: PQ26YML005163 (חוזה EMW1721467, Trade ID MEDW40753000) ו־PQ26YML005151 (חוזה EMW1721484, Trade ID MEDW02099000). שתיהן בתוקף 16.11.2026–30.11.2026, והוצאו ל־Mayan Logistics (1977) Ltd. הסוכן במחירון: Konmart (ships agent) ltd, as agents for Yang Ming Lines. לא צוין במסמכים דוא״ל להזמנה.</p>" +
+        "<p>תנאי תשלום: COLLECT. התעריפים כפופים לתוספות החלות במועד השילוח, בלי הודעה מוקדמת; אינם כוללים שחרור מכס וחיובים מקומיים; כפופים לדמי דמורג׳; וההובלה הימית חלה לפי ETB/ETD המקורי בכפוף להוראות POL/POD. יש לפנות למשרד לאימות התוקף לפחות שבוע לפני פקיעת ההצעה. זמן ההגעה עשוי להשתנות בגלל עומס בטרמינל, מזג אוויר או עיכובים בכלי השיט וברכבת.</p>" +
+        "<p>תוספת TA (Transport Additional Charge) ליעד חיפה (ILHFA): 100$ ל-20DC, 200$ ל-40DC ו־40HQ — לא כלולה בהצעת אשדוד, ואין במחירון תעריף הובלה ימית לחיפה. תוספת משקל יתר OW: Over 18Ton/26Ton gross weight: 350$/700$ — לא נוספה לסה״כ. EU (ETS) מופיע עם ההערה FROM CHINA PORTS EU INCLUDED: ממוצא סין מטופל ככלול בהובלה; ממוצא אחר לא נוסף, כי לא ברור אם חל.</p>";
+    }
+    let html = "<p>בעת הזמנה יש למסור את מספר ההסכם " + esc(displayCarrier.ref) + ". פניות להזמנה: " + esc(displayCarrier.email || "") + "." +
+      (displayCarrier.scheduleUrl ? ' לוח הפלגות: <span class="ltr">' + esc(displayCarrier.scheduleUrl) + "</span>." : "") + "</p>";
+    html += "<p>התעריפים כפופים לתוספות התקפות במועד השילוח, ועשויים להשתנות עד לקבלת הזמנה סופית. החברה שומרת לעצמה את הזכות להוסיף תוספות כגון Peak Season ו־War Risk Premium.</p>";
+    html += "<p>ההצעה כפופה לזמינות מקום וציוד, לתיאור המטען ולנפח שנמסר, ולתנאי שטר המטען והתעריפים הרשמיים. אם לא צוין אחרת, השילוח הוא ב־liner terms. דמי סוכן בנמל הטעינה או הפריקה אינם כלולים. אגרות מקומיות של רשויות המכס יש לשלם בנפרד.</p>";
+    if (displayCarrier.termsZim || displayCarrier.termsGsl) {
+      html += "<p>";
+      if (displayCarrier.termsZim) html += 'תנאי הצעת המחיר של צים: <span class="ltr">' + esc(displayCarrier.termsZim) + "</span>. ";
+      if (displayCarrier.termsGsl) html += 'תנאי Gold Star Line: <span class="ltr">' + esc(displayCarrier.termsGsl) + "</span>.";
+      html += "</p>";
+    }
+    return html;
+  }
+
+  function render() {
+    const isCompare = state.carrierId === COMPARE_ID;
+    const carrier = carriers.find((c) => c.id === state.carrierId) ?? carriers[0];
+    const rates = isCompare ? allByCarrier.flatMap((x) => x.rates) : carrier.rows.map(unpackRow);
+    let origins;
+    if (!isCompare) origins = buildOrigins(rates);
+    else {
+      const map = new Map();
+      for (const o of buildOrigins(rates)) {
+        const id = "cmp::" + bareKey(o.name);
+        if (!map.has(id)) map.set(id, Object.assign({}, o, { id }));
+      }
+      origins = Array.from(map.values()).sort((a, b) => {
+        const c = a.countryHe.localeCompare(b.countryHe, "he");
+        return c !== 0 ? c : a.name.localeCompare(b.name, "en");
+      });
+    }
+    const filteredOrigins = origins.filter((o) => matchesQuery(o, state.query));
+    const selectedOrigin = origins.find((o) => o.id === state.originId) || null;
+    const originOptionsList = filteredOrigins.slice();
+    if (selectedOrigin && !originOptionsList.some((o) => o.id === selectedOrigin.id)) {
+      originOptionsList.unshift(selectedOrigin);
+    }
+    const shipIso = parseDateInput(state.dateText);
+    const qty = Math.max(1, Math.floor(Number(state.qtyText) || 1));
+    const markup = Math.max(0, Number(state.markupText) || 0);
+
+    let laneRates = [];
+    if (state.originId) {
+      if (isCompare) {
+        const key = state.originId.startsWith("cmp::") ? state.originId.slice(5) : bareKey(state.originId);
+        laneRates = rates.filter((r) => bareKey(r.origin ?? r.pol) === key && r.pod === state.dest);
+      } else {
+        laneRates = rates.filter((r) => originIdOf(r) === state.originId && r.pod === state.dest);
+      }
+    }
+    const typesInLane = PACKED.types.filter((t) => laneRates.some((r) => r.typ === t));
+    const effectiveTyp = state.typ && typesInLane.includes(state.typ) ? state.typ : "";
+    const typedRates = laneRates.filter((r) => r.typ === effectiveTyp);
+    const hasHaz = typedRates.some((r) => r.haz);
+    const hasNonHaz = typedRates.some((r) => !r.haz);
+    const effectiveHaz = hasHaz && (state.haz || !hasNonHaz);
+    const windowRates = typedRates.filter((r) => r.haz === effectiveHaz);
+    const validRates = shipIso ? windowRates.filter((r) => isValidOn(r, shipIso)) : [];
+    const validRate = validRates.slice().sort((a, b) => a.frt - b.frt)[0];
+    const altQuotes = validRates.filter((r) => r !== validRate);
+    const otherWindows = windowRates.filter((r) => !isValidOn(r, shipIso || ""));
+
+    let displayCarrier = carrier;
+    if (isCompare && validRate) {
+      for (const x of allByCarrier) {
+        if (x.rates.some((r) =>
+          r.pol === validRate.pol && r.pod === validRate.pod && r.typ === validRate.typ &&
+          r.frt === validRate.frt && r.vf === validRate.vf && r.vt === validRate.vt &&
+          r.quoteIdx === validRate.quoteIdx && r.haz === validRate.haz
+        )) { displayCarrier = x.c; break; }
+      }
+    }
+    const peerQuotes = [];
+    if (selectedOrigin && effectiveTyp && shipIso) {
+      const key = bareKey(selectedOrigin.name);
+      for (const x of allByCarrier) {
+        if (!isCompare && x.c.id === carrier.id) continue;
+        const hits = x.rates
+          .filter((r) =>
+            bareKey(r.origin ?? r.pol) === key &&
+            r.pod === state.dest &&
+            r.typ === effectiveTyp &&
+            r.haz === effectiveHaz &&
+            isValidOn(r, shipIso),
+          )
+          .sort((a, b) => a.frt - b.frt);
+        for (const rate of hits) peerQuotes.push({ c: x.c, rate });
+      }
+    }
+    const t = validRate ? totalsOf(validRate, qty) : null;
+    const saleUsd = t ? (t.shipment.USD || 0) + markup * qty : 0;
+
+    const carrierOptions = carriers.map((c) =>
+      '<option value="' + esc(c.id) + '"' + (!isCompare && carrier.id === c.id ? " selected" : "") + ">" + esc(c.nameHe) + "</option>"
+    ).join("") + '<option value="' + COMPARE_ID + '"' + (isCompare ? " selected" : "") + ">השוואה בין חברות</option>";
+
+    let carrierMeta = "";
+    if (isCompare) {
+      carrierMeta = '<p class="hint">מציגים תעריף מכל חברה שיש לה שורה למסלול שנבחר. YML ו־OOCL חופפים במסלולי מזרח אסיה לאשדוד; צים מכסה בעיקר אירופה, אמריקה ואוסטרליה. וריאנטי ניתוב (כמו Qingdao או Xiamen) מוצגים בנפרד.</p>';
+    } else {
+      const head = (carrier.quotes && carrier.quotes.length)
+        ? "הצעות " + carrier.quotes.map((q) => q.ref).join(" / ") + " · " + carrier.party
+        : "הסכם " + carrier.ref + (carrier.version ? " · גרסה " + carrier.version : "") + " · " + carrier.party;
+      let line2 = "תוקף כללי: " + fmtDate(addDays(carrier.vf)) + "–" + fmtDate(addDays(carrier.vt));
+      if (bookingLine(carrier)) line2 += carrier.email ? " · הזמנות: " + carrier.email : " · " + bookingLine(carrier);
+      if (carrier.paymentTerms) line2 += " · תשלום: " + carrier.paymentTerms;
+      carrierMeta = '<p class="meta">' + esc(head) + "</p><p class="meta">' + esc(line2) + "</p>";
+    }
+
+    const originLabelText = state.query.trim()
+      ? "נמל מוצא (" + filteredOrigins.length + " תוצאות)"
+      : "נמל מוצא (" + origins.length + " במחירון)";
+    const originOpts = '<option value="">בחרו נמל מוצא</option>' + originOptionsList.map((o) =>
+      '<option value="' + esc(o.id) + '"' + (o.id === state.originId ? " selected" : "") + ">" + esc(originLabel(o)) + "</option>"
+    ).join("");
+
+    const typOpts = '<option value="">' + (state.originId ? "בחרו סוג מכולה" : "בחרו קודם נמל מוצא") + "</option>" +
+      typesInLane.map((typ) =>
+        '<option value="' + esc(typ) + '"' + (typ === effectiveTyp ? " selected" : "") + ">" + esc(TYPE_HE[typ] || typ) + "</option>"
+      ).join("");
+
+    let formExtra = "";
+    if (effectiveTyp && hasHaz) {
+      const lab = hasNonHaz
+        ? "מטען מסוכן (HAZ) — רק אם יש שורה במחירון"
+        : "למסלול זה קיימת במחירון רק שורת מטען מסוכן";
+      formExtra += '<label class="toggle"><input type="checkbox" id="haz" ' + (effectiveHaz ? "checked " : "") + (!hasNonHaz ? "disabled " : "") + "> <span>" + esc(lab) + "</span></label>";
+    }
+    if (state.originId && typesInLane.length === 0) {
+      const msg = (carrier.id === "yml-nov-2026" && state.dest.startsWith("HAIFA"))
+        ? "במחירון YML שנטען כל שורות ההובלה הימית הן לאשדוד בלבד. יש תוספת TA (Transport Additional Charge) ליעד חיפה (ILHFA): 100$ ל-20DC, 200$ ל-40DC ו־40HQ — בלי תעריף הובלה ימית נפרד לחיפה. לא הומצא מחיר הובלה לחיפה."
+        : "לנמל המוצא שנבחר אין שורות אל " + destHe(state.dest) + " במחירון הזה.";
+      formExtra += '<div class="callout warn"><strong>אין תעריף ליעד הזה</strong>' + esc(msg) + "</div>";
+    }
+    if (!shipIso) {
+      formExtra += '<div class="callout warn"><strong>תאריך לא מזוהה</strong>כתבו את תאריך השילוח בפורמט 18.11.2026 (יום.חודש.שנה).</div>';
+    }
+
+    let quoteHtml = "";
+    if (!state.originId || !effectiveTyp) {
+      quoteHtml = '<div class="callout info"><strong>מוכנים להתחיל</strong>בחרו נמל מוצא, יעד וסוג מכולה. התעריף שייך לשורה התקפה בתאריך השילוח.</div>';
+    } else if (!shipIso) {
+      quoteHtml = "<p>יש לתקן את תאריך השילוח כדי לשלוף תעריף בתוקף.</p>";
+    } else if (!validRate && windowRates.length > 0) {
+      quoteHtml = '<div class="callout warn"><strong>אין תעריף בתוקף לתאריך שנבחר</strong>למסלול ' +
+        esc((selectedOrigin && selectedOrigin.name) || "") + " → " + esc(destHe(state.dest)) + " (" + esc(TYPE_HE[effectiveTyp] || effectiveTyp) +
+        (effectiveHaz ? ", מטען מסוכן" : "") + ") אין שורה שחלה ב־" + esc(fmtDate(shipIso)) +
+        ". החלונות הקיימים במחירון מוצגים למטה — לא משתמשים בהם כמחיר נוכחי.</div>" + windowsTableHtml(windowRates);
+    } else if (!validRate) {
+      quoteHtml = '<div class="callout warn"><strong>אין שורה במחירון</strong>אין תעריף למסלול הזה בסוג המכולה' +
+        (effectiveHaz ? " ולמטען מסוכן" : "") + " שנבחרו.</div>";
+    } else {
+      const pathVal = selectedOrigin.kind === "inland"
+        ? selectedOrigin.name + " → " + destHe(state.dest) + " (דרך " + selectedOrigin.pol + ")"
+        : selectedOrigin.name + " → " + destHe(state.dest);
+      const recv = validRate.mode + (validRate.mot ? " / " + validRate.mot : "") + (validRate.thru === "EX" ? " · Thru rate (EX)" : "");
+      let props = "<dl class='props'>" +
+        "<dt>חברה</dt><dd>" + esc(displayCarrier.nameHe) + "</dd>" +
+        "<dt>מסלול</dt><dd>" + esc(pathVal) + "</dd>" +
+        "<dt>סוג</dt><dd>" + esc((TYPE_HE[validRate.typ] || validRate.typ) + (validRate.haz ? " · מטען מסוכן" : "")) + "</dd>" +
+        "<dt>קבלת מטען</dt><dd>" + esc(recv) + "</dd>";
+      if (routingOf(validRate)) props += "<dt>ניתוב</dt><dd>" + esc(routingOf(validRate)) + "</dd>";
+      props += "<dt>מספר הסכם / הצעה לציין בהזמנה</dt><dd>" + esc(quoteLabel(displayCarrier, validRate)) + "</dd>" +
+        "<dt>" + (displayCarrier.email ? "דוא״ל הזמנות" : "גורם מטפל") + "</dt><dd>" + esc(bookingLine(displayCarrier) || "לא צוין במחירון") + "</dd>";
+      if (displayCarrier.paymentTerms) props += "<dt>תנאי תשלום</dt><dd>" + esc(displayCarrier.paymentTerms) + "</dd>";
+      props += "</dl>";
+
+      let metrics = '<div class="metrics">';
+      for (const c of t.currencies) {
+        metrics += '<div class="metric"><div class="val">' + moneyHtml(t.perCtr[c] || 0, c) + '</div><div class="lab">' +
+          esc(t.currencies.length > 1 ? "סה״כ למכולה · " + c : "סה״כ למכולה (All-in)") +
+          '</div><div class="det">הובלה + תוספות למכולה, בלי חיוב לשטר מטען</div></div>';
+      }
+      const ttDet = validRate.ett
+        ? "ETT לפי המחירון (טווח ימים משוער, ללא התחייבות)"
+        : validRate.tt >= 0
+          ? "Est. T/T לפי המחירון, ללא התחייבות ללוח זמנים"
+          : "זמן ההפלגה לא צוין במחירון";
+      metrics += '<div class="metric"><div class="val">' + esc(ttLabel(validRate)) + '</div><div class="lab">זמן הפלגה משוער</div><div class="det">' + esc(ttDet) + "</div></div>";
+      metrics += '<div class="metric"><div class="val">' + esc(fmtDate(validRate.vf) + "–" + fmtDate(validRate.vt)) + '</div><div class="lab">תוקף התעריף</div><div class="det">לפי תאריך השילוח שנבחר</div></div>';
+      metrics += "</div>";
+
+      let table = '<div class="table-wrap"><table><thead><tr><th>חיוב</th><th>סכום</th><th>בסיס</th><th>תשלום</th><th>סוג מחיר</th></tr></thead><tbody>';
+      table += "<tr><td>הובלה ימית (FRT)</td><td class='num'>" + esc(money(validRate.frt, "USD")) + "</td><td>למכולה</td><td>הובלה</td><td></td></tr>";
+      const scSorted = validRate.sc.slice().sort((a, b) => PAY_ORDER.indexOf(a.pay) - PAY_ORDER.indexOf(b.pay));
+      for (const s of scSorted) {
+        table += "<tr><td>" + esc(surchargeLabel(s.code)) + "</td><td class='num'>" + esc(money(s.amount, s.currency)) + "</td><td>" +
+          esc(s.basis === "BL" || s.basis === "B/L" ? "לשטר מטען (B/L)" : "למכולה") + "</td><td>" +
+          esc(PAY_HE[s.pay]) + "</td><td>" + esc(KIND_HE[s.kind]) + "</td></tr>";
+      }
+      table += "</tbody></table></div>";
+
+      let inclHtml = validRate.incl.length > 0
+        ? "<p>כלול במחיר ההובלה (Inclusive, בלי סכום נפרד): " +
+          esc(validRate.incl.map((c) => (SURCHARGE_HE[c] ? c + " — " + SURCHARGE_HE[c] : c)).join(" · ")) + ".</p>"
+        : "<p>בשורה הזו לא צוינו תוספות כלולות (Inclusive Surcharges).</p>";
+
+      let how = "";
+      if (t.currencies.some((c) => t.perBl[c]) || t.currencies.some((c) => c !== "USD")) {
+        let msg = "";
+        if (t.currencies.some((c) => t.perBl[c])) msg += "חיוב לשטר מטען (B/L) נספר פעם אחת למשלוח, ולא מוכפל במספר המכולות. ";
+        if (t.currencies.some((c) => c !== "USD")) msg += "יש תוספות באירו או בריאל ברזילאי. הן לא הומרו לדולר — לפי תנאי המחירון, המרה של מטבע מקומי נעשית ביום היבוא או היצוא.";
+        how = '<div class="callout info"><strong>איך מחושב הסה״כ</strong>' + esc(msg) + "</div>";
+      }
+
+      let shipBlock = "";
+      if (qty > 1 || markup > 0) {
+        shipBlock = '<hr class="div"><div class="metrics">';
+        for (const c of t.currencies) {
+          shipBlock += '<div class="metric"><div class="val">' + moneyHtml(t.shipment[c], c) + '</div><div class="lab">' +
+            esc("סה״כ למשלוח · " + qty + " מכולות · " + c) + "</div>" +
+            (t.perBl[c] ? '<div class="det">כולל ' + esc(money(t.perBl[c], c)) + " לשטר מטען</div>" : "") + "</div>";
+        }
+        if (markup > 0) {
+          shipBlock += '<div class="metric"><div class="val">' + moneyHtml(markup, "USD") + '</div><div class="lab">רווח למכולה</div><div class="det">סה״כ רווח למשלוח ' + esc(money(markup * qty, "USD")) + "</div></div>";
+          shipBlock += '<div class="metric"><div class="val">' + moneyHtml(saleUsd, "USD") + '</div><div class="lab">מחיר מכירה למשלוח (USD)</div><div class="det">עלות ' + esc(money(t.shipment.USD || 0, "USD")) + " + רווח " + esc(money(markup * qty, "USD")) + "</div></div>";
+        }
+        shipBlock += "</div>";
+      }
+
+      let nis = "";
+      if (displayCarrier.localCharges && t) {
+        const lc = displayCarrier.localCharges;
+        const agencyUsd = Math.round(validRate.frt * (lc.agencyPct / 100) * qty * 100) / 100;
+        nis = '<hr class="div"><p>חיובים מקומיים ביעד (₪) — מוצגים בנפרד, לא נכללים בסה״כ הדולרי, ולא הומרו (אין שער במחירון). תשלום הוצאות מקומיות בשקלים בלבד. אם משלמים את ההובלה בשקלים: שער בנק לאומי + 3.5%.</p>' +
+          '<div class="table-wrap"><table><thead><tr><th>חיוב מקומי</th><th>סכום</th><th>הערה</th></tr></thead><tbody>' +
+          "<tr><td>D/O fee</td><td class='num'>" + lc.doFeeNis + " ₪</td><td>לשטר מטען (פעם אחת למשלוח)</td></tr>" +
+          "<tr><td>Container Handling</td><td class='num'>" + lc.handlingNis + " ₪ למכולה</td><td>" +
+            esc(qty > 1 ? (lc.handlingNis * qty) + " ₪ למשלוח (" + qty + " מכולות)" : "למכולה") + "</td></tr>" +
+          "<tr><td>דמי סוכנות " + lc.agencyPct + "% מההובלה (FRT)</td><td class='num'>" + esc(money(agencyUsd, "USD")) +
+            "</td><td>מחושב מ-FRT במטבע ההובלה (USD). המינימום " + lc.agencyMinNis + " ₪ חל רק אחרי המרה לשקלים — לא הומצא שער, ולכן הסכום לא הומר ולא הושווה לרצפה.</td></tr>" +
+          "<tr><td>העברה בנקאית (לקוח שאינו באשראי)</td><td class='num'>" + lc.bankTransferNis +
+            " ₪</td><td>לשטר מטען, רק בתשלום במטבע חוץ / מזומן (לפי תנאי ההצעה)</td></tr>" +
+          "<tr><td>סכומי ₪ הידועים (בלי דמי הסוכנות)</td><td class='num'>" +
+            (lc.doFeeNis + lc.handlingNis * qty + lc.bankTransferNis) +
+            " ₪</td><td>D/O + טיפול מכולה + העברה בנקאית</td></tr>" +
+          "</tbody></table></div>";
+      }
+
+      let notes = validRate.notes
+        ? '<div class="callout warn"><strong>הערה מהמחירון — לציין ללקוח</strong>' + esc(validRate.notes) + "</div>"
+        : "";
+      let alts = "";
+      if (altQuotes.length > 0) {
+        alts += '<div class="callout info"><strong>הצעת מחיר נוספת לאותו מסלול ותאריך</strong>יש במחירון יותר מהצעה אחת בתוקף לאותו מסלול (מספרי הצעה שונים). למעלה מוצגת ההצעה עם ההובלה הנמוכה יותר. ההצעות האחרות בתוקף:</div>' + windowsTableHtml(altQuotes);
+      }
+      if (otherWindows.length > 0) {
+        alts += '<div class="callout info"><strong>חלונות תוקף נוספים לאותו מסלול</strong>לאותו נמל, יעד וסוג מכולה יש במחירון יותר מחלון אחד, והמחיר משתנה ביניהם. למעלה מוצג החלון שחל בתאריך שנבחר. החלונות האחרים:</div>' + windowsTableHtml(otherWindows);
+      }
+
+      let peers = "";
+      if (peerQuotes.length > 0) {
+        peers = '<div class="callout info"><strong>' + (isCompare ? "השוואה בין חברות" : "חברה אחרת במסלול זה") + "</strong>" +
+          (isCompare
+            ? "התעריפים התקפים לתאריך שנבחר, לפי כל חברה שיש לה שורה במחירון."
+            : "נמצא תעריף תקף גם אצל חברה אחרת לאותו מסלול, יעד, סוג מכולה ותאריך.") +
+          "</div>";
+        peers += '<div class="table-wrap"><table><thead><tr><th>חברה</th><th>הצעה / הסכם</th><th>ניתוב</th><th>הובלה (FRT)</th><th>סה״כ למכולה</th><th>תוקף</th><th>זמן הפלגה</th></tr></thead><tbody>';
+        for (const { c, rate } of peerQuotes) {
+          const tot = totalsOf(rate, 1);
+          const allIn = tot.currencies.map((cur) => money(tot.perCtr[cur] || 0, cur)).join(" + ");
+          peers += "<tr><td>" + esc(c.nameHe) + "</td><td>" + esc(quoteLabel(c, rate)) + "</td><td>" +
+            esc(routingOf(rate) || "—") + "</td><td class='num'>" + esc(money(rate.frt, "USD")) +
+            "</td><td class='num'>" + esc(allIn) + "</td><td>" + esc(fmtDate(rate.vf) + "–" + fmtDate(rate.vt)) +
+            "</td><td>" + esc(ttLabel(rate)) + "</td></tr>";
+        }
+        peers += "</tbody></table></div>";
+      } else if (!isCompare && selectedOrigin && effectiveTyp && shipIso) {
+        peers = "<p>" + esc(carriers.filter((c) => c.id !== carrier.id).map((c) => c.nameHe + ": אין תעריף למסלול זה במחירון שנטען").join(". ") + ".") + "</p>";
+      }
+
+      const payNote = "<p>Prepaid משולם במוצא, Collect משולם ביעד, ו־FRT Terms הולכים אחרי תנאי התשלום של ההובלה. סכום שמסומן ״לפי תעריף״ עשוי להשתנות לפי התעריף התקף במועד השילוח; סכום ״קבוע״ נעול בהסכם.</p>";
+      const fallback = state.copyFallback
+        ? '<div class="copy-fallback"><label class="fld">סיכום להעתקה ידנית</label><textarea id="copy-text" readonly>' + esc(state.copyFallback) + "</textarea></div>"
+        : "";
+
+      quoteHtml = props + metrics + table + inclHtml + how + shipBlock + nis + notes + alts + peers + payNote + fallback;
+    }
+
+    const copyBtn = validRate
+      ? '<button type="button" class="btn' + (state.copied ? " ok" : "") + '" id="copy-btn">' +
+        (state.copied ? "הסיכום הועתק" : "העתק סיכום") + "</button>"
+      : "";
+
+    const app = document.getElementById("app");
+    app.innerHTML =
+      '<section class="card"><h2>בחירת מסלול</h2>' +
+      '<div class="grid grid-2">' +
+        '<div><label class="fld" for="carrier">חברת ספנות</label><select id="carrier">' + carrierOptions + "</select></div>" +
+        "<div>" + carrierMeta + "</div>" +
+      "</div>" +
+      '<div style="margin-top:12px"><label class="fld" for="query">חיפוש נמל מוצא (שם, מדינה או קוד UNLOCODE)</label>' +
+      '<input type="text" id="query" value="' + esc(state.query) + '" placeholder="למשל Brisbane, איטליה, או AUMEL"></div>' +
+      '<div style="margin-top:12px"><label class="fld" for="origin">' + esc(originLabelText) + "</label>" +
+      '<select id="origin"' + (originOptionsList.length === 0 ? " disabled" : "") + ">" + originOpts + "</select></div>" +
+      (state.query.trim() && filteredOrigins.length === 0
+        ? '<div class="callout warn"><strong>לא נמצא נמל</strong>אין נמל מוצא במחירון הזה שמתאים לחיפוש. נסו שם באנגלית, מדינה, או קוד נמל.</div>'
+        : "") +
+      '<div class="grid grid-2" style="margin-top:12px">' +
+        '<div><div class="fld-label">נמל יעד</div><div class="seg" role="group" aria-label="נמל יעד">' +
+          '<button type="button" data-dest="ASHDOD, IL" aria-pressed="' + (state.dest === "ASHDOD, IL") + '">אשדוד</button>' +
+          '<button type="button" data-dest="HAIFA, IL" aria-pressed="' + (state.dest === "HAIFA, IL") + '">חיפה</button>' +
+        "</div></div>" +
+        '<div><label class="fld" for="typ">סוג מכולה</label><select id="typ"' +
+          (!state.originId || typesInLane.length === 0 ? " disabled" : "") + ">" + typOpts + "</select></div>" +
+      "</div>" +
+      '<div class="grid grid-3" style="margin-top:12px">' +
+        '<div><label class="fld" for="date">תאריך שילוח</label><input type="text" id="date" value="' + esc(state.dateText) + '" placeholder="18.11.2026" inputmode="numeric"></div>' +
+        '<div><label class="fld" for="qty">מספר מכולות</label><input type="number" id="qty" min="1" step="1" value="' + esc(state.qtyText) + '"></div>' +
+        '<div><label class="fld" for="markup">רווח למכולה (USD, רשות)</label><input type="number" id="markup" min="0" step="1" value="' + esc(state.markupText) + '" placeholder="0"></div>' +
+      "</div>" + formExtra +
+      "</section>" +
+      '<section class="card"><div class="card-head"><h2>הצעת מחיר</h2>' + copyBtn + "</div>" + quoteHtml + "</section>" +
+      '<details class="terms" open><summary>תנאים שחשוב לציין</summary><div class="card">' + termsHtml(displayCarrier) + "</div></details>";
+
+    const $ = (id) => document.getElementById(id);
+    $("carrier").addEventListener("change", (e) => {
+      const v = e.target.value;
+      const next = rematchOrigin(v, state.originId, origins);
+      state.carrierId = v;
+      state.originId = next;
+      if (!next) state.typ = "";
+      state.haz = false;
+      state.copied = false;
+      state.copyFallback = "";
+      render();
+    });
+    $("query").addEventListener("input", (e) => { state.query = e.target.value; state.copied = false; render(); });
+    // keep caret at end after rerender of search is annoying — only re-render origins on input is heavy.
+    // Fix: don't full-rerender on query input for caret. We'll restore focus and cursor.
+    $("origin").addEventListener("change", (e) => {
+      state.originId = e.target.value;
+      state.typ = "";
+      state.haz = false;
+      state.copied = false;
+      state.copyFallback = "";
+      render();
+    });
+    $("typ").addEventListener("change", (e) => {
+      state.typ = e.target.value;
+      state.haz = false;
+      state.copied = false;
+      state.copyFallback = "";
+      render();
+    });
+    app.querySelectorAll("[data-dest]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        state.dest = btn.getAttribute("data-dest");
+        state.typ = "";
+        state.haz = false;
+        state.copied = false;
+        state.copyFallback = "";
+        render();
+      });
+    });
+    $("date").addEventListener("change", (e) => { state.dateText = e.target.value; state.copied = false; state.copyFallback = ""; render(); });
+    $("date").addEventListener("blur", (e) => { state.dateText = e.target.value; render(); });
+    $("qty").addEventListener("change", (e) => { state.qtyText = e.target.value; render(); });
+    $("markup").addEventListener("change", (e) => { state.markupText = e.target.value; render(); });
+    const hazEl = $("haz");
+    if (hazEl && !hazEl.disabled) {
+      hazEl.addEventListener("change", (e) => { state.haz = e.target.checked; state.copied = false; render(); });
+    }
+    const copyBtnEl = $("copy-btn");
+    if (copyBtnEl && validRate && selectedOrigin && shipIso) {
+      copyBtnEl.addEventListener("click", async () => {
+        const text = quoteText(displayCarrier, selectedOrigin, destHe(state.dest), validRate, qty, markup, shipIso);
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(text);
+            state.copied = true;
+            state.copyFallback = "";
+            render();
+            setTimeout(() => { state.copied = false; render(); }, 2000);
+            return;
+          }
+        } catch (err) { /* fallback */ }
+        state.copied = false;
+        state.copyFallback = text;
+        render();
+        const ta = document.getElementById("copy-text");
+        if (ta) { ta.focus(); ta.select(); }
+      });
+    }
+
+    // Restore search field focus/caret if the user was typing
+    if (document.activeElement && false) { /* placeholder */ }
+  }
+
+  // Better query typing: debounce re-render and restore selection
+  const _render = render;
+  render = function (keepQueryFocus) {
+    const q = document.getElementById("query");
+    const start = q && document.activeElement === q ? q.selectionStart : null;
+    _render();
+    if (start != null) {
+      const nq = document.getElementById("query");
+      if (nq) { nq.focus(); nq.setSelectionRange(start, start); }
+    }
+  };
+
+  // override query handler via event delegation after first paint? already inside render.
+  // Re-bind: modify the query listener in render - already does full render on input which will restore caret if we use the wrapper.
+  // Need first render to use wrapped render. The inner listener calls render() which will be the wrapped one if we wrap first.
+
+  render();
+})();
+  </script>
+</body>
+</html>
