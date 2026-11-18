@@ -112,6 +112,79 @@
       max-width: 100%;
     }
     .carrier-field .history-link:hover { color: var(--navy); }
+    .notice-banner {
+      display: block;
+      width: 100%;
+      margin-top: 8px;
+      box-sizing: border-box;
+      border: 1px solid #e8b15a;
+      background: #fff1d6;
+      color: #7a3e00;
+      border-radius: 10px;
+      padding: 8px 10px;
+      font: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-align: start;
+      cursor: pointer;
+      line-height: 1.4;
+      max-width: 100%;
+    }
+    .notice-banner:hover { background: #ffe8bf; }
+    #notice-sheet { max-height: min(88vh, 740px); }
+    #notice-sheet-title { font-size: 0.95rem; }
+    .notice-sheet-body { font-size: 0.88rem; line-height: 1.5; color: var(--ink); }
+    .notice-sheet-body .notice-meta { margin: 0 0 6px; color: var(--muted); font-size: 0.86rem; }
+    .notice-sheet-body p { margin: 0 0 10px; }
+    .notice-sheet-body p:last-child { margin-bottom: 0; }
+    .notice-sheet-body .lead { font-weight: 700; color: var(--navy); }
+    .notice-sheet-body .notice-related {
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: #fff6e5;
+      border: 1px solid #f0d9a8;
+    }
+    .quote-notice {
+      margin: 0 0 14px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 2px solid #d9822b;
+      background: #fff1d6;
+      color: #7a3e00;
+    }
+    .quote-notice strong { display: block; margin-bottom: 4px; font-size: 0.95rem; }
+    .quote-notice p { margin: 0 0 8px; }
+    .quote-notice .notice-open-link {
+      font: inherit;
+      font-weight: 700;
+      color: #7a3e00;
+      background: none;
+      border: 0;
+      padding: 0;
+      cursor: pointer;
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+    .cmp-dg-warn {
+      display: inline-block;
+      margin-inline-start: 4px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: #7a3e00;
+      background: #fff1d6;
+      border: 1px solid #e8b15a;
+      border-radius: 999px;
+      padding: 1px 6px;
+      white-space: nowrap;
+    }
+    .hist-notices { margin-top: 14px; }
+    .hist-notices h3 {
+      margin: 0 0 8px;
+      font-size: 0.88rem;
+      color: var(--navy);
+    }
+    body.notice-open { overflow: hidden; }
     body.hist-open { overflow: hidden; }
     .hist-sheet-root {
       position: fixed;
@@ -553,7 +626,8 @@
     <footer class="note">כלי פנימי להצעת מחיר ממחירון. התעריפים כפופים לתוקף, למקום פנוי ולתנאי החברה.</footer>
   </div>
   <noscript><p class="wrap">יש להפעיל JavaScript כדי להשתמש במחשבון.</p></noscript>
-  <script src="data/index.js?v=evergreen-20261118"></script>
+  <script src="data/index.js?v=notices-20261118"></script>
+  <script src="data/notices.js?v=notices-20261118"></script>
   <script>
 (function () {
   const DATA = window.QUOTE_INDEX;
@@ -1003,6 +1077,8 @@
     calOpen: false,
     calYear: null,
     calMonth: null,
+    noticeOpen: false,
+    noticeId: "",
   };
 
   function versionsFor(carrierId) {
@@ -1108,7 +1184,7 @@
     }
     return new Promise(function (resolve, reject) {
       const s = document.createElement("script");
-      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=evergreen-20261118";
+      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=notices-20261118";
       s.async = true;
       s.onload = function () {
         const pack = window.QUOTE_PACK && window.QUOTE_PACK[meta.id];
@@ -1408,6 +1484,150 @@
     html += "</div>";
     return html;
   }
+  const NOTICES = window.CARRIER_NOTICES || [];
+  function noticesFor(carrierId) {
+    return NOTICES.filter(function (n) { return (n.carrierIds || []).indexOf(carrierId) >= 0; });
+  }
+  function noticeById(id) {
+    return NOTICES.find(function (n) { return n.id === id; }) || null;
+  }
+  function noticePublished(n) {
+    return n.publishedDate || n.published || "";
+  }
+  function noticeIsActive(n, iso) {
+    if (!iso) return false;
+    const pub = noticePublished(n);
+    if (pub && iso < pub) return false;
+    if (n.validTo && iso > n.validTo) return false;
+    return true;
+  }
+  function activeNoticesFor(carrierId, iso) {
+    return noticesFor(carrierId).filter(function (n) { return noticeIsActive(n, iso); });
+  }
+  function noticeStatusKind(n, iso) {
+    const pub = noticePublished(n);
+    if (pub && iso && iso < pub) return "future";
+    if (n.validTo && iso && iso > n.validTo) return "expired";
+    if (iso && noticeIsActive(n, iso)) return "valid";
+    return "expired";
+  }
+  function quoteNoticesFor(carrierId, iso) {
+    return activeNoticesFor(carrierId, iso).filter(function (n) {
+      const when = n.appliesWhen || "always";
+      if (when === "haz") return !!state.haz;
+      return true;
+    });
+  }
+  function hasNoticeHazToggle(carrierId, iso, isCompare) {
+    if (isCompare) {
+      return carriers.some(function (c) {
+        return activeNoticesFor(c.id, iso).some(function (n) {
+          return (n.appliesWhen || "always") === "haz";
+        });
+      });
+    }
+    return activeNoticesFor(carrierId, iso).some(function (n) {
+      return (n.appliesWhen || "always") === "haz";
+    });
+  }
+  function openNotice(id) {
+    state.noticeId = id;
+    state.noticeOpen = true;
+    state.historyOpen = false;
+    state.calOpen = false;
+    render();
+  }
+  function closeNotice() {
+    if (!state.noticeOpen) return;
+    state.noticeOpen = false;
+    render();
+  }
+  function noticeBannerHtml(carrier, iso) {
+    const list = activeNoticesFor(carrier.id, iso);
+    if (!list.length) return "";
+    return list.map(function (n, i) {
+      const idAttr = i === 0 ? ' id="notice-banner"' : "";
+      return '<button type="button" class="notice-banner"' + idAttr + ' data-notice-id="' + esc(n.id) + '">' + esc(n.banner) + "</button>";
+    }).join("");
+  }
+  function noticeBodyHtml(n) {
+    let html = '<div class="notice-sheet-body">';
+    (n.sections || []).forEach(function (s) {
+      if (s.kind === "meta") {
+        html += '<p class="notice-meta">' + esc(s.text) + "</p>";
+        return;
+      }
+      const lead = s.lead ? '<span class="lead">' + esc(s.lead) + "</span> " : "";
+      const cls = s.kind === "related" ? ' class="notice-related"' : "";
+      html += "<p" + cls + ">" + lead + esc(s.text) + "</p>";
+    });
+    html += "</div>";
+    return html;
+  }
+  function noticeSheetHtml() {
+    if (!state.noticeOpen || !state.noticeId) return "";
+    const n = noticeById(state.noticeId);
+    if (!n) return "";
+    let html = '<div class="hist-sheet-root" id="notice-sheet-root">';
+    html += '<div class="hist-backdrop" id="notice-backdrop"></div>';
+    html += '<div class="hist-sheet" id="notice-sheet" role="dialog" aria-modal="true" aria-labelledby="notice-sheet-title" tabindex="-1">';
+    html += '<div class="hist-sheet-head"><h2 id="notice-sheet-title">' + esc(n.title) + "</h2>";
+    html += '<button type="button" class="hist-close" id="notice-close" aria-label="סגירה">×</button></div>';
+    html += noticeBodyHtml(n);
+    html += "</div></div>";
+    return html;
+  }
+  function formatNoticeWarning(n) {
+    let text = n.quoteWarning || "";
+    const vessel = n.effectiveFromVessel || "";
+    const shortVessel = vessel.replace(/\s*\([^)]*\)\s*$/, "").trim();
+    if (shortVessel && text.indexOf(shortVessel) >= 0) {
+      return esc(text).replace(esc(shortVessel), ltrHtml(shortVessel).replace(/^<span/, "<span"));
+    }
+    return esc(text);
+  }
+  function quoteNoticeHtml(carrier, iso) {
+    if (!carrier) return "";
+    const list = quoteNoticesFor(carrier.id, iso);
+    if (!list.length) return "";
+    return list.map(function (n, i) {
+      const idAttr = i === 0 ? ' id="quote-notice"' : "";
+      return '<div class="quote-notice"' + idAttr + '><strong>' + esc(n.quoteWarningTitle || n.banner || n.title) + "</strong>" +
+        "<p>" + formatNoticeWarning(n) + "</p>" +
+        '<button type="button" class="notice-open-link" data-notice-id="' + esc(n.id) + '">לקריאת ההודעה המלאה</button></div>';
+    }).join("");
+  }
+  function dgNoticeMark(carrierId, iso) {
+    if (!state.haz) return "";
+    const list = quoteNoticesFor(carrierId, iso);
+    if (!list.length) return "";
+    return '<span class="cmp-dg-warn">⚠️ הודעת DG</span>';
+  }
+  function historyNoticesHtml(carrier, iso) {
+    const list = noticesFor(carrier.id).slice().sort(function (a, b) {
+      const pa = noticePublished(b) || "";
+      const pb = noticePublished(a) || "";
+      if (pa !== pb) return pa < pb ? -1 : 1;
+      return 0;
+    });
+    if (!list.length) return "";
+    const statusHe = { valid: "בתוקף", future: "טרם פורסמה", expired: "פג תוקף" };
+    let html = '<div class="hist-notices"><h3>הודעות</h3><ul class="hist-list">';
+    list.forEach(function (n) {
+      const kind = noticeStatusKind(n, iso);
+      let meta = "";
+      if (noticePublished(n)) meta += "פורסם " + fmtDate(noticePublished(n));
+      if (n.effectiveFromVessel) meta += (meta ? " · " : "") + "בתוקף מ־" + n.effectiveFromVessel;
+      if (n.validTo) meta += (meta ? " · " : "") + "עד " + fmtDate(n.validTo);
+      html += '<li><button type="button" class="hist-item" data-notice-id="' + esc(n.id) + '">';
+      html += '<span class="hist-item-title">' + esc(n.title) + "</span>";
+      if (meta) html += '<span class="hist-item-meta">' + esc(meta) + "</span>";
+      html += '<span class="hist-status is-' + kind + '">' + statusHe[kind] + "</span>";
+      html += "</button></li>";
+    });
+    html += "</ul></div>";
+    return html;
+  }
   function historyLinkHtml(carrier) {
     const n = versionsFor(carrier.id).length;
     return '<button type="button" class="history-link" id="history-link" aria-expanded="' +
@@ -1446,7 +1666,9 @@
       html += '<span class="hist-status is-' + kind + '">' + statusHe[kind] + "</span>";
       html += "</button></li>";
     });
-    html += "</ul></div></div>";
+    html += "</ul>";
+    html += historyNoticesHtml(carrier, iso);
+    html += "</div></div>";
     return html;
   }
   function pickHistoryVersion(carrierId, versionId) {
@@ -1519,8 +1741,9 @@
     const typedRates = laneRates.filter((r) => r.typ === effectiveTyp);
     const hasHaz = typedRates.some((r) => r.haz);
     const hasNonHaz = typedRates.some((r) => !r.haz);
+    const noticeHazToggle = hasNoticeHazToggle(carrier.id, shipIsoEarly, isCompare);
     const effectiveHaz = hasHaz && (state.haz || !hasNonHaz);
-    const windowRates = typedRates.filter((r) => r.haz === effectiveHaz);
+    const windowRates = typedRates.filter((r) => r.haz === (hasHaz ? effectiveHaz : false));
     const validRates = shipIso ? windowRates.filter((r) => isValidOn(r, shipIso)) : [];
     const validRate = (function () {
       if (!validRates.length) return null;
@@ -1615,6 +1838,8 @@
         ? "מטען מסוכן (HAZ) — רק אם יש שורה במחירון"
         : "למסלול זה קיימת במחירון רק שורת מטען מסוכן";
       formHaz += '<label class="toggle"><input type="checkbox" id="haz" ' + (effectiveHaz ? "checked " : "") + (!hasNonHaz ? "disabled " : "") + "> <span>" + esc(lab) + "</span></label>";
+    } else if (effectiveTyp && noticeHazToggle) {
+      formHaz += '<label class="toggle"><input type="checkbox" id="haz" ' + (state.haz ? "checked " : "") + "> <span>מטען מסוכן (HAZ)</span></label>";
     }
     if (state.originId && state.dest && typesInLane.length === 0) {
       const msg = (carrier.id === "yml" && state.dest.startsWith("HAIFA"))
@@ -1798,7 +2023,7 @@
         for (const { c, rate } of peerQuotes) {
           const tot = totalsOf(rate, 1);
           const allIn = tot.currencies.map((cur) => money(tot.perCtr[cur] || 0, cur)).join(" + ");
-          peers += "<tr><td>" + esc(c.nameHe) + "</td><td>" + esc(quoteLabel(c, rate)) + "</td><td>" +
+          peers += "<tr><td>" + esc(c.nameHe) + dgNoticeMark(c.id, shipIso) + "</td><td>" + esc(quoteLabel(c, rate)) + "</td><td>" +
             esc(routingOf(rate) || "—") + "</td><td class='num'>" + esc(money(rate.frt, frtCcy(rate))) +
             "</td><td class='num'>" + esc(allIn) + "</td><td>" + esc(fmtDate(rate.vf) + "–" + fmtDate(rate.vt)) +
             "</td><td>" + esc(ttLabel(rate)) + "</td></tr>";
@@ -1860,7 +2085,8 @@
       '<section class="card search-card">' +
       '<div class="search-top">' +
         '<div class="carrier-field"><label class="fld" for="carrier">חברת ספנות</label><select id="carrier">' + carrierOptions + "</select>" +
-        (!isCompare ? historyLinkHtml(carrier) : "") + "</div>" +
+        (!isCompare ? historyLinkHtml(carrier) : "") +
+        (!isCompare ? noticeBannerHtml(carrier, shipIso) : "") + "</div>" +
         '<div class="origin-combo" id="origin-combo">' +
           '<label class="fld" for="origin-input" id="origin-field-label">נמל מוצא (' + origins.length + " במחירון)</label>" +
           '<input type="text" id="origin-input" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="origin-list" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" placeholder="הקלידו אות לחיפוש או בחרו מהרשימה" value="' + esc(selectedOrigin ? originChoiceLabel(selectedOrigin) : "") + '">' +
@@ -1883,13 +2109,15 @@
       '<details class="extras-panel" id="extras-panel"' + (state.extrasOpen ? " open" : "") + "><summary>אפשרויות נוספות</summary>" + extrasInner + "</details>" +
       "</section>" +
       (state.originId && state.dest && effectiveTyp
-        ? '<section class="card" id="quote-card"><div class="card-head"><h2>הצעת מחיר</h2>' + copyBtn + "</div>" + quoteMeta + (activeVersion ? versionBadgeHtml(activeVersion, shipIso, altVersions) : "") + quoteHtml + "</section>"
+        ? '<section class="card" id="quote-card"><div class="card-head"><h2>הצעת מחיר</h2>' + copyBtn + "</div>" + quoteMeta + quoteNoticeHtml(displayCarrier, shipIso) + (activeVersion ? versionBadgeHtml(activeVersion, shipIso, altVersions) : "") + quoteHtml + "</section>"
         : "") +
       '<details class="terms"><summary>תנאים שחשוב לציין</summary><div class="card">' + termsHtml(displayCarrier, shipIso) + "</div></details>" +
       (!isCompare ? historySheetHtml(carrier, shipIso) : "") +
-      calendarHtml();
+      calendarHtml() +
+      noticeSheetHtml();
     document.body.classList.toggle("hist-open", !isCompare && state.historyOpen);
     document.body.classList.toggle("cal-open", !!state.calOpen);
+    document.body.classList.toggle("notice-open", !!state.noticeOpen);
 
     const $ = (id) => document.getElementById(id);
     $("carrier").addEventListener("change", (e) => {
@@ -1912,6 +2140,8 @@
       state.historyOpen = false;
       state.extrasOpen = false;
       state.calOpen = false;
+      state.noticeOpen = false;
+      state.noticeId = "";
       render();
       window.scrollTo(0, 0);
     });
@@ -2068,6 +2298,17 @@
     });
     const histSheet = $("hist-sheet");
     if (histSheet) histSheet.focus({ preventScroll: true });
+    document.querySelectorAll("[data-notice-id]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        openNotice(btn.getAttribute("data-notice-id"));
+      });
+    });
+    const noticeBackdrop = $("notice-backdrop");
+    if (noticeBackdrop) noticeBackdrop.addEventListener("click", function () { closeNotice(); });
+    const noticeClose = $("notice-close");
+    if (noticeClose) noticeClose.addEventListener("click", function () { closeNotice(); });
+    const noticeSheet = $("notice-sheet");
+    if (noticeSheet) noticeSheet.focus({ preventScroll: true });
     const altSel = $("alt-version");
     if (altSel) {
       altSel.addEventListener("change", function (e) {
@@ -2087,6 +2328,7 @@
   document.addEventListener("keydown", function (e) {
     if (e.key !== "Escape") return;
     if (state.calOpen) { e.preventDefault(); closeCalendar(); return; }
+    if (state.noticeOpen) { e.preventDefault(); closeNotice(); return; }
     if (state.historyOpen) {
       e.preventDefault();
       state.historyOpen = false;
