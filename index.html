@@ -353,7 +353,7 @@
     <footer class="note">כלי פנימי להצעת מחיר ממחירון. התעריפים כפופים לתוקף, למקום פנוי ולתנאי החברה.</footer>
   </div>
   <noscript><p class="wrap">יש להפעיל JavaScript כדי להשתמש במחשבון.</p></noscript>
-  <script src="data/index.js?v=hist-20261118"></script>
+  <script src="data/index.js?v=neu-20261118"></script>
   <script>
 (function () {
   const DATA = window.QUOTE_INDEX;
@@ -484,6 +484,15 @@
     return s;
   }
   function bareKey(name) { return normalizeOrigin(name); }
+  function frtCcy(rate) { return (rate && rate.frtCur) || "USD"; }
+  function ratesFromPack(meta, pack) {
+    const ccy = (meta && meta.frtCurrency) || pack.frtCurrency || "USD";
+    return pack.rows.map(function (row) {
+      const r = unpackRow(row);
+      r.frtCur = ccy;
+      return r;
+    });
+  }
   function quoteLabel(carrier, rate) {
     const qs = carrier.quotes;
     if (qs && qs.length) {
@@ -581,13 +590,14 @@
   }
   function isValidOn(rate, iso) { return iso >= rate.vf && iso <= rate.vt; }
   function totalsOf(rate, qty) {
-    const perCtr = { USD: rate.frt };
+    const perCtr = {};
+    perCtr[frtCcy(rate)] = rate.frt;
     const perBl = {};
     for (const s of rate.sc) {
       const bag = s.basis === "BL" || s.basis === "B/L" ? perBl : perCtr;
       bag[s.currency] = (bag[s.currency] || 0) + s.amount;
     }
-    const order = ["USD", "EUR", "BRL"];
+    const order = [frtCcy(rate), "USD", "EUR", "BRL"].filter(function (c, i, arr) { return arr.indexOf(c) === i; });
     const currencies = Array.from(new Set([...Object.keys(perCtr), ...Object.keys(perBl)])).sort(
       (a, b) => (order.indexOf(a) === -1 ? 99 : order.indexOf(a)) - (order.indexOf(b) === -1 ? 99 : order.indexOf(b)),
     );
@@ -627,7 +637,7 @@
     if (routingOf(rate)) lines.push("ניתוב: " + routingOf(rate));
     lines.push("זמן הפלגה משוער: " + ttLabel(rate));
     lines.push("");
-    lines.push("הובלה ימית (FRT): " + money(rate.frt, "USD") + " למכולה");
+    lines.push("הובלה ימית (FRT): " + money(rate.frt, frtCcy(rate)) + " למכולה");
     for (const s of rate.sc) {
       const basis = s.basis === "BL" || s.basis === "B/L" ? "לשטר מטען" : "למכולה";
       lines.push(surchargeLabel(s.code) + ": " + money(s.amount, s.currency) + " " + basis + " · " + PAY_HE[s.pay] + " · " + KIND_HE[s.kind]);
@@ -653,7 +663,19 @@
     lines.push("להזמנה ציינו את " + quoteLabel(carrier, rate) + (book ? " ופנו אל " + book : ""));
     if (carrier.paymentTerms) lines.push("תנאי תשלום לפי המחירון: " + carrier.paymentTerms);
     const lc = carrier.localCharges;
-    if (lc) {
+    if (lc && lc.items) {
+      lines.push("");
+      lines.push("חיובים מקומיים ביעד — מוצגים בנפרד, לא נכללים בסה״כ ההובלה, ולא הומרו (אין שער במחירון):");
+      for (const it of lc.items) {
+        let amt = it.quantum || "";
+        if (it.amount20 != null) amt = (rate.typ === "DV20" ? it.amount20 : it.amount40) + " " + it.currency + " למכולה";
+        else if (it.amount != null) amt = it.amount + " " + it.currency + (it.basis && it.basis.indexOf("B/L") >= 0 ? " לשטר מטען" : " למכולה");
+        lines.push(it.name + ": " + amt + (it.remarks ? " · " + it.remarks : ""));
+      }
+      if (lc.notes && lc.notes.length) {
+        for (const n of lc.notes) lines.push(n);
+      }
+    } else if (lc && lc.doFeeNis != null) {
       const agencyUsd = Math.round(rate.frt * (lc.agencyPct / 100) * qty * 100) / 100;
       lines.push("");
       lines.push("חיובים מקומיים ביעד (₪) — לא הומרו ולא נכללים בסה״כ הדולרי:");
@@ -765,17 +787,17 @@
     if (versionCache[meta.id]) return Promise.resolve(versionCache[meta.id]);
     if (window.QUOTE_PACK && window.QUOTE_PACK[meta.id]) {
       const pack = window.QUOTE_PACK[meta.id];
-      versionCache[meta.id] = { meta: meta, rows: pack.rows, rates: pack.rows.map(unpackRow) };
+      versionCache[meta.id] = { meta: meta, rows: pack.rows, rates: ratesFromPack(meta, pack) };
       return Promise.resolve(versionCache[meta.id]);
     }
     return new Promise(function (resolve, reject) {
       const s = document.createElement("script");
-      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=hist-20261118";
+      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=neu-20261118";
       s.async = true;
       s.onload = function () {
         const pack = window.QUOTE_PACK && window.QUOTE_PACK[meta.id];
         if (!pack) { reject(new Error("חסר תוכן מחירון " + meta.id)); return; }
-        versionCache[meta.id] = { meta: meta, rows: pack.rows, rates: pack.rows.map(unpackRow) };
+        versionCache[meta.id] = { meta: meta, rows: pack.rows, rates: ratesFromPack(meta, pack) };
         resolve(versionCache[meta.id]);
       };
       s.onerror = function () { reject(new Error("טעינת המחירון נכשלה: " + meta.file)); };
@@ -945,7 +967,7 @@
       const allIn = t.currencies.map((c) => money(t.perCtr[c] || 0, c)).join(" + ");
       const route = showRoute ? "<td>" + esc(routingOf(r) || "") + "</td>" : "";
       return "<tr><td>" + esc(fmtDate(r.vf) + "–" + fmtDate(r.vt)) + "</td>" + route +
-        "<td class='num'>" + esc(money(r.frt, "USD")) + "</td>" +
+        "<td class='num'>" + esc(money(r.frt, frtCcy(r))) + "</td>" +
         "<td class='num'>" + esc(allIn) + "</td>" +
         "<td>" + esc(ttLabel(r)) + "</td></tr>";
     }).join("");
@@ -971,6 +993,28 @@
       return "<p>שתי הצעות YML הוטענו: PQ26YML005163 (חוזה EMW1721467, Trade ID MEDW40753000) ו־PQ26YML005151 (חוזה EMW1721484, Trade ID MEDW02099000). שתיהן בתוקף 16.11.2026–30.11.2026, והוצאו ל־Mayan Logistics (1977) Ltd. הסוכן במחירון: Konmart (ships agent) ltd, as agents for Yang Ming Lines. לא צוין במסמכים דוא״ל להזמנה.</p>" +
         "<p>תנאי תשלום: COLLECT. התעריפים כפופים לתוספות החלות במועד השילוח, בלי הודעה מוקדמת; אינם כוללים שחרור מכס וחיובים מקומיים; כפופים לדמי דמורג׳; וההובלה הימית חלה לפי ETB/ETD המקורי בכפוף להוראות POL/POD. יש לפנות למשרד לאימות התוקף לפחות שבוע לפני פקיעת ההצעה. זמן ההגעה עשוי להשתנות בגלל עומס בטרמינל, מזג אוויר או עיכובים בכלי השיט וברכבת.</p>" +
         "<p>תוספת TA (Transport Additional Charge) ליעד חיפה (ILHFA): 100$ ל-20DC, 200$ ל-40DC ו־40HQ — לא כלולה בהצעת אשדוד, ואין במחירון תעריף הובלה ימית לחיפה. תוספת משקל יתר OW: Over 18Ton/26Ton gross weight: 350$/700$ — לא נוספה לסה״כ. EU (ETS) מופיע עם ההערה FROM CHINA PORTS EU INCLUDED: ממוצא סין מטופל ככלול בהובלה; ממוצא אחר לא נוסף, כי לא ברור אם חל.</p>";
+    }
+    if (displayCarrier.id === "one") {
+      return "<p>חברת הספנות: Ocean Network Express (ONE). הסוכן הכללי בישראל לפי המייל: Crown Shipping, as general agent for ONE. "
+        + "פניות: " + ltrHtml("sales@crown-shipping.co.il") + " · " + ltrHtml("https://www.one-line.com") + ". "
+        + "לא צוין במחירון או במייל מספר הסכם / filing, ולא הומצא. בעת הזמנה יש לבקש מהסוכן להגיש (file) את התעריף לפני ההזמנה.</p>"
+        + "<p>מחירון יבוא מצפון אירופה, הבלטיק וסקנדינביה לחיפה/אשדוד. תוקף 01.11.2026–30.11.2026. הונפק / נשלח ב-25.10.2026. "
+        + "ההובלה הימית נקובה ב<strong>אירו</strong>; התוספות OBS, EES, DTHC ו-CMD נקובות בדולר. הסכומים לא הומרו ולא חוברו למטבע אחד. "
+        + " Inclusive במחיר ההובלה: EFS, THL, CSS, IFP, MBS, TSL. כפוף ל-OBS 198$ ל-TEU ול-EES 72$ ל-TEU (למכולה: 198+72$ ל-20׳, 396+144$ ל-40׳/HC). "
+        + "DTHC: 270$/20׳ ו-390$/40׳–40HC. CMD: 21$ ל-UNIT (טופל כמכולה). ריפרים — לפנות מקרה-מקרה (אין תעריף ריפר במחירון).</p>"
+        + "<p>הערות ההצעה: כל התעריפים כפופים לכל התוספות התקפות במועד השילוח. כפוף ל-FGP (Food Grade Premium) — לא צוין סכום, לא נוסף לסה״כ. "
+        + "התעריפים תקפים ל-freight prepaid, בכפוף להגשת תעריף (filing) לפני הזמנה. תאריך דירוג ה-B/L הוא Proforma ETD (לוח הזמנים במועד ההזמנה); "
+        + "אם המטען נטען על דוברה/פידר — Proforma ETD של הדוברה/פידר. הניתוב הוא ניתוב סטנדרטי אחד בלבד (ניתוב חריג דורש פנייה לצוות התמחור). "
+        + "כפוף לאישור תפעולי לפני השילוח, ולזמינות ציוד ומקום. ללקוחות ללא תנאי אשראי — תשלום במזומן בשקלים.</p>"
+        + "<p>בגיליון General Terms (באותו קובץ): המטען הוא General cargo / Non IMCO only. "
+        + "שימו לב לסתירה: בגיליון התעריפים ובמייל נכתב freight prepaid, ואילו ב-General Terms מופיע גם המשפט Rates are valid for freight collect, subject to filing before booking — מוצג ככתבו, בלי להכריע מעבר למה שנאמר בהצעת היבוא עצמה (prepaid). "
+        + "תוספת משקל כבד ל-20׳ (HWS, לפי משקל המטען נטו): 0–13.99 טון 0$; 14–17.99 טון 300$; 18–27 טון 600$ — מותנה במשקל, לא נוסף לסה״כ. "
+        + "תעריף demurrage ליבוא לישראל (סטנדרט 7 ימים חינם ל-DV ולציוד מיוחד, 3 ימים לריפר) מופיע בגיליון התנאים ולא נוסף לסה״כ. "
+        + "תוספות PSA לסינגפור חלות לפי הגיליון רק אם יש שטעון/מוצא/יעד בסינגפור — לא רלוונטי לניתוב הסטנדרטי במחירון זה ולא נוספו. "
+        + "תנאי ציוד מיוחד (OT/FL) וחיובים לריפר (ניטור וכו׳) מופיעים בגיליון ולא תומחרו כהובלה.</p>"
+        + "<p>חיובים מקומיים ליבוא מוצגים בבלוק נפרד לפי המטבע שצוין במחירון, ולא נכללים בסה״כ ההובלה. "
+        + "דמי סוכנות (0.3%, מינימום 80 ₪) ודמי העברה (0.6%, מינימום 55 ₪) מחושבים מאחוז מההובלה והתוספות — לא הומרו לשקלים (אין שער). "
+        + "דמי הובלה יבשתית (6%, מינימום 58 ₪) לא נוספו כי אין במחירון תעריף inland.</p>";
     }
     let html = "<p>בעת הזמנה יש למסור את מספר ההסכם " + esc(displayCarrier.ref) + ". פניות להזמנה: " + esc(displayCarrier.email || "") + "." +
       (displayCarrier.scheduleUrl ? ' לוח הפלגות: <span class="ltr">' + esc(displayCarrier.scheduleUrl) + "</span>." : "") + "</p>";
@@ -1089,7 +1133,12 @@
     const effectiveHaz = hasHaz && (state.haz || !hasNonHaz);
     const windowRates = typedRates.filter((r) => r.haz === effectiveHaz);
     const validRates = shipIso ? windowRates.filter((r) => isValidOn(r, shipIso)) : [];
-    const validRate = validRates.slice().sort((a, b) => a.frt - b.frt)[0];
+    const validRate = (function () {
+      if (!validRates.length) return null;
+      const ccys = Array.from(new Set(validRates.map(frtCcy)));
+      if (ccys.length > 1) return validRates[0];
+      return validRates.slice().sort((a, b) => a.frt - b.frt)[0];
+    })();
     const quoteRate = validRate || (windowRates.length ? windowRates.slice().sort((a, b) => a.frt - b.frt)[0] : null);
     const isExpiredRef = !!(quoteRate && shipIso && !validRate && windowRates.every((r) => r.vt < shipIso));
     const isNotYetValid = !!(quoteRate && shipIso && !validRate && windowRates.every((r) => r.vf > shipIso));
@@ -1253,7 +1302,7 @@
       metrics += "</div>";
 
       let table = '<div class="table-wrap"><table><thead><tr><th>חיוב</th><th>סכום</th><th>בסיס</th><th>תשלום</th><th>סוג מחיר</th></tr></thead><tbody>';
-      table += "<tr><td>הובלה ימית (FRT)</td><td class='num'>" + esc(money(quoteRate.frt, "USD")) + "</td><td>למכולה</td><td>הובלה</td><td></td></tr>";
+      table += "<tr><td>הובלה ימית (FRT)</td><td class='num'>" + esc(money(quoteRate.frt, frtCcy(quoteRate))) + "</td><td>למכולה</td><td>הובלה</td><td></td></tr>";
       const scSorted = quoteRate.sc.slice().sort((a, b) => PAY_ORDER.indexOf(a.pay) - PAY_ORDER.indexOf(b.pay));
       for (const s of scSorted) {
         table += "<tr><td>" + esc(surchargeLabel(s.code)) + "</td><td class='num'>" + esc(money(s.amount, s.currency)) + "</td><td>" +
@@ -1268,10 +1317,10 @@
         : "<p>בשורה הזו לא צוינו תוספות כלולות (Inclusive Surcharges).</p>";
 
       let how = "";
-      if (t.currencies.some((c) => t.perBl[c]) || t.currencies.some((c) => c !== "USD")) {
+      if (t.currencies.some((c) => t.perBl[c]) || t.currencies.some((c) => c !== "USD") || frtCcy(quoteRate) !== "USD") {
         let msg = "";
         if (t.currencies.some((c) => t.perBl[c])) msg += "חיוב לשטר מטען (B/L) נספר פעם אחת למשלוח, ולא מוכפל במספר המכולות. ";
-        if (t.currencies.some((c) => c !== "USD")) msg += "יש תוספות באירו או בריאל ברזילאי. הן לא הומרו לדולר — לפי תנאי המחירון, המרה של מטבע מקומי נעשית ביום היבוא או היצוא.";
+        if (t.currencies.some((c) => c !== "USD") || frtCcy(quoteRate) !== "USD") msg += "סכומים שאינם בדולר (למשל הובלה באירו, או תוספות באירו/ריאל) לא הומרו ולא חוברו למטבע אחד — אין שער במחירון.";
         how = '<div class="callout info"><strong>איך מחושב הסה״כ</strong>' + esc(msg) + "</div>";
       }
 
@@ -1287,13 +1336,34 @@
           shipBlock += '<div class="metric"><div class="val">' + moneyHtml(markup, "USD") + '</div><div class="lab">רווח למכולה</div><div class="det">סה״כ רווח למשלוח ' + esc(money(markup * qty, "USD")) + "</div></div>";
           shipBlock += '<div class="metric"><div class="val">' + moneyHtml(saleUsd, "USD") + '</div><div class="lab">' +
             esc(!validRate ? "חישוב לעיון בלבד (USD) — לא הצעת מחיר בתוקף" : "מחיר מכירה למשלוח (USD)") +
-            '</div><div class="det">עלות ' + esc(money(t.shipment.USD || 0, "USD")) + " + רווח " + esc(money(markup * qty, "USD")) + "</div></div>";
+            '</div><div class="det">עלות החלק ב-USD ' + esc(money(t.shipment.USD || 0, "USD")) + " + רווח " + esc(money(markup * qty, "USD")) +
+            (frtCcy(quoteRate) !== "USD" ? " (ההובלה ב-" + frtCcy(quoteRate) + " לא הומרה ולא נכללת במחיר מכירה זה)" : "") + "</div></div>";
         }
         shipBlock += "</div>";
       }
 
       let nis = "";
-      if (displayCarrier.localCharges && t) {
+      if (displayCarrier.localCharges && displayCarrier.localCharges.items) {
+        const lc = displayCarrier.localCharges;
+        nis = '<hr class="div"><p>חיובים מקומיים ביעד (Local Charges for Import) — מוצגים בנפרד לפי המטבע שצוין במחירון, לא נכללים בסה״כ ההובלה, ולא הומרו (אין שער במחירון).</p>';
+        nis += '<div class="table-wrap"><table><thead><tr><th>חיוב מקומי</th><th>מטבע</th><th>בסיס / סכום</th><th>הערה</th></tr></thead><tbody>';
+        for (const it of lc.items) {
+          let amt = it.quantum || "";
+          if (it.amount20 != null) {
+            const n = quoteRate.typ === "DV20" ? it.amount20 : it.amount40;
+            amt = money(n, it.currency) + " למכולה" + (qty > 1 ? " · " + money(n * qty, it.currency) + " למשלוח" : "");
+          } else if (it.amount != null) {
+            const perBl = (it.basis || "").indexOf("B/L") >= 0;
+            amt = money(it.amount, it.currency) + (perBl ? " לשטר מטען" : " למכולה");
+            if (!perBl && qty > 1) amt += " · " + money(it.amount * qty, it.currency) + " למשלוח";
+          }
+          nis += "<tr><td>" + esc(it.name) + "</td><td>" + esc(it.currency) + "</td><td class='num'>" + esc(amt) + "</td><td>" + esc(it.remarks || it.basis || "") + "</td></tr>";
+        }
+        nis += "</tbody></table></div>";
+        if (lc.notes && lc.notes.length) {
+          nis += "<ul>" + lc.notes.map(function (n) { return "<li>" + esc(n) + "</li>"; }).join("") + "</ul>";
+        }
+      } else if (displayCarrier.localCharges && displayCarrier.localCharges.doFeeNis != null && t) {
         const lc = displayCarrier.localCharges;
         const agencyUsd = Math.round(quoteRate.frt * (lc.agencyPct / 100) * qty * 100) / 100;
         nis = '<hr class="div"><p>חיובים מקומיים ביעד (₪) — מוצגים בנפרד, לא נכללים בסה״כ הדולרי, ולא הומרו (אין שער במחירון). תשלום הוצאות מקומיות בשקלים בלבד. אם משלמים את ההובלה בשקלים: שער בנק לאומי + 3.5%.</p>' +
@@ -1323,8 +1393,13 @@
       }
 
       let peers = "";
+      const peerFrtCcys = [quoteRate].concat(peerQuotes.map(function (p) { return p.rate; }), expiredPeerQuotes.map(function (p) { return p.rate; })).map(frtCcy);
+      const mixedFrt = Array.from(new Set(peerFrtCcys)).length > 1;
+      if (mixedFrt) {
+        peers += '<div class="callout warn"><strong>מטבעות שונים — אין דירוג מחיר אחד</strong>ההובלה אצל חברה אחת נקובה במטבע שונה (למשל אירו מול דולר). הסכומים לא הומרו ולא ניתן לקבוע מי זול יותר לפי המספר הגולמי.</div>';
+      }
       if (peerQuotes.length > 0) {
-        peers = '<div class="callout info"><strong>' + (isCompare ? "השוואה בין חברות" : "חברה אחרת במסלול זה") + "</strong>" +
+        peers = (peers || "") + '<div class="callout info"><strong>' + (isCompare ? "השוואה בין חברות" : "חברה אחרת במסלול זה") + "</strong>" +
           (isCompare
             ? "התעריפים התקפים לתאריך שנבחר, לפי כל חברה שיש לה שורה במחירון."
             : "נמצא תעריף תקף גם אצל חברה אחרת לאותו מסלול, יעד, סוג מכולה ותאריך.") +
@@ -1334,7 +1409,7 @@
           const tot = totalsOf(rate, 1);
           const allIn = tot.currencies.map((cur) => money(tot.perCtr[cur] || 0, cur)).join(" + ");
           peers += "<tr><td>" + esc(c.nameHe) + "</td><td>" + esc(quoteLabel(c, rate)) + "</td><td>" +
-            esc(routingOf(rate) || "—") + "</td><td class='num'>" + esc(money(rate.frt, "USD")) +
+            esc(routingOf(rate) || "—") + "</td><td class='num'>" + esc(money(rate.frt, frtCcy(rate))) +
             "</td><td class='num'>" + esc(allIn) + "</td><td>" + esc(fmtDate(rate.vf) + "–" + fmtDate(rate.vt)) +
             "</td><td>" + esc(ttLabel(rate)) + "</td></tr>";
         }
@@ -1349,7 +1424,7 @@
           const tot = totalsOf(rate, 1);
           const allIn = tot.currencies.map((cur) => money(tot.perCtr[cur] || 0, cur)).join(" + ");
           peers += "<tr><td>" + esc(c.nameHe) + " · פג תוקף</td><td>" + esc(quoteLabel(c, rate)) + "</td><td>" +
-            esc(routingOf(rate) || "—") + "</td><td class='num'>" + esc(money(rate.frt, "USD")) +
+            esc(routingOf(rate) || "—") + "</td><td class='num'>" + esc(money(rate.frt, frtCcy(rate))) +
             "</td><td class='num'>" + esc(allIn) + "</td><td>" + esc(fmtDate(rate.vf) + "–" + fmtDate(rate.vt)) +
             "</td><td>" + esc(ttLabel(rate)) + "</td></tr>";
         }
