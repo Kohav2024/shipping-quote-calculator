@@ -212,6 +212,48 @@
       color: var(--muted);
       text-align: center;
     }
+
+    .origin-combo { position: relative; margin-top: 12px; }
+    #origin-input { direction: ltr; text-align: left; }
+    .origin-list {
+      position: absolute;
+      z-index: 50;
+      right: 0;
+      left: 0;
+      top: calc(100% + 4px);
+      margin: 0;
+      padding: 4px;
+      list-style: none;
+      background: #fff;
+      border: 1px solid #cfc9bd;
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      overflow-x: hidden;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      max-height: 320px;
+    }
+    .origin-item {
+      display: block;
+      width: 100%;
+      text-align: start;
+      font: inherit;
+      font-size: 16px;
+      line-height: 1.35;
+      background: transparent;
+      border: 0;
+      border-radius: 10px;
+      padding: 12px 14px;
+      min-height: 48px;
+      cursor: pointer;
+      color: var(--ink);
+    }
+    .origin-item .oname { font-weight: 600; }
+    .origin-item .ocountry { color: var(--muted); margin-inline-start: 0.35em; }
+    .origin-item .oroute { display: block; font-size: 0.82rem; color: var(--muted); margin-top: 2px; }
+    .origin-item[aria-selected="true"], .origin-item.is-active { background: var(--accent-soft); }
+    .origin-item:hover { background: #efebe3; }
+    .origin-empty { padding: 12px 14px; color: var(--muted); font-size: 0.92rem; }
     .copy-fallback { margin-top: 12px; }
     .copy-fallback textarea { min-height: 160px; }
     @media (max-width: 720px) {
@@ -419,22 +461,39 @@
       return a.name.localeCompare(b.name, "en");
     });
   }
-  function originLabel(o) {
-    const loc = o.unlocode ? " · " + o.unlocode : "";
-    const route = o.routing ? " · " + o.routing : "";
-    if (o.kind === "inland") {
-      const how = [o.mode, o.mot].filter(Boolean).join(" / ");
-      return o.name + " — " + o.countryHe + " · " + how + " דרך " + o.pol + loc + route;
-    }
-    return o.name + " — " + o.countryHe + loc + route;
+  function originChoiceLabel(o) {
+    let s = o.name + " — " + (o.countryHe || o.countryEn || "");
+    if (o.kind === "inland") s += " · דרך " + o.pol;
+    if (o.routing) s += " · " + o.routing;
+    return s;
   }
-  function matchesQuery(o, q) {
-    if (!q) return true;
-    const n = q.trim().toLowerCase();
-    const hay = [o.name, o.pol, o.countryHe, o.countryEn, o.iso, o.unlocode, o.mode, o.mot || "", o.routing || ""]
-      .join(" ")
-      .toLowerCase();
-    return n.split(/\s+/).every((part) => hay.includes(part));
+  function searchNorm(s) {
+    return String(s || "").toLowerCase().replace(/\s+/g, " ").trim();
+  }
+  function searchWords(s) {
+    return searchNorm(s).split(/[\s,\/_.()\-]+/).filter(Boolean);
+  }
+  function originRank(o, q) {
+    if (!q) return 1;
+    const nq = searchNorm(q);
+    const name = searchNorm(o.name);
+    const bare = searchNorm(portBare(o.name));
+    if (name.startsWith(nq) || bare.startsWith(nq)) return 1;
+    if (searchWords(o.name).some(function (w) { return w.startsWith(nq); })) return 2;
+    if (o.pol && searchNorm(portBare(o.pol)).startsWith(nq)) return 3;
+    return 0;
+  }
+  function filterOrigins(list, q) {
+    const nq = searchNorm(q);
+    if (!nq) return list.slice();
+    return list
+      .map(function (o) { return { o: o, r: originRank(o, nq) }; })
+      .filter(function (x) { return x.r > 0; })
+      .sort(function (a, b) {
+        if (a.r !== b.r) return a.r - b.r;
+        return a.o.name.localeCompare(b.o.name, "en");
+      })
+      .map(function (x) { return x.o; });
   }
   function isValidOn(rate, iso) { return iso >= rate.vf && iso <= rate.vt; }
   function totalsOf(rate, qty) {
@@ -528,7 +587,6 @@
   const allByCarrier = carriers.map((c) => ({ c, rates: c.rows.map(unpackRow) }));
   const state = {
     carrierId: carriers[0].id,
-    query: "",
     originId: "",
     dest: "ASHDOD, IL",
     typ: "",
@@ -539,6 +597,124 @@
     copied: false,
     copyFallback: "",
   };
+
+  let comboOrigins = [];
+  let comboOpen = false;
+  let comboTyped = null;
+  let comboHighlight = -1;
+
+  function originItemHtml(o, active) {
+    const route = (o.kind === "inland" ? "דרך " + o.pol : "") + (o.routing ? ((o.kind === "inland" ? " · " : "") + o.routing) : "");
+    return '<li><button type="button" class="origin-item' + (active ? " is-active" : "") + '" role="option" id="origin-opt-' + esc(o.id) + '" data-id="' + esc(o.id) + '" aria-selected="' + (active ? "true" : "false") + '">' +
+      '<span class="oname">' + esc(o.name) + '</span>' +
+      (o.countryHe || o.countryEn ? '<span class="ocountry">' + esc(o.countryHe || o.countryEn) + "</span>" : "") +
+      (route ? '<span class="oroute">' + esc(route) + "</span>" : "") +
+      "</button></li>";
+  }
+
+  function positionOriginList() {
+    const input = document.getElementById("origin-input");
+    const list = document.getElementById("origin-list");
+    if (!input || !list || list.hidden) return;
+    const vv = window.visualViewport;
+    const vh = vv ? vv.height : window.innerHeight;
+    const vtop = vv ? vv.offsetTop : 0;
+    const rect = input.getBoundingClientRect();
+    const spaceBelow = vtop + vh - rect.bottom - 10;
+    const spaceAbove = rect.top - vtop - 10;
+    if (spaceBelow >= 140 || spaceBelow >= spaceAbove) {
+      list.style.top = "calc(100% + 4px)";
+      list.style.bottom = "auto";
+      list.style.maxHeight = Math.max(140, Math.min(320, spaceBelow)) + "px";
+    } else {
+      list.style.top = "auto";
+      list.style.bottom = "calc(100% + 4px)";
+      list.style.maxHeight = Math.max(140, Math.min(320, spaceAbove)) + "px";
+    }
+  }
+
+  function paintOriginList() {
+    const input = document.getElementById("origin-input");
+    const list = document.getElementById("origin-list");
+    const lab = document.getElementById("origin-field-label");
+    if (!input || !list) return;
+    const q = comboTyped != null ? comboTyped : "";
+    const items = filterOrigins(comboOrigins, q);
+    if (comboHighlight >= items.length) comboHighlight = items.length - 1;
+    if (comboHighlight < -1) comboHighlight = -1;
+    input.setAttribute("aria-expanded", "true");
+    list.hidden = false;
+    if (!items.length) {
+      list.innerHTML = '<li class="origin-empty">לא נמצא נמל שמתחיל באותיות האלה</li>';
+    } else {
+      list.innerHTML = items.map(function (o, i) { return originItemHtml(o, i === comboHighlight); }).join("");
+    }
+    if (lab) {
+      lab.textContent = q
+        ? "נמל מוצא (" + items.length + " תוצאות)"
+        : "נמל מוצא (" + comboOrigins.length + " במחירון)";
+    }
+    const active = items[comboHighlight];
+    if (active) input.setAttribute("aria-activedescendant", "origin-opt-" + active.id);
+    else input.removeAttribute("aria-activedescendant");
+    list.querySelectorAll("[data-id]").forEach(function (btn) {
+      btn.addEventListener("pointerdown", function (e) {
+        e.preventDefault();
+        chooseOrigin(btn.getAttribute("data-id"));
+      });
+    });
+    if (comboHighlight >= 0) {
+      const el = list.querySelector(".is-active");
+      if (el && el.scrollIntoView) el.scrollIntoView({ block: "nearest" });
+    }
+    positionOriginList();
+  }
+
+  function closeOriginList(revert) {
+    comboOpen = false;
+    comboTyped = null;
+    comboHighlight = -1;
+    const list = document.getElementById("origin-list");
+    const input = document.getElementById("origin-input");
+    const lab = document.getElementById("origin-field-label");
+    if (list) list.hidden = true;
+    if (input) {
+      input.setAttribute("aria-expanded", "false");
+      input.removeAttribute("aria-activedescendant");
+      if (revert) {
+        const sel = comboOrigins.find(function (o) { return o.id === state.originId; });
+        input.value = sel ? originChoiceLabel(sel) : "";
+      }
+    }
+    if (lab) lab.textContent = "נמל מוצא (" + comboOrigins.length + " במחירון)";
+  }
+
+  function openOriginList() {
+    comboOpen = true;
+    if (comboTyped === null) comboTyped = "";
+    paintOriginList();
+    const input = document.getElementById("origin-input");
+    if (input) {
+      const vv = window.visualViewport;
+      const vtop = vv ? vv.offsetTop : 0;
+      const top = input.getBoundingClientRect().top + window.scrollY - vtop - 64;
+      window.scrollTo({ top: Math.max(0, top), behavior: "auto" });
+      positionOriginList();
+      requestAnimationFrame(positionOriginList);
+      setTimeout(positionOriginList, 300);
+    }
+  }
+
+  function chooseOrigin(id) {
+    state.originId = id || "";
+    state.typ = "";
+    state.haz = false;
+    state.copied = false;
+    state.copyFallback = "";
+    comboTyped = null;
+    comboOpen = false;
+    render();
+  }
 
   function rematchOrigin(nextId, prevOriginId, prevOrigins) {
     const prev = prevOrigins.find((o) => o.id === prevOriginId);
@@ -617,12 +793,8 @@
         return c !== 0 ? c : a.name.localeCompare(b.name, "en");
       });
     }
-    const filteredOrigins = origins.filter((o) => matchesQuery(o, state.query));
+    comboOrigins = origins;
     const selectedOrigin = origins.find((o) => o.id === state.originId) || null;
-    const originOptionsList = filteredOrigins.slice();
-    if (selectedOrigin && !originOptionsList.some((o) => o.id === selectedOrigin.id)) {
-      originOptionsList.unshift(selectedOrigin);
-    }
     const shipIso = parseDateInput(state.dateText);
     const qty = Math.max(1, Math.floor(Number(state.qtyText) || 1));
     const markup = Math.max(0, Number(state.markupText) || 0);
@@ -696,13 +868,6 @@
       if (carrier.paymentTerms) line2Html += " · תשלום: " + esc(carrier.paymentTerms);
       carrierMeta = '<p class="meta">' + headHtml + '</p><p class="meta">' + line2Html + '</p>';
     }
-
-    const originLabelText = state.query.trim()
-      ? "נמל מוצא (" + filteredOrigins.length + " תוצאות)"
-      : "נמל מוצא (" + origins.length + " במחירון)";
-    const originOpts = '<option value="">בחרו נמל מוצא</option>' + originOptionsList.map((o) =>
-      '<option value="' + esc(o.id) + '"' + (o.id === state.originId ? " selected" : "") + ">" + esc(originLabel(o)) + "</option>"
-    ).join("");
 
     const typOpts = '<option value="">' + (state.originId ? "בחרו סוג מכולה" : "בחרו קודם נמל מוצא") + "</option>" +
       typesInLane.map((typ) =>
@@ -880,13 +1045,11 @@
         '<div><label class="fld" for="carrier">חברת ספנות</label><select id="carrier">' + carrierOptions + "</select></div>" +
         "<div>" + carrierMeta + "</div>" +
       "</div>" +
-      '<div style="margin-top:12px"><label class="fld" for="query">חיפוש נמל מוצא (שם, מדינה או קוד UNLOCODE)</label>' +
-      '<input type="text" id="query" value="' + esc(state.query) + '" placeholder="למשל Brisbane, איטליה, או AUMEL"></div>' +
-      '<div style="margin-top:12px"><label class="fld" for="origin">' + esc(originLabelText) + "</label>" +
-      '<select id="origin"' + (originOptionsList.length === 0 ? " disabled" : "") + ">" + originOpts + "</select></div>" +
-      (state.query.trim() && filteredOrigins.length === 0
-        ? '<div class="callout warn"><strong>לא נמצא נמל</strong>אין נמל מוצא במחירון הזה שמתאים לחיפוש. נסו שם באנגלית, מדינה, או קוד נמל.</div>'
-        : "") +
+      '<div class="origin-combo" id="origin-combo">' +
+        '<label class="fld" for="origin-input" id="origin-field-label">נמל מוצא (' + origins.length + " במחירון)</label>" +
+        '<input type="text" id="origin-input" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="origin-list" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" placeholder="הקלידו אות לחיפוש או בחרו מהרשימה" value="' + esc(selectedOrigin ? originChoiceLabel(selectedOrigin) : "") + '">' +
+        '<ul id="origin-list" class="origin-list" role="listbox" hidden></ul>' +
+      "</div>" +
       '<div class="grid grid-2" style="margin-top:12px">' +
         '<div><div class="fld-label">נמל יעד</div><div class="seg" role="group" aria-label="נמל יעד">' +
           '<button type="button" data-dest="ASHDOD, IL" aria-pressed="' + (state.dest === "ASHDOD, IL") + '">אשדוד</button>' +
@@ -916,17 +1079,48 @@
       state.copyFallback = "";
       render();
     });
-    $("query").addEventListener("input", (e) => { state.query = e.target.value; state.copied = false; render(); });
-    // keep caret at end after rerender of search is annoying — only re-render origins on input is heavy.
-    // Fix: don't full-rerender on query input for caret. We'll restore focus and cursor.
-    $("origin").addEventListener("change", (e) => {
-      state.originId = e.target.value;
-      state.typ = "";
-      state.haz = false;
-      state.copied = false;
-      state.copyFallback = "";
-      render();
-    });
+    const originInput = $("origin-input");
+    if (originInput) {
+      originInput.addEventListener("focus", function () {
+        originInput.select();
+        if (!comboOpen) {
+          comboTyped = "";
+          openOriginList();
+        }
+      });
+      originInput.addEventListener("input", function () {
+        comboTyped = originInput.value;
+        comboHighlight = comboTyped ? 0 : -1;
+        if (!comboOpen) openOriginList();
+        else paintOriginList();
+      });
+      originInput.addEventListener("keydown", function (e) {
+        const items = filterOrigins(comboOrigins, comboTyped != null ? comboTyped : "");
+        if (e.key === "ArrowDown") {
+          e.preventDefault();
+          if (!comboOpen) openOriginList();
+          comboHighlight = Math.min(items.length - 1, comboHighlight + 1);
+          if (comboHighlight < 0 && items.length) comboHighlight = 0;
+          paintOriginList();
+        } else if (e.key === "ArrowUp") {
+          e.preventDefault();
+          comboHighlight = Math.max(0, comboHighlight - 1);
+          paintOriginList();
+        } else if (e.key === "Enter") {
+          if (comboOpen && items.length) {
+            e.preventDefault();
+            const pick = items[Math.max(0, comboHighlight)];
+            if (pick) chooseOrigin(pick.id);
+          }
+        } else if (e.key === "Escape") {
+          e.preventDefault();
+          closeOriginList(true);
+          originInput.blur();
+        } else if (e.key === "Tab") {
+          if (comboOpen) closeOriginList(true);
+        }
+      });
+    }
     $("typ").addEventListener("change", (e) => {
       state.typ = e.target.value;
       state.haz = false;
@@ -974,25 +1168,22 @@
       });
     }
 
-    // Restore search field focus/caret if the user was typing
-    if (document.activeElement && false) { /* placeholder */ }
   }
 
-  // Better query typing: debounce re-render and restore selection
-  const _render = render;
-  render = function (keepQueryFocus) {
-    const q = document.getElementById("query");
-    const start = q && document.activeElement === q ? q.selectionStart : null;
-    _render();
-    if (start != null) {
-      const nq = document.getElementById("query");
-      if (nq) { nq.focus(); nq.setSelectionRange(start, start); }
-    }
-  };
-
-  // override query handler via event delegation after first paint? already inside render.
-  // Re-bind: modify the query listener in render - already does full render on input which will restore caret if we use the wrapper.
-  // Need first render to use wrapped render. The inner listener calls render() which will be the wrapped one if we wrap first.
+  document.addEventListener("pointerdown", function (e) {
+    const combo = document.getElementById("origin-combo");
+    if (!combo || !comboOpen) return;
+    if (!combo.contains(e.target)) closeOriginList(true);
+  });
+  function onViewportChange() {
+    if (comboOpen) positionOriginList();
+  }
+  window.addEventListener("resize", onViewportChange);
+  window.addEventListener("scroll", onViewportChange, { passive: true });
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", onViewportChange);
+    window.visualViewport.addEventListener("scroll", onViewportChange);
+  }
 
   render();
 })();
