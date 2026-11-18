@@ -36,24 +36,23 @@
       line-height: 1.55;
       min-height: 100vh;
     }
-    .wrap { max-width: 980px; margin: 0 auto; padding: 20px 16px 48px; }
+    .wrap { max-width: 980px; margin: 0 auto; padding: 10px 12px 40px; }
     header.hero {
       background: var(--navy);
       color: #fff;
-      padding: 28px 16px 24px;
+      padding: 8px 12px;
+      padding-top: max(8px, env(safe-area-inset-top));
     }
-    header.hero .wrap { padding-top: 0; padding-bottom: 0; }
+    header.hero .wrap { padding: 0; }
     header.hero h1 {
-      margin: 0 0 8px;
-      font-size: 1.55rem;
+      margin: 0;
+      font-size: 0.95rem;
       font-weight: 700;
       letter-spacing: -0.02em;
-    }
-    header.hero p {
-      margin: 0;
-      color: rgba(255,255,255,0.82);
-      font-size: 0.98rem;
-      max-width: 46rem;
+      line-height: 1.25;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     .card {
       background: var(--paper);
@@ -63,6 +62,39 @@
       padding: 18px 18px 20px;
       margin: 16px 0 0;
     }
+    .search-card {
+      margin-top: 10px;
+      padding: 12px;
+    }
+    .search-top, .search-row { display: grid; gap: 8px; }
+    .search-top { margin: 0; }
+    .search-row { margin-top: 8px; }
+    .search-card .origin-combo { margin-top: 0; }
+    .search-card label.fld, .search-card .fld-label { margin-bottom: 4px; font-size: 0.78rem; }
+    .search-card input[type="text"], .search-card input[type="number"], .search-card select {
+      padding: 8px 10px;
+    }
+    .search-card .seg { padding: 2px; }
+    .search-card .seg button { padding: 8px 8px; }
+    .meta-line { font-size: 0.8rem; color: var(--muted); margin: 0 0 8px; }
+    .extras-panel {
+      margin-top: 8px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      padding: 0 12px 8px;
+    }
+    .extras-panel > summary {
+      cursor: pointer;
+      font-weight: 700;
+      padding: 8px 0;
+      list-style-position: inside;
+      font-size: 0.92rem;
+      color: var(--navy);
+    }
+    .extras-panel .extras-body { padding-bottom: 4px; }
+    .extras-panel .grid { margin-top: 8px; }
+    .extras-panel .history-panel { margin-top: 8px; border: 0; padding: 0; }
     .card h2 {
       margin: 0 0 14px;
       font-size: 1.15rem;
@@ -299,7 +331,14 @@
     .hist-row label { display: block; font-weight: 600; margin-bottom: 2px; }
     @media (max-width: 720px) {
       .grid-2, .grid-3 { grid-template-columns: 1fr; }
-      header.hero h1 { font-size: 1.35rem; }
+      .wrap { padding: 8px 12px 32px; }
+      .search-top { grid-template-columns: 1fr; }
+      .search-row { grid-template-columns: 1fr 1fr; }
+      .search-row .fld-date { grid-column: 1 / -1; }
+    }
+    @media (min-width: 721px) {
+      .search-top { grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr); align-items: end; }
+      .search-row { grid-template-columns: 1fr 1fr 1fr; }
     }
   </style>
 </head>
@@ -307,7 +346,6 @@
   <header class="hero">
     <div class="wrap">
       <h1>מחשבון הצעת מחיר לשילוח</h1>
-      <p>בחרו חברת ספנות, נמל מוצא, יעד, סוג מכולה ותאריך הפלגה / BL — והמחשבון ישלוף את המחירון שחל באותו תאריך. מחירונים ישנים נשמרים לתמחור תיק כשהמכולה מגיעה, בלי גלילה ארוכה: לכל חברה רשימה מקופלת בהיסטוריית המחירונים. אפשר גם להשוות בין החברות כשיש כיסוי לאותו מסלול. המספרים לקוחים מהמחירונים שצורפו, בלי המרה ובלי תוספות שלא רשומות.</p>
     </div>
   </header>
   <div class="wrap">
@@ -656,6 +694,7 @@
     copyFallback: "",
     versionOverride: {},
     historyOpen: false,
+    extrasOpen: false,
   };
 
   function versionsFor(carrierId) {
@@ -1125,28 +1164,7 @@
 
     let carrierMeta = "";
     if (isCompare) {
-      carrierMeta = '<p class="hint">מציגים תעריף מכל חברה שיש לה מחירון תקף לתאריך ההפלגה / BL שנבחר. אם יש כמה גרסאות חופפות, נבחרת זו שהונפקה לאחרונה. YML ו־OOCL חופפים במסלולי מזרח אסיה לאשדוד; צים מכסה בעיקר אירופה, אמריקה ואוסטרליה; MSC מכסה הודו וסרי לנקה לחיפה ולאשדוד כשהתאריך נופל בחלון של המחירון. וריאנטי ניתוב (כמו Qingdao או Xiamen) מוצגים בנפרד.</p>';
-    } else {
-      const dc = displayCarrier;
-      let headHtml;
-      if (dc.quotes && dc.quotes.length) {
-        headHtml = "הצעות " + dc.quotes.map((q) => ltrHtml(q.ref)).join(" / ") + " · " + ltrHtml(dc.party || "");
-      } else if (!dc.ref) {
-        headHtml = (dc.offerTitle ? ltrHtml(dc.offerTitle) + " · " : "") + ltrHtml(dc.party || "") + " · לא צוין מספר הסכם במחירון";
-      } else {
-        headHtml = "הסכם " + ltrHtml(dc.ref) + (dc.version ? " · גרסה " + ltrHtml(dc.version) : "") + (dc.party ? " · " + ltrHtml(dc.party) : "");
-      }
-      let line2Html = activeVersion
-        ? "תוקף המחירון: " + versionWindow(activeVersion)
-        : (shipIso ? "אין מחירון בתוקף לתאריך זה" : "בחרו תאריך הפלגה / BL");
-      if (activeVersion && shipIso && !isVersionValidOn(activeVersion, shipIso)) {
-        line2Html += addDays(activeVersion.vt) < shipIso ? " · המחירון פג תוקף לתאריך שנבחר" : " · עדיין לא בתוקף לתאריך שנבחר";
-      }
-      if (bookingLine(dc)) {
-        line2Html += dc.email ? " · הזמנות: " + ltrHtml(dc.email) : " · " + ltrHtml(bookingLine(dc));
-      }
-      if (dc.paymentTerms) line2Html += " · תשלום: " + esc(dc.paymentTerms);
-      carrierMeta = '<p class="meta">' + headHtml + '</p><p class="meta">' + line2Html + '</p>';
+      carrierMeta = "השוואה: מוצג התעריף התקף לתאריך ההפלגה / BL מכל חברה שיש לה שורה במסלול. בחפיפה נבחרת הגרסה שהונפקה לאחרונה.";
     }
 
     const typOpts = '<option value="">' + (state.originId ? "בחרו סוג מכולה" : "בחרו קודם נמל מוצא") + "</option>" +
@@ -1154,21 +1172,22 @@
         '<option value="' + esc(typ) + '"' + (typ === effectiveTyp ? " selected" : "") + ">" + esc(TYPE_HE[typ] || typ) + "</option>"
       ).join("");
 
-    let formExtra = "";
+    let formHaz = "";
+    let formWarn = "";
     if (effectiveTyp && hasHaz) {
       const lab = hasNonHaz
         ? "מטען מסוכן (HAZ) — רק אם יש שורה במחירון"
         : "למסלול זה קיימת במחירון רק שורת מטען מסוכן";
-      formExtra += '<label class="toggle"><input type="checkbox" id="haz" ' + (effectiveHaz ? "checked " : "") + (!hasNonHaz ? "disabled " : "") + "> <span>" + esc(lab) + "</span></label>";
+      formHaz += '<label class="toggle"><input type="checkbox" id="haz" ' + (effectiveHaz ? "checked " : "") + (!hasNonHaz ? "disabled " : "") + "> <span>" + esc(lab) + "</span></label>";
     }
     if (state.originId && typesInLane.length === 0) {
       const msg = (carrier.id === "yml" && state.dest.startsWith("HAIFA"))
         ? "במחירון YML שנטען כל שורות ההובלה הימית הן לאשדוד בלבד. יש תוספת TA (Transport Additional Charge) ליעד חיפה (ILHFA): 100$ ל-20DC, 200$ ל-40DC ו־40HQ — בלי תעריף הובלה ימית נפרד לחיפה. לא הומצא מחיר הובלה לחיפה."
         : "לנמל המוצא שנבחר אין שורות אל " + destHe(state.dest) + " במחירון הזה.";
-      formExtra += '<div class="callout warn"><strong>אין תעריף ליעד הזה</strong>' + esc(msg) + "</div>";
+      formWarn += '<div class="callout warn"><strong>אין תעריף ליעד הזה</strong>' + esc(msg) + "</div>";
     }
     if (!shipIso) {
-      formExtra += '<div class="callout warn"><strong>תאריך לא מזוהה</strong>כתבו את תאריך השילוח בפורמט 18.11.2026 (יום.חודש.שנה).</div>';
+      formWarn += '<div class="callout warn"><strong>תאריך לא מזוהה</strong>כתבו את תאריך השילוח בפורמט 18.11.2026 (יום.חודש.שנה).</div>';
     }
 
     let quoteHtml = "";
@@ -1361,33 +1380,42 @@
       : "";
 
     const app = document.getElementById("app");
+    const extrasInner =
+      '<div class="extras-body">' +
+        '<div class="grid grid-2">' +
+          '<div><label class="fld" for="qty">מספר מכולות</label><input type="number" id="qty" min="1" step="1" value="' + esc(state.qtyText) + '"></div>' +
+          '<div><label class="fld" for="markup">רווח למכולה (USD, רשות)</label><input type="number" id="markup" min="0" step="1" value="' + esc(state.markupText) + '" placeholder="0"></div>' +
+        "</div>" +
+        formHaz +
+        historyPanelHtml(shipIso) +
+      "</div>";
+    const quoteMeta = isCompare
+      ? (carrierMeta ? '<p class="meta-line">' + carrierMeta + "</p>" : "")
+      : "";
     app.innerHTML =
-      '<section class="card"><h2>בחירת מסלול</h2>' +
-      '<div class="grid grid-2">' +
+      '<section class="card search-card">' +
+      '<div class="search-top">' +
         '<div><label class="fld" for="carrier">חברת ספנות</label><select id="carrier">' + carrierOptions + "</select></div>" +
-        "<div>" + carrierMeta + "</div>" +
+        '<div class="origin-combo" id="origin-combo">' +
+          '<label class="fld" for="origin-input" id="origin-field-label">נמל מוצא (' + origins.length + " במחירון)</label>" +
+          '<input type="text" id="origin-input" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="origin-list" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" placeholder="הקלידו אות לחיפוש או בחרו מהרשימה" value="' + esc(selectedOrigin ? originChoiceLabel(selectedOrigin) : "") + '">' +
+          '<ul id="origin-list" class="origin-list" role="listbox" hidden></ul>' +
+        "</div>" +
       "</div>" +
-      '<div class="origin-combo" id="origin-combo">' +
-        '<label class="fld" for="origin-input" id="origin-field-label">נמל מוצא (' + origins.length + " במחירון)</label>" +
-        '<input type="text" id="origin-input" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="origin-list" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" placeholder="הקלידו אות לחיפוש או בחרו מהרשימה" value="' + esc(selectedOrigin ? originChoiceLabel(selectedOrigin) : "") + '">' +
-        '<ul id="origin-list" class="origin-list" role="listbox" hidden></ul>' +
-      "</div>" +
-      '<div class="grid grid-2" style="margin-top:12px">' +
+      '<div class="search-row">' +
         '<div><div class="fld-label">נמל יעד</div><div class="seg" role="group" aria-label="נמל יעד">' +
           '<button type="button" data-dest="ASHDOD, IL" aria-pressed="' + (state.dest === "ASHDOD, IL") + '">אשדוד</button>' +
           '<button type="button" data-dest="HAIFA, IL" aria-pressed="' + (state.dest === "HAIFA, IL") + '">חיפה</button>' +
         "</div></div>" +
         '<div><label class="fld" for="typ">סוג מכולה</label><select id="typ"' +
           (!state.originId || typesInLane.length === 0 ? " disabled" : "") + ">" + typOpts + "</select></div>" +
+        '<div class="fld-date"><label class="fld" for="date">תאריך הפלגה / BL</label><input type="text" id="date" value="' + esc(state.dateText) + '" placeholder="18.11.2026" inputmode="numeric"></div>' +
       "</div>" +
-      '<div class="grid grid-3" style="margin-top:12px">' +
-        '<div><label class="fld" for="date">תאריך הפלגה / BL</label><input type="text" id="date" value="' + esc(state.dateText) + '" placeholder="18.11.2026" inputmode="numeric"></div>' +
-        '<div><label class="fld" for="qty">מספר מכולות</label><input type="number" id="qty" min="1" step="1" value="' + esc(state.qtyText) + '"></div>' +
-        '<div><label class="fld" for="markup">רווח למכולה (USD, רשות)</label><input type="number" id="markup" min="0" step="1" value="' + esc(state.markupText) + '" placeholder="0"></div>' +
-      "</div>" + formExtra + historyPanelHtml(shipIso) +
+      formWarn +
+      '<details class="extras-panel" id="extras-panel"' + (state.extrasOpen ? " open" : "") + "><summary>אפשרויות נוספות</summary>" + extrasInner + "</details>" +
       "</section>" +
-      '<section class="card"><div class="card-head"><h2>הצעת מחיר</h2>' + copyBtn + "</div>" + (activeVersion ? versionBadgeHtml(activeVersion, shipIso, altVersions) : "") + quoteHtml + "</section>" +
-      '<details class="terms" open><summary>תנאים שחשוב לציין</summary><div class="card">' + termsHtml(displayCarrier, shipIso) + "</div></details>";
+      '<section class="card"><div class="card-head"><h2>הצעת מחיר</h2>' + copyBtn + "</div>" + quoteMeta + (activeVersion ? versionBadgeHtml(activeVersion, shipIso, altVersions) : "") + quoteHtml + "</section>" +
+      '<details class="terms"><summary>תנאים שחשוב לציין</summary><div class="card">' + termsHtml(displayCarrier, shipIso) + "</div></details>";
 
     const $ = (id) => document.getElementById(id);
     $("carrier").addEventListener("change", (e) => {
@@ -1488,6 +1516,10 @@
         const ta = document.getElementById("copy-text");
         if (ta) { ta.focus(); ta.select(); }
       });
+    }
+    const extrasPanel = $("extras-panel");
+    if (extrasPanel) {
+      extrasPanel.addEventListener("toggle", function () { state.extrasOpen = extrasPanel.open; });
     }
     const histPanel = $("history-panel");
     if (histPanel) {
