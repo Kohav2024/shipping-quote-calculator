@@ -265,6 +265,38 @@
     .origin-empty { padding: 12px 14px; color: var(--muted); font-size: 0.92rem; }
     .copy-fallback { margin-top: 12px; }
     .copy-fallback textarea { min-height: 160px; }
+    .version-badge {
+      margin: 10px 0 0;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--info-bd);
+      background: var(--info-bg);
+      color: var(--info-ink);
+      font-size: 0.92rem;
+      line-height: 1.45;
+    }
+    .version-badge strong { display: block; margin-bottom: 2px; }
+    .version-badge .alt { margin-top: 8px; }
+    .version-badge select, .history-panel select {
+      width: 100%;
+      margin-top: 4px;
+    }
+    .history-panel {
+      margin-top: 14px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #fff;
+      padding: 0 12px 8px;
+    }
+    .history-panel > summary {
+      cursor: pointer;
+      font-weight: 700;
+      padding: 10px 0;
+      list-style-position: inside;
+    }
+    .history-panel .hint { margin: 0 0 8px; }
+    .hist-row { margin: 0 0 10px; }
+    .hist-row label { display: block; font-weight: 600; margin-bottom: 2px; }
     @media (max-width: 720px) {
       .grid-2, .grid-3 { grid-template-columns: 1fr; }
       header.hero h1 { font-size: 1.35rem; }
@@ -275,7 +307,7 @@
   <header class="hero">
     <div class="wrap">
       <h1>מחשבון הצעת מחיר לשילוח</h1>
-      <p>בחרו חברת ספנות, נמל מוצא, יעד, סוג מכולה ותאריך שילוח — והמחשבון ישלוף מהמחירון את ההובלה, התוספות, התוקף וזמן ההפלגה. אפשר גם להשוות בין החברות כשיש כיסוי לאותו מסלול. המספרים לקוחים מהמחירונים שצורפו, בלי המרה ובלי תוספות שלא רשומות.</p>
+      <p>בחרו חברת ספנות, נמל מוצא, יעד, סוג מכולה ותאריך הפלגה / BL — והמחשבון ישלוף את המחירון שחל באותו תאריך. מחירונים ישנים נשמרים לתמחור תיק כשהמכולה מגיעה, בלי גלילה ארוכה: לכל חברה רשימה מקופלת בהיסטוריית המחירונים. אפשר גם להשוות בין החברות כשיש כיסוי לאותו מסלול. המספרים לקוחים מהמחירונים שצורפו, בלי המרה ובלי תוספות שלא רשומות.</p>
     </div>
   </header>
   <div class="wrap">
@@ -283,15 +315,15 @@
     <footer class="note">כלי פנימי להצעת מחיר ממחירון. התעריפים כפופים לתוקף, למקום פנוי ולתנאי החברה.</footer>
   </div>
   <noscript><p class="wrap">יש להפעיל JavaScript כדי להשתמש במחשבון.</p></noscript>
-  <script src="data.js?v=msc-20261118"></script>
+  <script src="data/index.js?v=hist-20261118"></script>
   <script>
 (function () {
-  const DATA = window.QUOTE_DATA;
-  if (!DATA || !DATA.packed) {
-    document.getElementById("app").innerHTML = '<div class="callout warn"><strong>חסר קובץ המחירון</strong>לא נמצא data.js.</div>';
+  const DATA = window.QUOTE_INDEX;
+  if (!DATA || !DATA.versions) {
+    document.getElementById("app").innerHTML = '<div class="callout warn"><strong>חסר קובץ המחירון</strong>לא נמצא data/index.js.</div>';
     return;
   }
-  const PACKED = DATA.packed;
+  const PACKED = DATA;
   const COUNTRY_HE = DATA.countryHe;
   const COUNTRY_EN = DATA.countryEn;
   const TYPE_HE = DATA.typeHe;
@@ -301,7 +333,8 @@
   const EPOCH = DATA.epochUtc || [2026, 10, 11];
   const PAY_ORDER = ["prepaid", "frt_terms", "collect"];
   const COMPARE_ID = "compare-all";
-  const carriers = PACKED.carriers;
+  const carriers = DATA.carriers;
+  const VERSIONS = DATA.versions;
 
   function addDays(offset) {
     const t = Date.UTC(EPOCH[0], EPOCH[1], EPOCH[2]) + offset * 86400000;
@@ -538,7 +571,13 @@
       lines.push("");
     }
     lines.push(carrier.nameHe);
-    lines.push(quoteLabel(carrier, rate) + " · " + carrier.party);
+    if (carrier.versionId || carrier.version || carrier.ref) {
+      lines.push((carrier.ref && carrier.version ? ("הסכם " + carrier.ref + " · גרסה " + carrier.version) : quoteLabel(carrier, rate)) +
+        (carrier.vf ? " · תוקף " + fmtDate(addDays(carrier.vf)) + "–" + fmtDate(addDays(carrier.vt)) : "") +
+        (carrier.issued ? " · הונפק " + fmtDate(carrier.issued) : "") +
+        (carrier.added ? " · נוסף למחשבון " + fmtDate(carrier.added) : ""));
+    }
+    lines.push(quoteLabel(carrier, rate) + (carrier.party ? " · " + carrier.party : ""));
     if (origin.kind === "inland") {
       lines.push("מוצא: " + origin.name + " (" + origin.mode + (origin.mot ? " / " + origin.mot : "") + ") דרך " + origin.pol);
     } else {
@@ -602,10 +641,11 @@
     return '<span class="ltr" dir="ltr">' + esc(s) + "</span>";
   }
 
-  const allByCarrier = carriers.map((c) => ({ c, rates: c.rows.map(unpackRow) }));
+  const versionCache = {};
   const state = {
     carrierId: carriers[0].id,
     originId: "",
+    originKey: "",
     dest: "ASHDOD, IL",
     typ: "",
     dateText: todayText(),
@@ -614,7 +654,105 @@
     haz: false,
     copied: false,
     copyFallback: "",
+    versionOverride: {},
+    historyOpen: false,
   };
+
+  function versionsFor(carrierId) {
+    return VERSIONS.filter((v) => v.carrierId === carrierId);
+  }
+  function versionMeta(id) {
+    return VERSIONS.find((v) => v.id === id) || null;
+  }
+  function versionIssued(v) {
+    return v.issued || addDays(v.vf);
+  }
+  function compareVersionsNewest(a, b) {
+    const ia = versionIssued(a);
+    const ib = versionIssued(b);
+    if (ib !== ia) return ib < ia ? -1 : 1;
+    const na = parseInt(a.version, 10) || 0;
+    const nb = parseInt(b.version, 10) || 0;
+    if (nb !== na) return nb - na;
+    const aa = a.added || "";
+    const ab = b.added || "";
+    if (ab !== aa) return ab < aa ? -1 : 1;
+    return 0;
+  }
+  function isVersionValidOn(v, iso) {
+    return !!iso && iso >= addDays(v.vf) && iso <= addDays(v.vt);
+  }
+  function coveringVersions(carrierId, iso) {
+    return versionsFor(carrierId).filter((v) => isVersionValidOn(v, iso)).slice().sort(compareVersionsNewest);
+  }
+  function autoVersion(carrierId, iso) {
+    return coveringVersions(carrierId, iso)[0] || null;
+  }
+  function selectedVersionMeta(carrierId, iso) {
+    const pinned = state.versionOverride[carrierId];
+    if (pinned) {
+      const v = versionMeta(pinned);
+      if (v) return v;
+    }
+    if (iso) return autoVersion(carrierId, iso);
+    return versionsFor(carrierId).slice().sort(compareVersionsNewest)[0] || null;
+  }
+  function nearestVersions(carrierId, iso) {
+    const all = versionsFor(carrierId);
+    const prev = all.filter((v) => addDays(v.vt) < iso).sort((a, b) => addDays(b.vt).localeCompare(addDays(a.vt)))[0] || null;
+    const next = all.filter((v) => addDays(v.vf) > iso).sort((a, b) => addDays(a.vf).localeCompare(addDays(b.vf)))[0] || null;
+    return { prev: prev, next: next };
+  }
+  function versionTitle(v) {
+    if (v.ref && v.version) return "הסכם " + v.ref + " · גרסה " + v.version;
+    if (v.label) return v.label;
+    if (v.ref) return "הסכם " + v.ref;
+    return v.id;
+  }
+  function versionWindow(v) {
+    return fmtDate(addDays(v.vf)) + "–" + fmtDate(addDays(v.vt));
+  }
+  function mergeDisplay(carrier, version) {
+    if (!version) return Object.assign({}, carrier);
+    return Object.assign({}, carrier, version, {
+      id: carrier.id,
+      name: carrier.name,
+      nameHe: carrier.nameHe,
+      versionId: version.id,
+    });
+  }
+  function loadVersion(meta) {
+    if (!meta) return Promise.resolve(null);
+    if (versionCache[meta.id]) return Promise.resolve(versionCache[meta.id]);
+    if (window.QUOTE_PACK && window.QUOTE_PACK[meta.id]) {
+      const pack = window.QUOTE_PACK[meta.id];
+      versionCache[meta.id] = { meta: meta, rows: pack.rows, rates: pack.rows.map(unpackRow) };
+      return Promise.resolve(versionCache[meta.id]);
+    }
+    return new Promise(function (resolve, reject) {
+      const s = document.createElement("script");
+      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=hist-20261118";
+      s.async = true;
+      s.onload = function () {
+        const pack = window.QUOTE_PACK && window.QUOTE_PACK[meta.id];
+        if (!pack) { reject(new Error("חסר תוכן מחירון " + meta.id)); return; }
+        versionCache[meta.id] = { meta: meta, rows: pack.rows, rates: pack.rows.map(unpackRow) };
+        resolve(versionCache[meta.id]);
+      };
+      s.onerror = function () { reject(new Error("טעינת המחירון נכשלה: " + meta.file)); };
+      document.head.appendChild(s);
+    });
+  }
+  function neededVersions(isCompare, carrier, shipIso) {
+    if (isCompare) {
+      return carriers.map((c) => selectedVersionMeta(c.id, shipIso)).filter(Boolean);
+    }
+    const v = selectedVersionMeta(carrier.id, shipIso);
+    return v ? [v] : [];
+  }
+  function ratesOfLoaded(meta) {
+    return meta && versionCache[meta.id] ? versionCache[meta.id].rates : [];
+  }
 
   let comboOrigins = [];
   let comboOpen = false;
@@ -725,6 +863,7 @@
 
   function chooseOrigin(id) {
     state.originId = id || "";
+    state.originKey = "";
     state.typ = "";
     state.haz = false;
     state.copied = false;
@@ -739,12 +878,16 @@
     if (!prev) return "";
     const key = bareKey(prev.name);
     const nextIsCompare = nextId === COMPARE_ID;
-    const nextCarrier = carriers.find((c) => c.id === nextId);
-    const nextRates = nextIsCompare
-      ? allByCarrier.flatMap((x) => x.rates)
-      : nextCarrier
-        ? nextCarrier.rows.map(unpackRow)
-        : [];
+    const shipIso = parseDateInput(state.dateText);
+    let nextRates = [];
+    if (nextIsCompare) {
+      carriers.forEach((c) => {
+        const v = selectedVersionMeta(c.id, shipIso);
+        nextRates = nextRates.concat(ratesOfLoaded(v));
+      });
+    } else {
+      nextRates = ratesOfLoaded(selectedVersionMeta(nextId, shipIso));
+    }
     const nextOrigins = nextIsCompare
       ? buildOrigins(nextRates).map((o) => Object.assign({}, o, { id: "cmp::" + bareKey(o.name) }))
       : buildOrigins(nextRates);
@@ -770,18 +913,22 @@
     return '<div class="table-wrap"><table>' + head + body + "</table></div>";
   }
 
-  function termsHtml(displayCarrier) {
-    if (displayCarrier.id === "oocl-nov-2026") {
+  function termsHtml(displayCarrier, shipIso) {
+    if (displayCarrier.id === "oocl") {
       return "<p>מספר חוזה / Filing לציין בהזמנה: 00007640 (יבש שאינו IMCO, וגם מטען מסוכן / ריפר / ציוד מיוחד — אותו מספר). תיקון מספר חוזה שגוי עולה 100$. ההובלה מתומחרת לפי תאריך הטעינה בשטר המטען (BL loading date) בלי חריגים. מטען כללי / non-IMCO, Freight Collect. תוקף 15.11.2026–30.11.2026. ההצעה תקפה לתשלום במזומן ולמטען בשווי נמוך מ-500,000$ למכולה, וכפופה למקום פנוי.</p>" +
         "<p>הסוכן: Israel Scandinavian Maritime Agency Ltd (סוכן בלבד ל-OOCL). פניות: isma-sales@israscan.co.il, www.Israscan.co.il, טל׳ (972) 4-8680777. חיפה: 2 Khayat Sq., POB 33557. אשדוד: Haorgim 35, room 602, P.O.B 4060. תנאי התעריף וה-B/L ב-www.OOCL.com. התעריפים כפופים לשינוי (V.A.T.O.S). אינם כוללים ביטוח, שחרור מכס, אגרות ומיסים. המוביל רשאי לנתב דרך סואץ או כף התקווה הטובה (COGH) בלי הודעה. זמני ההפלגה משוערים.</p>" +
         "<p>לפי האקסל: התעריף מבוסס על הניתוב שצוין (Rates from NON BASE PORTS); ניתוב אחר עלול לשנות את המחיר. B/L שימוזגו עם B/L אחר יהיו כפופים ל-roll over. לפי הטקסט הנלווה (לא בתאי האקסל): Foshan, Jiangmen ו-Huangpu דרך טרמינלים מסוימים בלבד — לפנות לסוכן; וכן אם נדרש תעריף מ-POL אחר.</p>";
     }
-    if (displayCarrier.id === "msc-india-sl-aug-oct-2026") {
-      return "<p><strong>שימו לב: תוקף המחירון 16.08.2026–31.10.2026, ולפי תאריך השילוח היום הוא פג תוקף.</strong> הכותרת במחירון: Updated rate offer Ex India + Sri Lanka as from 16.08.2026 till 31.10.2026* (F.A.K HARMLESS) To Haifa/Ashdod — Updated 15.09.26. הערת הכוכבית: Effective last container Received for export at train depots, terminals or POL'S. הצד במכתב: MEDITERRANEAN SHIPPING CO. (Israel) Ltd. לא נמצא במחירון מספר הסכם, filing או חוזה. במייל צוין שההסכם כבר הוגש לפי שורת הנושא, אבל המספר אינו מופיע בקובץ ולא הומצא.</p>" +
+    if (displayCarrier.id === "msc") {
+      const mscExpired = !!(shipIso && displayCarrier.vt != null && shipIso > addDays(displayCarrier.vt));
+      const head = mscExpired
+        ? "<p><strong>שימו לב: תוקף המחירון 16.08.2026–31.10.2026, ולפי תאריך ההפלגה / BL שנבחר הוא פג תוקף.</strong> "
+        : "<p>תוקף המחירון 16.08.2026–31.10.2026. ";
+      return head + "הכותרת במחירון: Updated rate offer Ex India + Sri Lanka as from 16.08.2026 till 31.10.2026* (F.A.K HARMLESS) To Haifa/Ashdod — Updated 15.09.26. הערת הכוכבית: Effective last container Received for export at train depots, terminals or POL'S. הצד במכתב: MEDITERRANEAN SHIPPING CO. (Israel) Ltd. לא נמצא במחירון מספר הסכם, filing או חוזה. במייל צוין שההסכם כבר הוגש לפי שורת הנושא, אבל המספר אינו מופיע בקובץ ולא הומצא.</p>" +
         "<p>התעריפים הם F.A.K. harmless ליעדי חיפה ואשדוד (אותו מחיר לשני היעדים). 40DV ו-40HC באותו מחיר. DTHC: 275$/20׳ ו-400$/40׳. EFS IN USD - SEP: 156$ × TEU (156$/20׳, 312$/40׳) — נוסף לסה״כ לפי הטבלה, בלי להמציא סכום אחר. OVW כלול בתעריף ל-20׳. 14 ימי demurrage חינם ביעד, אלא אם צוין אחרת. Origin THC משולם על ידי השולח. כפוף לדמי D/O ולהוצאות מקומיות (סכומים לא צוינו — לא הומצאו). כפוף לתוספות במועד השילוח. תנאי ההובלה: <span class=\"ltr\">https://www.msc.com/che/contract-of-carriage</span>.</p>" +
         "<p>לא נוספו אוטומטית (מותנים / ציוד מיוחד / מסוכן, והמחירון הוא FAK harmless): EIS 50$/מכולה ל-Coir pith/Flammable (הסכם נפרד) ולמטען עם סכנת בעירה ספונטנית; FTS 14$/TEU ל-FlexiTank/FlexiBag; SWB FEE 35$ לסוכן/שולח ב-POL שאינו אשראי; דמי HAZ ב-POL (בלי VIZAK ו-GOA): 500/150/250$ ל-TEU לפי PG 1/3/2; OTS 500$ ל-20׳ Open Top ו-1000$ ל-40׳ Open Top/High; Israel THC למסוכן/ציוד מיוחד 320$/20׳ ו-460$/40׳; SOC FEE 500$ × TEU. ביטול הזמנה: 200$/מכולה. לא מקבלים Granite Blocks. הובלה יבשתית עד מחסן הלקוח הוצעה במייל בנפרד ולא תומחרה במחירון. לא צוין במחירון דוא״ל להזמנה.</p>";
     }
-    if (displayCarrier.id === "yml-nov-2026") {
+    if (displayCarrier.id === "yml") {
       return "<p>שתי הצעות YML הוטענו: PQ26YML005163 (חוזה EMW1721467, Trade ID MEDW40753000) ו־PQ26YML005151 (חוזה EMW1721484, Trade ID MEDW02099000). שתיהן בתוקף 16.11.2026–30.11.2026, והוצאו ל־Mayan Logistics (1977) Ltd. הסוכן במחירון: Konmart (ships agent) ltd, as agents for Yang Ming Lines. לא צוין במסמכים דוא״ל להזמנה.</p>" +
         "<p>תנאי תשלום: COLLECT. התעריפים כפופים לתוספות החלות במועד השילוח, בלי הודעה מוקדמת; אינם כוללים שחרור מכס וחיובים מקומיים; כפופים לדמי דמורג׳; וההובלה הימית חלה לפי ETB/ETD המקורי בכפוף להוראות POL/POD. יש לפנות למשרד לאימות התוקף לפחות שבוע לפני פקיעת ההצעה. זמן ההגעה עשוי להשתנות בגלל עומס בטרמינל, מזג אוויר או עיכובים בכלי השיט וברכבת.</p>" +
         "<p>תוספת TA (Transport Additional Charge) ליעד חיפה (ILHFA): 100$ ל-20DC, 200$ ל-40DC ו־40HQ — לא כלולה בהצעת אשדוד, ואין במחירון תעריף הובלה ימית לחיפה. תוספת משקל יתר OW: Over 18Ton/26Ton gross weight: 350$/700$ — לא נוספה לסה״כ. EU (ETS) מופיע עם ההערה FROM CHINA PORTS EU INCLUDED: ממוצא סין מטופל ככלול בהובלה; ממוצא אחר לא נוסף, כי לא ברור אם חל.</p>";
@@ -799,10 +946,67 @@
     return html;
   }
 
+
+  function versionBadgeHtml(v, shipIso, alts) {
+    const issued = v.issued ? fmtDate(v.issued) : "";
+    const issuedLab = v.issuedApprox ? "תחילת תוקף (תאריך הנפקה לא צוין במסמך)" : "הונפק";
+    let html = '<div class="version-badge" id="version-badge"><strong>מחירון שנבחר לתאריך ההפלגה / BL</strong>';
+    html += esc(versionTitle(v));
+    html += " · תוקף " + esc(versionWindow(v));
+    if (issued) html += " · " + issuedLab + " " + esc(issued);
+    if (v.added) html += " · נוסף למחשבון " + esc(fmtDate(v.added));
+    if (v.sourceFile) html += '<div class="det">מקור: ' + esc(v.sourceFile) + "</div>";
+    if (alts && alts.length) {
+      html += '<div class="alt"><label class="fld" for="alt-version">גרסאות נוספות לתאריך זה</label><select id="alt-version">';
+      html += '<option value="' + esc(v.id) + '" selected>' + esc(versionTitle(v) + " · " + versionWindow(v) + " (נבחר)") + "</option>";
+      alts.forEach(function (a) {
+        html += '<option value="' + esc(a.id) + '">' + esc(versionTitle(a) + " · " + versionWindow(a) + " · הונפק " + fmtDate(versionIssued(a))) + "</option>";
+      });
+      html += "</select></div>";
+    }
+    html += "</div>";
+    return html;
+  }
+  function historyPanelHtml(shipIso) {
+    let html = '<details class="history-panel" id="history-panel"' + (state.historyOpen ? " open" : "") + "><summary>היסטוריית מחירונים</summary>";
+    html += '<p class="hint">בחרו מחירון ישן לתמחור תיק לפי תאריך הפלגה / BL. לכל חברה רשימה מקופלת (החדש למעלה). הבחירה האוטומטית היא המחירון התקף לתאריך, ובחפיפה — זה שהונפק לאחרונה.</p>';
+    carriers.forEach(function (c) {
+      const list = versionsFor(c.id).slice().sort(compareVersionsNewest);
+      const auto = shipIso ? autoVersion(c.id, shipIso) : null;
+      html += '<div class="hist-row"><label for="hist-' + esc(c.id) + '">' + esc(c.nameHe) + " (" + list.length + " גרסאות)</label>";
+      html += '<select id="hist-' + esc(c.id) + '" data-hist-carrier="' + esc(c.id) + '">';
+      html += '<option value="auto"' + (!state.versionOverride[c.id] ? " selected" : "") + ">אוטומטי לפי התאריך" +
+        (auto ? " · " + versionTitle(auto) + " · " + versionWindow(auto) : " · אין מחירון לתאריך זה") + "</option>";
+      list.forEach(function (v) {
+        const sel = state.versionOverride[c.id] === v.id ? " selected" : "";
+        html += '<option value="' + esc(v.id) + '"' + sel + ">" +
+          esc(versionTitle(v) + " · " + versionWindow(v) + (v.issued ? " · הונפק " + fmtDate(v.issued) : "") + (v.added ? " · נוסף " + fmtDate(v.added) : "")) +
+          "</option>";
+      });
+      html += "</select></div>";
+    });
+    html += "</details>";
+    return html;
+  }
+
   function render() {
     const isCompare = state.carrierId === COMPARE_ID;
     const carrier = carriers.find((c) => c.id === state.carrierId) ?? carriers[0];
-    const rates = isCompare ? allByCarrier.flatMap((x) => x.rates) : carrier.rows.map(unpackRow);
+    const shipIsoEarly = parseDateInput(state.dateText);
+    const needed = neededVersions(isCompare, carrier, shipIsoEarly);
+    const missing = needed.filter((v) => !versionCache[v.id]);
+    if (missing.length) {
+      if (!document.getElementById("carrier")) {
+        document.getElementById("app").innerHTML = '<p class="hint">טוען את המחירון…</p>';
+      }
+      Promise.all(missing.map(loadVersion)).then(function () { render(); }).catch(function (err) {
+        document.getElementById("app").innerHTML = '<div class="callout warn"><strong>טעינת מחירון נכשלה</strong>' + esc(err && err.message ? err.message : String(err)) + "</div>";
+      });
+      return;
+    }
+    const rates = isCompare
+      ? carriers.flatMap((c) => ratesOfLoaded(selectedVersionMeta(c.id, shipIsoEarly)))
+      : ratesOfLoaded(selectedVersionMeta(carrier.id, shipIsoEarly));
     let origins;
     if (!isCompare) origins = buildOrigins(rates);
     else {
@@ -817,7 +1021,14 @@
       });
     }
     comboOrigins = origins;
+    if (state.originId && !origins.some((o) => o.id === state.originId)) {
+      const key = state.originKey || (state.originId.startsWith("cmp::") ? state.originId.slice(5) : bareKey(state.originId));
+      const match = origins.find((o) => bareKey(o.name) === key);
+      state.originId = match ? match.id : "";
+      if (!match) state.typ = "";
+    }
     const selectedOrigin = origins.find((o) => o.id === state.originId) || null;
+    if (selectedOrigin) state.originKey = bareKey(selectedOrigin.name);
     const shipIso = parseDateInput(state.dateText);
     const qty = Math.max(1, Math.floor(Number(state.qtyText) || 1));
     const markup = Math.max(0, Number(state.markupText) || 0);
@@ -846,7 +1057,14 @@
     const altQuotes = validRates.filter((r) => r !== validRate);
     const otherWindows = windowRates.filter((r) => r !== quoteRate && !isValidOn(r, shipIso || ""));
 
-    let displayCarrier = carrier;
+    const allByCarrier = isCompare
+      ? carriers.map((c) => {
+          const v = selectedVersionMeta(c.id, shipIso);
+          return { c: mergeDisplay(c, v), rates: ratesOfLoaded(v), version: v };
+        })
+      : [{ c: mergeDisplay(carrier, selectedVersionMeta(carrier.id, shipIso)), rates: rates, version: selectedVersionMeta(carrier.id, shipIso) }];
+
+    let displayCarrier = mergeDisplay(carrier, selectedVersionMeta(carrier.id, shipIso));
     if (isCompare && quoteRate) {
       for (const x of allByCarrier) {
         if (x.rates.some((r) =>
@@ -896,36 +1114,39 @@
     const saleUsd = t ? (t.shipment.USD || 0) + markup * qty : 0;
 
     const carrierOptions = carriers.map((c) => {
-      const expiredBadge = shipIso && addDays(c.vt) < shipIso ? " — פג תוקף" : "";
+      const none = shipIso && coveringVersions(c.id, shipIso).length === 0;
+      const expiredBadge = none ? " — אין מחירון לתאריך" : "";
       return '<option value="' + esc(c.id) + '"' + (!isCompare && carrier.id === c.id ? " selected" : "") + ">" + esc(c.nameHe + expiredBadge) + "</option>";
     }).join("") + '<option value="' + COMPARE_ID + '"' + (isCompare ? " selected" : "") + ">השוואה בין חברות</option>";
 
+    const activeVersion = isCompare ? null : selectedVersionMeta(carrier.id, shipIso);
+    const coveringForDate = shipIso && !isCompare ? coveringVersions(carrier.id, shipIso) : [];
+    const altVersions = coveringForDate.filter((v) => activeVersion && v.id !== activeVersion.id);
+
     let carrierMeta = "";
     if (isCompare) {
-      carrierMeta = '<p class="hint">מציגים תעריף מכל חברה שיש לה שורה למסלול שנבחר. YML ו־OOCL חופפים במסלולי מזרח אסיה לאשדוד; צים מכסה בעיקר אירופה, אמריקה ואוסטרליה; MSC מכסה הודו וסרי לנקה לחיפה ולאשדוד (המחירון שנטען פג ב-31.10.2026 ומוצג לעיון בלבד כשהתאריך מחוץ לחלון). וריאנטי ניתוב (כמו Qingdao או Xiamen) מוצגים בנפרד. אין כרגע חפיפת מוצא בין MSC לבין שלוש החברות האחרות.</p>';
+      carrierMeta = '<p class="hint">מציגים תעריף מכל חברה שיש לה מחירון תקף לתאריך ההפלגה / BL שנבחר. אם יש כמה גרסאות חופפות, נבחרת זו שהונפקה לאחרונה. YML ו־OOCL חופפים במסלולי מזרח אסיה לאשדוד; צים מכסה בעיקר אירופה, אמריקה ואוסטרליה; MSC מכסה הודו וסרי לנקה לחיפה ולאשדוד כשהתאריך נופל בחלון של המחירון. וריאנטי ניתוב (כמו Qingdao או Xiamen) מוצגים בנפרד.</p>';
     } else {
+      const dc = displayCarrier;
       let headHtml;
-      if (carrier.quotes && carrier.quotes.length) {
-        headHtml = "הצעות " + carrier.quotes.map((q) => ltrHtml(q.ref)).join(" / ") + " · " + ltrHtml(carrier.party);
-      } else if (!carrier.ref) {
-        headHtml = (carrier.offerTitle ? ltrHtml(carrier.offerTitle) + " · " : "") + ltrHtml(carrier.party) + " · לא צוין מספר הסכם במחירון";
+      if (dc.quotes && dc.quotes.length) {
+        headHtml = "הצעות " + dc.quotes.map((q) => ltrHtml(q.ref)).join(" / ") + " · " + ltrHtml(dc.party || "");
+      } else if (!dc.ref) {
+        headHtml = (dc.offerTitle ? ltrHtml(dc.offerTitle) + " · " : "") + ltrHtml(dc.party || "") + " · לא צוין מספר הסכם במחירון";
       } else {
-        headHtml = "הסכם " + ltrHtml(carrier.ref) + (carrier.version ? " · גרסה " + ltrHtml(carrier.version) : "") + " · " + ltrHtml(carrier.party);
+        headHtml = "הסכם " + ltrHtml(dc.ref) + (dc.version ? " · גרסה " + ltrHtml(dc.version) : "") + (dc.party ? " · " + ltrHtml(dc.party) : "");
       }
-      let line2Html = "תוקף כללי: " + fmtDate(addDays(carrier.vf)) + "–" + fmtDate(addDays(carrier.vt));
-      if (shipIso && addDays(carrier.vt) < shipIso) line2Html += " · המחירון פג תוקף";
-      else if (shipIso && addDays(carrier.vf) > shipIso) line2Html += " · עדיין לא בתוקף לתאריך שנבחר";
-      if (bookingLine(carrier)) {
-        line2Html += carrier.email ? " · הזמנות: " + ltrHtml(carrier.email) : " · " + ltrHtml(bookingLine(carrier));
+      let line2Html = activeVersion
+        ? "תוקף המחירון: " + versionWindow(activeVersion)
+        : (shipIso ? "אין מחירון בתוקף לתאריך זה" : "בחרו תאריך הפלגה / BL");
+      if (activeVersion && shipIso && !isVersionValidOn(activeVersion, shipIso)) {
+        line2Html += addDays(activeVersion.vt) < shipIso ? " · המחירון פג תוקף לתאריך שנבחר" : " · עדיין לא בתוקף לתאריך שנבחר";
       }
-      if (carrier.paymentTerms) line2Html += " · תשלום: " + esc(carrier.paymentTerms);
+      if (bookingLine(dc)) {
+        line2Html += dc.email ? " · הזמנות: " + ltrHtml(dc.email) : " · " + ltrHtml(bookingLine(dc));
+      }
+      if (dc.paymentTerms) line2Html += " · תשלום: " + esc(dc.paymentTerms);
       carrierMeta = '<p class="meta">' + headHtml + '</p><p class="meta">' + line2Html + '</p>';
-      if (shipIso && addDays(carrier.vt) < shipIso) {
-        carrierMeta += '<div class="callout expired"><strong>המחירון פג תוקף</strong>תוקף המחירון: ' +
-          esc(fmtDate(addDays(carrier.vf)) + "–" + fmtDate(addDays(carrier.vt))) +
-          ". תאריך השילוח שנבחר (" + esc(fmtDate(shipIso)) +
-          ") מחוץ לחלון. אפשר עדיין לעיין בתעריפים למטה — הם מסומנים בבירור כעיון בלבד, ולא כהצעת מחיר בתוקף.</div>";
-      }
     }
 
     const typOpts = '<option value="">' + (state.originId ? "בחרו סוג מכולה" : "בחרו קודם נמל מוצא") + "</option>" +
@@ -941,7 +1162,7 @@
       formExtra += '<label class="toggle"><input type="checkbox" id="haz" ' + (effectiveHaz ? "checked " : "") + (!hasNonHaz ? "disabled " : "") + "> <span>" + esc(lab) + "</span></label>";
     }
     if (state.originId && typesInLane.length === 0) {
-      const msg = (carrier.id === "yml-nov-2026" && state.dest.startsWith("HAIFA"))
+      const msg = (carrier.id === "yml" && state.dest.startsWith("HAIFA"))
         ? "במחירון YML שנטען כל שורות ההובלה הימית הן לאשדוד בלבד. יש תוספת TA (Transport Additional Charge) ליעד חיפה (ILHFA): 100$ ל-20DC, 200$ ל-40DC ו־40HQ — בלי תעריף הובלה ימית נפרד לחיפה. לא הומצא מחיר הובלה לחיפה."
         : "לנמל המוצא שנבחר אין שורות אל " + destHe(state.dest) + " במחירון הזה.";
       formExtra += '<div class="callout warn"><strong>אין תעריף ליעד הזה</strong>' + esc(msg) + "</div>";
@@ -1125,6 +1346,15 @@
       quoteHtml = expiredBanner + (!validRate ? '<div class="expired-ref">' + inner + "</div>" : inner);
     }
 
+    if (!isCompare && shipIso && !activeVersion) {
+      const near = nearestVersions(carrier.id, shipIso);
+      quoteHtml = '<div class="callout warn" id="no-version-msg"><strong>אין מחירון בתוקף לתאריך זה</strong>לתאריך ההפלגה / BL ' +
+        esc(fmtDate(shipIso)) + " אין מחירון של " + esc(carrier.nameHe) + " שחל באותו תאריך." +
+        (near.prev ? " המחירון הקודם: " + esc(versionTitle(near.prev) + " · " + versionWindow(near.prev)) + "." : "") +
+        (near.next ? " המחירון הבא: " + esc(versionTitle(near.next) + " · " + versionWindow(near.next)) + "." : "") +
+        " אפשר לפתוח מחירון ישן מ«היסטוריית מחירונים» לעיון.</div>";
+    }
+
     const copyBtn = quoteRate
       ? '<button type="button" class="btn' + (state.copied ? " ok" : "") + '" id="copy-btn">' +
         (state.copied ? "הסיכום הועתק" : (validRate ? "העתק סיכום" : "העתק סיכום לעיון (פג תוקף)")) + "</button>"
@@ -1151,13 +1381,13 @@
           (!state.originId || typesInLane.length === 0 ? " disabled" : "") + ">" + typOpts + "</select></div>" +
       "</div>" +
       '<div class="grid grid-3" style="margin-top:12px">' +
-        '<div><label class="fld" for="date">תאריך שילוח</label><input type="text" id="date" value="' + esc(state.dateText) + '" placeholder="18.11.2026" inputmode="numeric"></div>' +
+        '<div><label class="fld" for="date">תאריך הפלגה / BL</label><input type="text" id="date" value="' + esc(state.dateText) + '" placeholder="18.11.2026" inputmode="numeric"></div>' +
         '<div><label class="fld" for="qty">מספר מכולות</label><input type="number" id="qty" min="1" step="1" value="' + esc(state.qtyText) + '"></div>' +
         '<div><label class="fld" for="markup">רווח למכולה (USD, רשות)</label><input type="number" id="markup" min="0" step="1" value="' + esc(state.markupText) + '" placeholder="0"></div>' +
-      "</div>" + formExtra +
+      "</div>" + formExtra + historyPanelHtml(shipIso) +
       "</section>" +
-      '<section class="card"><div class="card-head"><h2>הצעת מחיר</h2>' + copyBtn + "</div>" + quoteHtml + "</section>" +
-      '<details class="terms" open><summary>תנאים שחשוב לציין</summary><div class="card">' + termsHtml(displayCarrier) + "</div></details>";
+      '<section class="card"><div class="card-head"><h2>הצעת מחיר</h2>' + copyBtn + "</div>" + (activeVersion ? versionBadgeHtml(activeVersion, shipIso, altVersions) : "") + quoteHtml + "</section>" +
+      '<details class="terms" open><summary>תנאים שחשוב לציין</summary><div class="card">' + termsHtml(displayCarrier, shipIso) + "</div></details>";
 
     const $ = (id) => document.getElementById(id);
     $("carrier").addEventListener("change", (e) => {
@@ -1230,7 +1460,7 @@
         render();
       });
     });
-    $("date").addEventListener("change", (e) => { state.dateText = e.target.value; state.copied = false; state.copyFallback = ""; render(); });
+    $("date").addEventListener("change", (e) => { state.dateText = e.target.value; state.versionOverride = {}; state.copied = false; state.copyFallback = ""; render(); });
     $("date").addEventListener("blur", (e) => { state.dateText = e.target.value; render(); });
     $("qty").addEventListener("change", (e) => { state.qtyText = e.target.value; render(); });
     $("markup").addEventListener("change", (e) => { state.markupText = e.target.value; render(); });
@@ -1257,6 +1487,30 @@
         render();
         const ta = document.getElementById("copy-text");
         if (ta) { ta.focus(); ta.select(); }
+      });
+    }
+    const histPanel = $("history-panel");
+    if (histPanel) {
+      histPanel.addEventListener("toggle", function () { state.historyOpen = histPanel.open; });
+    }
+    document.querySelectorAll("[data-hist-carrier]").forEach(function (sel) {
+      sel.addEventListener("change", function (e) {
+        const cid = sel.getAttribute("data-hist-carrier");
+        const val = e.target.value;
+        if (val === "auto") delete state.versionOverride[cid];
+        else state.versionOverride[cid] = val;
+        state.copied = false;
+        state.copyFallback = "";
+        render();
+      });
+    });
+    const altSel = $("alt-version");
+    if (altSel) {
+      altSel.addEventListener("change", function (e) {
+        if (!isCompare) state.versionOverride[carrier.id] = e.target.value;
+        state.copied = false;
+        state.copyFallback = "";
+        render();
       });
     }
 
