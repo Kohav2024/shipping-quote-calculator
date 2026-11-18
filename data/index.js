@@ -165,6 +165,53 @@ window.QUOTE_INDEX =
       "termsUrl": "https://www.msc.com/che/contract-of-carriage"
     },
     {
+      "id": "msc-fak-asia-2026-12-01",
+      "carrierId": "msc",
+      "file": "data/msc/2026-12-01_fak-asia.js",
+      "ref": "",
+      "version": "",
+      "party": "MEDITERRANEAN SHIPPING CO. (Israel) Ltd.",
+      "vf": 20,
+      "vt": 33,
+      "issued": "2026-11-15",
+      "added": "2026-11-18",
+      "sourceFile": "MSC FAK rate offer to Ashdod (HCT) and Haifa, 01.12.2026–14.12.2026 (xlsx)",
+      "sourceNote": "קובץ עודכן 15.11.2026. תוקף: Effective as of 1.12.2026 until further notice but not beyond 14.12.2026 (HARMLESS). הצעה מתוקנת עקב מגבלת מקום, כוללת SCS ו-PRS. לא צוין במחירון מספר SCT / הסכם / filing, ולא הועתק ה-placeholder מהמייל.",
+      "label": "FAK Far East / SE Asia (HARMLESS)",
+      "offerTitle": "FAK rate offer to Ashdod (HCT) and Haifa ports (HARMLESS)",
+      "website": "https://www.msc.com",
+      "termsUrl": "https://www.msc.com/che/contract-of-carriage",
+      "localCharges": {
+        "title": "ISRAEL LOCAL CHARGE FOR DRY CNTR / HARMLESS (IMPORT)",
+        "items": [
+          {
+            "name": "Handling Fee",
+            "basis": "Per BL",
+            "currency": "USD",
+            "amount": 76
+          },
+          {
+            "name": "Container Fee",
+            "basis": "Per DRY CTR",
+            "currency": "USD",
+            "amount": 15
+          },
+          {
+            "name": "Fuel Energy Transition",
+            "basis": "Per cntr",
+            "currency": "USD",
+            "quantum": "70/20DV & 140/40'",
+            "amount20": 70,
+            "amount40": 140
+          }
+        ],
+        "notes": [
+          "RATES DO NOT INCLUDE STORAGE AND DEMURRAGE AT PORT OF DISCHARGE 12 DAYS FREE OF DEMURRAGE.",
+          "RATES ARE SUBJECT TO DELIVERY ORDER FEES AND LOCAL EXPENSES."
+        ]
+      }
+    },
+    {
       "id": "one-neu-2026-11-01",
       "carrierId": "one",
       "file": "data/one/2026-11-01_neu.js",
@@ -433,7 +480,18 @@ window.QUOTE_INDEX =
     "GDYNIA, PL",
     "LEIXOES, PT",
     "GOTHENBURG, SE",
-    "HELSINGBORG, SE"
+    "HELSINGBORG, SE",
+    "BELAWAN / KUALA TANJUNG, ID",
+    "PANJANG, ID",
+    "VUNG TAU / DONG NAI, VN",
+    "QUINHON, VN",
+    "BUSAN, KR",
+    "GWANGYANG, KR",
+    "INCHEON, KR",
+    "HAKATA, JP",
+    "OSAKA, JP",
+    "YOKKAICHI, JP",
+    "YOKOHAMA, JP"
   ],
   "types": [
     "DV20",
@@ -465,7 +523,8 @@ window.QUOTE_INDEX =
     "הונג קונג טופלה כנמל שאינו סיני, ולכן ETS נוסף (62$/TEU; 20׳ = 62$, 40׳ = 124$). אם הסוכן מחשיב את הונג קונג כנמל סיני — יש להסיר את ה-ETS. תוספות משקל כבד לא נוספו אוטומטית: CWC ≥18 טון מטען 200$/20׳; CWX ≥24 טון 500$/20׳.",
     "ETS לא נוסף (מוצא בסין). לפי הטקסט הנלווה למחירון (לא בתאי האקסל): Foshan, Jiangmen ו-Huangpu via specific terminals only, please contact us for detail. תוספות משקל כבד לא נוספו אוטומטית: CWC ≥18 טון מטען 200$/20׳; CWX ≥24 טון 500$/20׳.",
     "F.A.K. HARMLESS. תוקף 16.08.2026–31.10.2026 (*Effective last container Received for export at train depots, terminals or POL'S). עודכן 15.09.26. DTHC ו-EFS נוספו לסה״כ לפי הטבלה: DTHC 275$/20׳ ו-400$/40׳; EFS IN USD - SEP = 156$ × TEU (156$/20׳, 312$/40׳). OVW כלול בתעריף ל-20׳. 14 ימי demurrage חינם ביעד, אלא אם איש המכירות ציין אחרת. אחסנה ו-demurrage ביעד אינם כלולים מעבר לימי הפטור. Origin THC משולם על ידי השולח ולא נוסף. כפוף לדמי D/O ולהוצאות מקומיות — סכומים לא צוינו במחירון ולא הומצאו. כפוף לתוספות נוספות במועד השילוח. לא כולל תוספות למשקל יתר, ציוד מיוחד ומטען מסוכן. כפוף לביקורת בכל נמל שטעון. לא מקבלים Granite Blocks. לא נוספו אוטומטית (מותנים): EIS 50$/מכולה ל-Coir pith/Flammable (הסכם נפרד) ולמטען harmless עם סכנת בעירה ספונטנית/חימום עצמי; FTS 14$/TEU ל-FlexiTank/FlexiBag; SWB FEE 35$ לסוכן/שולח ב-POL שאינו אשראי; דמי HAZ ב-POL (בלי VIZAK ו-GOA): HIGH RISK PG 1 500$/TEU, LOW RISK PG 3 150$/TEU, MEDIUM RISK PG 2 250$/TEU; OTS 500$ ל-20׳ Open Top ו-1000$ ל-40׳ Open Top/High; Israel THC למטען מסוכן/ציוד מיוחד 320$/20׳ ו-460$/40׳; SOC FEE 500$ × TEU. ביטול הזמנה: 200$/מכולה. תנאי ההובלה: https://www.msc.com/che/contract-of-carriage. הובלה יבשתית עד מחסן הלקוח הוצעה במייל בנפרד ולא תומחרה במחירון.",
-    "הובלה באירו (EUR) לפי המחירון; לא הומרה לדולר. Inclusive: EFS, THL, CSS, IFP, MBS, TSL. כפוף ל-OBS ו-EES (דולר ל-TEU, חושב למכולה לפי 1 TEU ל-20׳ ו-2 TEU ל-40׳/HC: OBS 198/396$, EES 72/144$). DTHC: 270$/20׳ ו-390$/40׳–40HC. CMD: 21$ ל-UNIT (טופל כמכולה). כפוף לכל התוספות התקפות במועד השילוח. כפוף ל-FGP (Food Grade Premium) — לא צוין סכום במחירון, לא נוסף לסה״כ. Freight prepaid, בכפוף להגשת תעריף (filing) לפני הזמנה. תאריך דירוג ה-B/L: Proforma ETD (ואם הטעינה בדוברה/פידר — Proforma ETD של הדוברה/פידר). ניתוב סטנדרטי אחד בלבד. כפוף לאישור תפעולי ולזמינות ציוד ומקום. ללקוחות ללא אשראי: תשלום במזומן בשקלים. ריפרים — לפנות מקרה-מקרה (אין תעריפי ריפר במחירון). לפי גיליון General Terms: General cargo / Non IMCO only."
+    "הובלה באירו (EUR) לפי המחירון; לא הומרה לדולר. Inclusive: EFS, THL, CSS, IFP, MBS, TSL. כפוף ל-OBS ו-EES (דולר ל-TEU, חושב למכולה לפי 1 TEU ל-20׳ ו-2 TEU ל-40׳/HC: OBS 198/396$, EES 72/144$). DTHC: 270$/20׳ ו-390$/40׳–40HC. CMD: 21$ ל-UNIT (טופל כמכולה). כפוף לכל התוספות התקפות במועד השילוח. כפוף ל-FGP (Food Grade Premium) — לא צוין סכום במחירון, לא נוסף לסה״כ. Freight prepaid, בכפוף להגשת תעריף (filing) לפני הזמנה. תאריך דירוג ה-B/L: Proforma ETD (ואם הטעינה בדוברה/פידר — Proforma ETD של הדוברה/פידר). ניתוב סטנדרטי אחד בלבד. כפוף לאישור תפעולי ולזמינות ציוד ומקום. ללקוחות ללא אשראי: תשלום במזומן בשקלים. ריפרים — לפנות מקרה-מקרה (אין תעריפי ריפר במחירון). לפי גיליון General Terms: General cargo / Non IMCO only.",
+    "F.A.K. HARMLESS ליעדי אשדוד (HCT) וחיפה (אותו מחיר). תוקף 01.12.2026–14.12.2026 (until further notice but not beyond 14.12.2026). תעריף 20׳ DV חל רק על מטען במשקל ברוטו עד 22.9 טון (OVW TILL 22.9 TONS) — תוספות למשקל עודף חלות לפי המחירון, אבל סכום התוספת לא צוין בגיליון התעריפים ולא הומצא. THC במחירון (THC IN USD) 275$/20׳ ו-400$/40׳ נוסף לסה״כ כטיפול יעד (Origin THC משולם ע״י השולח). PRS 55$/110$ ו-SCS 36$/72$ (20׳/40׳) נוספו לפי הטבלה. CLS 20$/40$ נוסף רק בשורות שבהן צוין (נמלי סין היבשתית). CRS 131$/262$ נוסף רק בשורות שבהן צוין (הונג קונג ושאר המוצאים שאינם סין היבשתית). EFS לא מופיע במחירון הזה ולא נוסף. מספר SCT לא צוין במחירון (במייל הופיע רק placeholder ולא הועתק כמספר אמיתי). אחרי שחרור הזמנה לא ניתן לשנות את קוד ה-SCT; קוד שגוי — קנס 3,500$ למכולה, ואם אין תעריף בגלל קוד שגוי יחולו תעריפי FAK. יש לאמת מול משרד MSC לפני הזמנה. הובלה מנמלי בסיס לפי תאריך יציאת הפרופורמה; מנמלי out (Sihanoukville, Makassar, Songkhla ונמלי out בסין) לפי היציאה בפועל; בנגקוק לפי פרופורמת Laem Chabang. 12 ימי demurrage חינם ביעד. כפוף לדמי D/O ולהוצאות מקומיות (טבלת Locals מוצגת בנפרד, לא בסה״כ ההובלה). כפוף לתוספות במועד השילוח ולזמינות מקום וציוד. לא נוספו אוטומטית: Flexi/Flexibag 14$ למכולה; מטען עם בעירה ספונטנית/חימום עצמי 50$/מכולה (גיליון SCF — רשימת הסחורות לא הייתה בטקסט מחלץ בגיליון); דמי מועמדות למכולה כבדה בהונג קונג ודרום סין (RMB/HKD לפי הגיליון, לא הומרו); תעריפי pre-carriage / TAO-PRE ו-China inland (גיליונות נפרדים) — להוסיף מעל תעריף נמל האם, לא נכללו בסה״כ."
   ],
   "incl": [
     "CNS/AGC/SSD/WR/THC",
@@ -536,7 +595,11 @@ window.QUOTE_INDEX =
     "IFP",
     "MBS",
     "TSL",
-    "CMD"
+    "CMD",
+    "PRS",
+    "SCS",
+    "CLS",
+    "CRS"
   ],
   "curs": [
     "USD",
@@ -1089,6 +1152,42 @@ window.QUOTE_INDEX =
     "HELSINGBORG": [
       "SEHEL",
       "Sweden"
+    ],
+    "PANJANG": [
+      "IDPNJ",
+      "Indonesia"
+    ],
+    "QUINHON": [
+      "VNUIH",
+      "Vietnam"
+    ],
+    "BUSAN": [
+      "KRPUS",
+      "South Korea"
+    ],
+    "GWANGYANG": [
+      "KRKAN",
+      "South Korea"
+    ],
+    "INCHEON": [
+      "KRINC",
+      "South Korea"
+    ],
+    "HAKATA": [
+      "JPHKT",
+      "Japan"
+    ],
+    "OSAKA": [
+      "JPOSA",
+      "Japan"
+    ],
+    "YOKKAICHI": [
+      "JPYKK",
+      "Japan"
+    ],
+    "YOKOHAMA": [
+      "JPYOK",
+      "Japan"
     ]
   },
   "countryHe": {
@@ -1264,7 +1363,9 @@ window.QUOTE_INDEX =
     "DTHC": "טיפול טרמינל ביעד (DTHC)",
     "EFS": "EFS (במחירון: EFS IN USD - SEP)",
     "OVW": "משקל יתר (OVW) — כלול בתעריף ל-20׳",
-    "RFE": "דלק חירום לנהר (River Emergency Fuel)"
+    "RFE": "דלק חירום לנהר (River Emergency Fuel)",
+    "PRS": "תוספת סיכון פירטיות (Piracy Risk Surcharge)",
+    "SCS": "תוספת תעלת סואץ (Suez Canal Surcharge)"
   },
   "payHe": {
     "prepaid": "במוצא (Prepaid)",
