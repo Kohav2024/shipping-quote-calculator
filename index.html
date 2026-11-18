@@ -94,7 +94,107 @@
     }
     .extras-panel .extras-body { padding-bottom: 4px; }
     .extras-panel .grid { margin-top: 8px; }
-    .extras-panel .history-panel { margin-top: 8px; border: 0; padding: 0; }
+    .carrier-field .history-link {
+      display: inline-block;
+      margin-top: 6px;
+      padding: 0;
+      border: 0;
+      background: none;
+      font: inherit;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--navy-2);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+      cursor: pointer;
+      text-align: start;
+      line-height: 1.35;
+      max-width: 100%;
+    }
+    .carrier-field .history-link:hover { color: var(--navy); }
+    body.hist-open { overflow: hidden; }
+    .hist-sheet-root {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    .hist-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(22, 49, 77, 0.35);
+    }
+    .hist-sheet {
+      position: relative;
+      width: 100%;
+      max-width: 480px;
+      max-height: min(80vh, 560px);
+      overflow: auto;
+      background: var(--paper);
+      border-radius: 16px 16px 0 0;
+      box-shadow: 0 -8px 28px rgba(22, 49, 77, 0.18);
+      padding: 14px 14px calc(14px + env(safe-area-inset-bottom));
+    }
+    .hist-sheet-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+    .hist-sheet-head h2 {
+      margin: 0;
+      font-size: 1rem;
+      color: var(--navy);
+      line-height: 1.35;
+      flex: 1;
+      min-width: 0;
+    }
+    .hist-close {
+      font: inherit;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--navy);
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      padding: 4px 10px;
+      cursor: pointer;
+      flex: 0 0 auto;
+    }
+    .hist-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+    .hist-item {
+      width: 100%;
+      text-align: start;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px 12px;
+      cursor: pointer;
+      font: inherit;
+      display: grid;
+      gap: 2px;
+    }
+    .hist-item:hover, .hist-item[aria-current="true"] {
+      border-color: var(--info-bd);
+      background: var(--info-bg);
+    }
+    .hist-item-title { font-weight: 700; color: var(--navy); }
+    .hist-item-meta { font-size: 0.82rem; color: var(--muted); }
+    .hist-status {
+      display: inline-block;
+      margin-top: 4px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      border-radius: 999px;
+      padding: 1px 8px;
+      width: fit-content;
+    }
+    .hist-status.is-valid { background: var(--accent-soft); color: var(--accent); }
+    .hist-status.is-future { background: var(--info-bg); color: var(--info-ink); }
+    .hist-status.is-expired { background: #f3f0ea; color: var(--muted); }
     .card h2 {
       margin: 0 0 14px;
       font-size: 1.15rem;
@@ -329,26 +429,10 @@
     }
     .version-badge strong { display: block; margin-bottom: 2px; }
     .version-badge .alt { margin-top: 8px; }
-    .version-badge select, .history-panel select {
+    .version-badge select {
       width: 100%;
       margin-top: 4px;
     }
-    .history-panel {
-      margin-top: 14px;
-      border: 1px solid var(--line);
-      border-radius: 12px;
-      background: #fff;
-      padding: 0 12px 8px;
-    }
-    .history-panel > summary {
-      cursor: pointer;
-      font-weight: 700;
-      padding: 10px 0;
-      list-style-position: inside;
-    }
-    .history-panel .hint { margin: 0 0 8px; }
-    .hist-row { margin: 0 0 10px; }
-    .hist-row label { display: block; font-weight: 600; margin-bottom: 2px; }
     @media (max-width: 720px) {
       .grid-2, .grid-3 { grid-template-columns: 1fr; }
       .wrap { padding: 8px 12px 32px; }
@@ -357,7 +441,12 @@
       .search-row .fld-date { grid-column: 1 / -1; }
     }
     @media (min-width: 721px) {
-      .search-top { grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr); align-items: end; }
+      .search-top { grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr); align-items: start; }
+      .hist-sheet-root { align-items: center; padding: 24px 16px; }
+      .hist-sheet {
+        border-radius: 16px;
+        max-height: min(70vh, 560px);
+      }
       .search-row { grid-template-columns: 1fr 1fr 1fr; }
     }
   </style>
@@ -373,7 +462,7 @@
     <footer class="note">כלי פנימי להצעת מחיר ממחירון. התעריפים כפופים לתוקף, למקום פנוי ולתנאי החברה.</footer>
   </div>
   <noscript><p class="wrap">יש להפעיל JavaScript כדי להשתמש במחשבון.</p></noscript>
-  <script src="data/index.js?v=msc-jump-20261118"></script>
+  <script src="data/index.js?v=hist-carrier-20261118"></script>
   <script>
 (function () {
   const DATA = window.QUOTE_INDEX;
@@ -860,7 +949,7 @@
     }
     return new Promise(function (resolve, reject) {
       const s = document.createElement("script");
-      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=msc-jump-20261118";
+      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=hist-carrier-20261118";
       s.async = true;
       s.onload = function () {
         const pack = window.QUOTE_PACK && window.QUOTE_PACK[meta.id];
@@ -1144,26 +1233,57 @@
     html += "</div>";
     return html;
   }
-  function historyPanelHtml(shipIso) {
-    let html = '<details class="history-panel" id="history-panel"' + (state.historyOpen ? " open" : "") + "><summary>היסטוריית מחירונים</summary>";
-    html += '<p class="hint">בחרו מחירון ישן לתמחור תיק לפי תאריך הפלגה / BL. לכל חברה רשימה מקופלת (החדש למעלה). הבחירה האוטומטית היא המחירון התקף לתאריך, ובחפיפה — זה שהונפק לאחרונה.</p>';
-    carriers.forEach(function (c) {
-      const list = versionsFor(c.id).slice().sort(compareVersionsNewest);
-      const auto = shipIso ? autoVersion(c.id, shipIso) : null;
-      html += '<div class="hist-row"><label for="hist-' + esc(c.id) + '">' + esc(c.nameHe) + " (" + list.length + " גרסאות)</label>";
-      html += '<select id="hist-' + esc(c.id) + '" data-hist-carrier="' + esc(c.id) + '">';
-      html += '<option value="auto"' + (!state.versionOverride[c.id] ? " selected" : "") + ">אוטומטי לפי התאריך" +
-        (auto ? " · " + versionTitle(auto) + " · " + versionWindow(auto) : " · אין מחירון לתאריך זה") + "</option>";
-      list.forEach(function (v) {
-        const sel = state.versionOverride[c.id] === v.id ? " selected" : "";
-        html += '<option value="' + esc(v.id) + '"' + sel + ">" +
-          esc(versionTitle(v) + " · " + versionWindow(v) + (v.issued ? " · הונפק " + fmtDate(v.issued) : "") + (v.added ? " · נוסף " + fmtDate(v.added) : "")) +
-          "</option>";
-      });
-      html += "</select></div>";
+  function historyLinkHtml(carrier) {
+    const n = versionsFor(carrier.id).length;
+    return '<button type="button" class="history-link" id="history-link" aria-expanded="' +
+      (state.historyOpen ? "true" : "false") + '" aria-controls="hist-sheet">' +
+      "היסטוריית מחירונים של " + esc(carrier.nameHe) + " (" + n + ")</button>";
+  }
+  function versionStatusKind(v, iso) {
+    const vf = addDays(v.vf), vt = addDays(v.vt);
+    if (iso && iso >= vf && iso <= vt) return "valid";
+    if (iso && iso < vf) return "future";
+    return "expired";
+  }
+  function historySheetHtml(carrier, shipIso) {
+    if (!state.historyOpen || !carrier) return "";
+    const iso = shipIso || parseDateInput(todayText());
+    const list = versionsFor(carrier.id).slice().sort(compareVersionsNewest);
+    const current = selectedVersionMeta(carrier.id, iso);
+    const statusHe = { valid: "בתוקף", future: "עתידי", expired: "פג תוקף" };
+    let html = '<div class="hist-sheet-root" id="hist-sheet-root">';
+    html += '<div class="hist-backdrop" id="hist-backdrop"></div>';
+    html += '<div class="hist-sheet" id="hist-sheet" role="dialog" aria-modal="true" aria-labelledby="hist-sheet-title" tabindex="-1">';
+    html += '<div class="hist-sheet-head"><h2 id="hist-sheet-title">היסטוריית מחירונים של ' + esc(carrier.nameHe) + "</h2>";
+    html += '<button type="button" class="hist-close" id="hist-close" aria-label="סגירה">×</button></div>';
+    html += '<ul class="hist-list">';
+    list.forEach(function (v) {
+      const kind = versionStatusKind(v, iso);
+      const cur = current && current.id === v.id ? ' aria-current="true"' : "";
+      const issuedLab = v.issuedApprox ? "תחילת תוקף" : "הונפק";
+      let meta2 = "";
+      if (v.issued) meta2 += issuedLab + " " + fmtDate(v.issued);
+      if (v.added) meta2 += (meta2 ? " · " : "") + "נוסף " + fmtDate(v.added);
+      html += '<li><button type="button" class="hist-item" data-hist-version="' + esc(v.id) + '"' + cur + ">";
+      html += '<span class="hist-item-title">' + esc(versionTitle(v)) + "</span>";
+      html += '<span class="hist-item-meta">תוקף ' + esc(versionWindow(v)) + "</span>";
+      if (meta2) html += '<span class="hist-item-meta">' + esc(meta2) + "</span>";
+      html += '<span class="hist-status is-' + kind + '">' + statusHe[kind] + "</span>";
+      html += "</button></li>";
     });
-    html += "</details>";
+    html += "</ul></div></div>";
     return html;
+  }
+  function pickHistoryVersion(carrierId, versionId) {
+    const v = versionMeta(versionId);
+    if (!v) return;
+    state.dateText = fmtDate(addDays(v.vf));
+    state.versionOverride = {};
+    state.versionOverride[carrierId] = v.id;
+    state.historyOpen = false;
+    state.copied = false;
+    state.copyFallback = "";
+    render();
   }
 
   function render() {
@@ -1557,7 +1677,6 @@
           '<div><label class="fld" for="markup">רווח למכולה (USD, רשות)</label><input type="number" id="markup" min="0" step="1" value="' + esc(state.markupText) + '" placeholder="0"></div>' +
         "</div>" +
         formHaz +
-        historyPanelHtml(shipIso) +
       "</div>";
     const quoteMeta = isCompare
       ? (carrierMeta ? '<p class="meta-line">' + carrierMeta + "</p>" : "")
@@ -1565,7 +1684,8 @@
     app.innerHTML =
       '<section class="card search-card">' +
       '<div class="search-top">' +
-        '<div><label class="fld" for="carrier">חברת ספנות</label><select id="carrier">' + carrierOptions + "</select></div>" +
+        '<div class="carrier-field"><label class="fld" for="carrier">חברת ספנות</label><select id="carrier">' + carrierOptions + "</select>" +
+        (!isCompare ? historyLinkHtml(carrier) : "") + "</div>" +
         '<div class="origin-combo" id="origin-combo">' +
           '<label class="fld" for="origin-input" id="origin-field-label">נמל מוצא (' + origins.length + " במחירון)</label>" +
           '<input type="text" id="origin-input" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="origin-list" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" placeholder="הקלידו אות לחיפוש או בחרו מהרשימה" value="' + esc(selectedOrigin ? originChoiceLabel(selectedOrigin) : "") + '">' +
@@ -1587,7 +1707,9 @@
       (state.originId && state.dest && effectiveTyp
         ? '<section class="card" id="quote-card"><div class="card-head"><h2>הצעת מחיר</h2>' + copyBtn + "</div>" + quoteMeta + (activeVersion ? versionBadgeHtml(activeVersion, shipIso, altVersions) : "") + quoteHtml + "</section>"
         : "") +
-      '<details class="terms"><summary>תנאים שחשוב לציין</summary><div class="card">' + termsHtml(displayCarrier, shipIso) + "</div></details>";
+      '<details class="terms"><summary>תנאים שחשוב לציין</summary><div class="card">' + termsHtml(displayCarrier, shipIso) + "</div></details>" +
+      (!isCompare ? historySheetHtml(carrier, shipIso) : "");
+    document.body.classList.toggle("hist-open", !isCompare && state.historyOpen);
 
     const $ = (id) => document.getElementById(id);
     $("carrier").addEventListener("change", (e) => {
@@ -1715,21 +1837,34 @@
     if (extrasPanel) {
       extrasPanel.addEventListener("toggle", function () { state.extrasOpen = extrasPanel.open; });
     }
-    const histPanel = $("history-panel");
-    if (histPanel) {
-      histPanel.addEventListener("toggle", function () { state.historyOpen = histPanel.open; });
-    }
-    document.querySelectorAll("[data-hist-carrier]").forEach(function (sel) {
-      sel.addEventListener("change", function (e) {
-        const cid = sel.getAttribute("data-hist-carrier");
-        const val = e.target.value;
-        if (val === "auto") delete state.versionOverride[cid];
-        else state.versionOverride[cid] = val;
-        state.copied = false;
-        state.copyFallback = "";
+    const histLink = $("history-link");
+    if (histLink) {
+      histLink.addEventListener("click", function () {
+        state.historyOpen = !state.historyOpen;
         render();
       });
+    }
+    const histBackdrop = $("hist-backdrop");
+    if (histBackdrop) {
+      histBackdrop.addEventListener("click", function () {
+        state.historyOpen = false;
+        render();
+      });
+    }
+    const histClose = $("hist-close");
+    if (histClose) {
+      histClose.addEventListener("click", function () {
+        state.historyOpen = false;
+        render();
+      });
+    }
+    document.querySelectorAll("[data-hist-version]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        pickHistoryVersion(carrier.id, btn.getAttribute("data-hist-version"));
+      });
     });
+    const histSheet = $("hist-sheet");
+    if (histSheet) histSheet.focus({ preventScroll: true });
     const altSel = $("alt-version");
     if (altSel) {
       altSel.addEventListener("change", function (e) {
@@ -1744,8 +1879,13 @@
 
   document.addEventListener("pointerdown", function (e) {
     const combo = document.getElementById("origin-combo");
-    if (!combo || !comboOpen) return;
-    if (!combo.contains(e.target)) closeOriginList(true);
+    if (combo && comboOpen && !combo.contains(e.target)) closeOriginList(true);
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key !== "Escape" || !state.historyOpen) return;
+    e.preventDefault();
+    state.historyOpen = false;
+    render();
   });
   function onViewportChange() {
     if (comboOpen) positionOriginList();
