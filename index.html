@@ -312,6 +312,95 @@
     }
     .date-jump .btn-secondary:hover { background: #f4f6f8; }
     .date-jump strong { display: inline; margin: 0; }
+    .date-wrap {
+      display: flex;
+      gap: 6px;
+      align-items: stretch;
+    }
+    .date-wrap #date { flex: 1; min-width: 0; }
+    .cal-toggle {
+      flex: 0 0 44px;
+      width: 44px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      color: var(--navy);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      padding: 0;
+    }
+    .cal-toggle svg { width: 22px; height: 22px; display: block; }
+    body.cal-open { overflow: hidden; }
+    .cal-root {
+      position: fixed;
+      inset: 0;
+      z-index: 90;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+    .cal-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(22, 49, 77, 0.35);
+    }
+    .cal-popup {
+      position: relative;
+      width: min(100%, 360px);
+      background: var(--paper);
+      border-radius: 16px 16px 0 0;
+      box-shadow: 0 -8px 28px rgba(22, 49, 77, 0.18);
+      padding: 12px 12px calc(14px + env(safe-area-inset-bottom));
+    }
+    .cal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .cal-title { font-weight: 700; color: var(--navy); font-size: 1rem; }
+    .cal-nav {
+      width: 44px;
+      height: 44px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: #fff;
+      font-size: 1.4rem;
+      line-height: 1;
+      cursor: pointer;
+      color: var(--navy);
+    }
+    .cal-dows, .cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 2px;
+      text-align: center;
+    }
+    .cal-dows span {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--muted);
+      padding: 4px 0;
+    }
+    .cal-day {
+      min-height: 44px;
+      border: 0;
+      background: transparent;
+      border-radius: 10px;
+      font: inherit;
+      font-weight: 600;
+      cursor: pointer;
+      color: var(--ink);
+    }
+    .cal-day:hover { background: var(--info-bg); }
+    .cal-day.is-today { box-shadow: inset 0 0 0 2px var(--navy-2); }
+    .cal-day.is-selected { background: var(--navy); color: #fff; }
+    .cal-day.is-selected.is-today { box-shadow: none; }
+    .cal-pad { min-height: 44px; }
+    .cal-foot { margin-top: 8px; display: flex; justify-content: center; }
+    .cal-foot .btn { min-height: 44px; min-width: 140px; }
     .expired-ref {
       border: 2px dashed #c45c5c;
       border-radius: 14px;
@@ -447,6 +536,8 @@
         border-radius: 16px;
         max-height: min(70vh, 560px);
       }
+      .cal-root { align-items: center; padding: 24px 16px; }
+      .cal-popup { border-radius: 16px; }
       .search-row { grid-template-columns: 1fr 1fr 1fr; }
     }
   </style>
@@ -462,7 +553,7 @@
     <footer class="note">כלי פנימי להצעת מחיר ממחירון. התעריפים כפופים לתוקף, למקום פנוי ולתנאי החברה.</footer>
   </div>
   <noscript><p class="wrap">יש להפעיל JavaScript כדי להשתמש במחשבון.</p></noscript>
-  <script src="data/index.js?v=hist-carrier-20261118"></script>
+  <script src="data/index.js?v=evergreen-20261118"></script>
   <script>
 (function () {
   const DATA = window.QUOTE_INDEX;
@@ -516,6 +607,70 @@
     }).formatToParts(new Date());
     const get = (t) => parts.find((p) => p.type === t).value;
     return get("day") + "." + get("month") + "." + get("year");
+  }
+  function todayIso() { return parseDateInput(todayText()); }
+  const HE_MONTHS = ["ינואר","פברואר","מרץ","אפריל","מאי","יוני","יולי","אוגוסט","ספטמבר","אוקטובר","נובמבר","דצמבר"];
+  const HE_DOW = ["א׳","ב׳","ג׳","ד׳","ה׳","ו׳","ש׳"];
+  function openCalendar() {
+    const iso = parseDateInput(state.dateText) || todayIso();
+    const parts = (iso || todayIso()).split("-").map(Number);
+    state.calYear = parts[0];
+    state.calMonth = parts[1] - 1;
+    state.calOpen = true;
+    render();
+  }
+  function closeCalendar() {
+    if (!state.calOpen) return;
+    state.calOpen = false;
+    render();
+  }
+  function setShipDate(iso) {
+    if (!iso) return;
+    state.dateText = fmtDate(iso);
+    state.calOpen = false;
+    state.versionOverride = {};
+    state.copied = false;
+    state.copyFallback = "";
+    render();
+  }
+  function shiftCalMonth(delta) {
+    let y = state.calYear, m = state.calMonth + delta;
+    while (m < 0) { m += 12; y -= 1; }
+    while (m > 11) { m -= 12; y += 1; }
+    state.calYear = y;
+    state.calMonth = m;
+    state.calOpen = true;
+    render();
+  }
+  function calendarHtml() {
+    if (!state.calOpen) return "";
+    const y = state.calYear, m = state.calMonth;
+    const startDow = new Date(Date.UTC(y, m, 1)).getUTCDay();
+    const daysIn = new Date(Date.UTC(y, m + 1, 0)).getUTCDate();
+    const selected = parseDateInput(state.dateText);
+    const today = todayIso();
+    let html = '<div class="cal-root" id="cal-root">';
+    html += '<div class="cal-backdrop" id="cal-backdrop"></div>';
+    html += '<div class="cal-popup" id="cal-popup" role="dialog" aria-label="לוח שנה" tabindex="-1">';
+    html += '<div class="cal-head">';
+    html += '<button type="button" class="cal-nav" id="cal-prev" aria-label="חודש קודם">›</button>';
+    html += '<div class="cal-title" id="cal-title">' + HE_MONTHS[m] + " " + y + "</div>";
+    html += '<button type="button" class="cal-nav" id="cal-next" aria-label="חודש הבא">‹</button>';
+    html += "</div>";
+    html += '<div class="cal-dows">' + HE_DOW.map(function (d) { return "<span>" + d + "</span>"; }).join("") + "</div>";
+    html += '<div class="cal-grid">';
+    for (let i = 0; i < startDow; i++) html += '<span class="cal-pad"></span>';
+    for (let d = 1; d <= daysIn; d++) {
+      const iso = y + "-" + String(m + 1).padStart(2, "0") + "-" + String(d).padStart(2, "0");
+      let cls = "cal-day";
+      if (iso === today) cls += " is-today";
+      if (iso === selected) cls += " is-selected";
+      html += '<button type="button" class="' + cls + '" data-cal-date="' + iso + '">' + d + "</button>";
+    }
+    html += "</div>";
+    html += '<div class="cal-foot"><button type="button" class="btn" id="cal-today">היום</button></div>';
+    html += "</div></div>";
+    return html;
   }
   function isoCountry(name) {
     const m = name.match(/, ([A-Z]{2})$/);
@@ -601,6 +756,11 @@
       "QUY NHON": "QUINHON",
       "QUI NHON": "QUINHON",
       "KWANGYANG": "GWANGYANG",
+      "GWANG YANG": "GWANGYANG",
+      "CHITTAGONG": "CHATTOGRAM",
+      "HAUKOU": "HAIKOU",
+      "ZHANGJIANG": "ZHANJIANG",
+      "PORT KLANG": "PORT KELANG",
     };
     if (aliases[s]) return aliases[s];
     if (s.includes(",")) return s.split(",")[0].trim();
@@ -840,6 +1000,9 @@
     versionOverride: {},
     historyOpen: false,
     extrasOpen: false,
+    calOpen: false,
+    calYear: null,
+    calMonth: null,
   };
 
   function versionsFor(carrierId) {
@@ -896,11 +1059,7 @@
     return { kind: "none", next: null, prev: null };
   }
   function carrierSelectLabel(c, iso) {
-    const st = carrierDateStatus(c.id, iso);
-    if (st.kind === "upcoming") return c.nameHe + " — מחירון חדש מ־" + fmtDateShort(addDays(st.next.vf));
-    if (st.kind === "expired") return c.nameHe + " — פג תוקף";
-    if (st.kind === "none") return c.nameHe + " — אין מחירון לתאריך";
-    return c.nameHe;
+    return c.name;
   }
   function dateJumpNoticeHtml(carrier, shipIso) {
     if (!shipIso) return "";
@@ -949,7 +1108,7 @@
     }
     return new Promise(function (resolve, reject) {
       const s = document.createElement("script");
-      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=hist-carrier-20261118";
+      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=evergreen-20261118";
       s.async = true;
       s.onload = function () {
         const pack = window.QUOTE_PACK && window.QUOTE_PACK[meta.id];
@@ -1132,6 +1291,22 @@
   }
 
   function termsHtml(displayCarrier, shipIso) {
+    if (displayCarrier.id === "evergreen") {
+      const vf = displayCarrier.vf != null ? addDays(displayCarrier.vf) : "2026-11-15";
+      const vt = displayCarrier.vt != null ? addDays(displayCarrier.vt) : "2026-11-30";
+      const win = fmtDate(vf) + "–" + fmtDate(vt);
+      return "<p>חברת הספנות: Evergreen Line (EMC). תוקף " + esc(win) + " ליעדי אשדוד (ILASH) וחיפה (ILHFA), אותו מחיר. F.A.K. "
+        + "לא צוין במחירון מספר הסכם או filing, ולא הומצא.</p>"
+        + "<p>התעריפים כוללים EBS, ERC, STF, WRC ו-PSS. 21 ימי BT חינם (ימי לוח שנה). "
+        + "תאריך הדירוג (rating base date) הוא תאריך ה-ETD שפורסם כאשר המכולה המלאה האחרונה נכנסת לשער (Last Full Container Gate In); "
+        + "חובת הסוכן או הספק המקומי במזרח הרחוק לאמת זאת מראש כדי למנוע מחלוקת תעריף.</p>"
+        + "<p>כפוף לתוספות שנוספו לסה״כ: THC/D 295$/20׳ ו-420$/40׳; ISPS/D 20$ למכולה; ISOCC 134$/20׳ ו-268$/40׳–40HC. "
+        + "EUIS (EU innovation surcharge): לנמלי סין היבשתית כלול בתעריף המחירון ולא נוסף; למדינות שאינן סין, כולל הונג קונג וטייוואן, 72 אירו ל-TEU (72€ ל-20׳, 144€ ל-40׳/HC) — נשמר באירו ולא הומר (אין שער במחירון). "
+        + "LSS: לנמלי סין היבשתית כלול ולא נוסף; למדינות שאינן סין, כולל הונג קונג וטייוואן, 20$ ל-TEU. "
+        + "מקאו (MOMCA) אינה סין יבשתית וטופלה כלא-סין, ולכן נוספו לה EUIS ו-LSS. "
+        + "HWSC רק ל-20׳: משקל ברוטו 18–20.99 טון = 200$ — מותנה במשקל ולא נוסף לסה״כ. "
+        + "40DV ו-40HC באותו מחיר. קודי מכולה במחירון: 2SD=20'DV, 4SD=40'DV, 4SH=40'HC.</p>";
+    }
     if (displayCarrier.id === "oocl") {
       return "<p>מספר חוזה / Filing לציין בהזמנה: 00007640 (יבש שאינו IMCO, וגם מטען מסוכן / ריפר / ציוד מיוחד — אותו מספר). תיקון מספר חוזה שגוי עולה 100$. ההובלה מתומחרת לפי תאריך הטעינה בשטר המטען (BL loading date) בלי חריגים. מטען כללי / non-IMCO, Freight Collect. תוקף 15.11.2026–30.11.2026. ההצעה תקפה לתשלום במזומן ולמטען בשווי נמוך מ-500,000$ למכולה, וכפופה למקום פנוי.</p>" +
         "<p>הסוכן: Israel Scandinavian Maritime Agency Ltd (סוכן בלבד ל-OOCL). פניות: isma-sales@israscan.co.il, www.Israscan.co.il, טל׳ (972) 4-8680777. חיפה: 2 Khayat Sq., POB 33557. אשדוד: Haorgim 35, room 602, P.O.B 4060. תנאי התעריף וה-B/L ב-www.OOCL.com. התעריפים כפופים לשינוי (V.A.T.O.S). אינם כוללים ביטוח, שחרור מכס, אגרות ומיסים. המוביל רשאי לנתב דרך סואץ או כף התקווה הטובה (COGH) בלי הודעה. זמני ההפלגה משוערים.</p>" +
@@ -1699,7 +1874,10 @@
         "</div></div>" +
         '<div><label class="fld" for="typ">סוג מכולה</label><select id="typ"' +
           (!state.originId || !state.dest || typesInLane.length === 0 ? " disabled" : "") + ">" + typOpts + "</select></div>" +
-        '<div class="fld-date"><label class="fld" for="date">תאריך הפלגה / BL</label><input type="text" id="date" value="' + esc(state.dateText) + '" placeholder="18.11.2026" inputmode="numeric"></div>' +
+        '<div class="fld-date" id="date-field"><label class="fld" for="date">תאריך הפלגה / BL</label><div class="date-wrap">' +
+          '<input type="text" id="date" value="' + esc(state.dateText) + '" placeholder="18.11.2026" inputmode="numeric" autocomplete="off" aria-haspopup="dialog" aria-expanded="' + (state.calOpen ? "true" : "false") + '" aria-controls="cal-popup">' +
+          '<button type="button" class="cal-toggle" id="cal-open" aria-label="פתח לוח שנה" aria-expanded="' + (state.calOpen ? "true" : "false") + '">' +
+          '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M8 3.5v3M16 3.5v3M3.5 9.5h17"/></svg></button></div></div>' +
       "</div>" +
       formWarn +
       '<details class="extras-panel" id="extras-panel"' + (state.extrasOpen ? " open" : "") + "><summary>אפשרויות נוספות</summary>" + extrasInner + "</details>" +
@@ -1708,8 +1886,10 @@
         ? '<section class="card" id="quote-card"><div class="card-head"><h2>הצעת מחיר</h2>' + copyBtn + "</div>" + quoteMeta + (activeVersion ? versionBadgeHtml(activeVersion, shipIso, altVersions) : "") + quoteHtml + "</section>"
         : "") +
       '<details class="terms"><summary>תנאים שחשוב לציין</summary><div class="card">' + termsHtml(displayCarrier, shipIso) + "</div></details>" +
-      (!isCompare ? historySheetHtml(carrier, shipIso) : "");
+      (!isCompare ? historySheetHtml(carrier, shipIso) : "") +
+      calendarHtml();
     document.body.classList.toggle("hist-open", !isCompare && state.historyOpen);
+    document.body.classList.toggle("cal-open", !!state.calOpen);
 
     const $ = (id) => document.getElementById(id);
     $("carrier").addEventListener("change", (e) => {
@@ -1731,6 +1911,7 @@
       state.versionOverride = {};
       state.historyOpen = false;
       state.extrasOpen = false;
+      state.calOpen = false;
       render();
       window.scrollTo(0, 0);
     });
@@ -1795,6 +1976,28 @@
     });
     $("date").addEventListener("change", (e) => { state.dateText = e.target.value; state.versionOverride = {}; state.copied = false; state.copyFallback = ""; render(); });
     $("date").addEventListener("blur", (e) => { state.dateText = e.target.value; render(); });
+    $("date").addEventListener("click", function () { if (!state.calOpen) openCalendar(); });
+    const calOpenBtn = $("cal-open");
+    if (calOpenBtn) {
+      calOpenBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        if (state.calOpen) closeCalendar();
+        else openCalendar();
+      });
+    }
+    const calBackdrop = $("cal-backdrop");
+    if (calBackdrop) calBackdrop.addEventListener("click", function () { closeCalendar(); });
+    const calPrev = $("cal-prev");
+    if (calPrev) calPrev.addEventListener("click", function () { shiftCalMonth(-1); });
+    const calNext = $("cal-next");
+    if (calNext) calNext.addEventListener("click", function () { shiftCalMonth(1); });
+    const calToday = $("cal-today");
+    if (calToday) calToday.addEventListener("click", function () { setShipDate(todayIso()); });
+    document.querySelectorAll("[data-cal-date]").forEach(function (btn) {
+      btn.addEventListener("click", function () { setShipDate(btn.getAttribute("data-cal-date")); });
+    });
+    const calPopup = $("cal-popup");
+    if (calPopup) calPopup.focus({ preventScroll: true });
     document.querySelectorAll("[data-jump-date]").forEach(function (btn) {
       btn.addEventListener("click", function () {
         const iso = btn.getAttribute("data-jump-date");
@@ -1882,10 +2085,13 @@
     if (combo && comboOpen && !combo.contains(e.target)) closeOriginList(true);
   });
   document.addEventListener("keydown", function (e) {
-    if (e.key !== "Escape" || !state.historyOpen) return;
-    e.preventDefault();
-    state.historyOpen = false;
-    render();
+    if (e.key !== "Escape") return;
+    if (state.calOpen) { e.preventDefault(); closeCalendar(); return; }
+    if (state.historyOpen) {
+      e.preventDefault();
+      state.historyOpen = false;
+      render();
+    }
   });
   function onViewportChange() {
     if (comboOpen) positionOriginList();

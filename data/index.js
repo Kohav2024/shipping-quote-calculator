@@ -56,6 +56,12 @@ window.QUOTE_INDEX =
       "website": "https://www.one-line.com",
       "agent": "Crown Shipping, as general agent for ONE",
       "party": "Crown Shipping, as general agent for ONE"
+    },
+    {
+      "id": "evergreen",
+      "name": "Evergreen",
+      "nameHe": "אברגרין (Evergreen Line / EMC)",
+      "party": "EVERGREEN LINE (EMC)"
     }
   ],
   "versions": [
@@ -315,6 +321,23 @@ window.QUOTE_INDEX =
           "Additional Plug in/out: USD 25 per additional action"
         ]
       }
+    },
+    {
+      "id": "evergreen-fak-2026-11-15",
+      "carrierId": "evergreen",
+      "file": "data/evergreen/2026-11-15_fak.js",
+      "ref": "",
+      "version": "",
+      "party": "EVERGREEN LINE (EMC)",
+      "vf": 4,
+      "vt": 19,
+      "issued": "2026-11-15",
+      "issuedApprox": true,
+      "added": "2026-11-18",
+      "sourceFile": "EVERGREEN LINE F.A.K rate offer 15.11.2026–30.11.2026 (pasted guideline, no file)",
+      "sourceNote": "FAK RATE GUIDELINE 20261115-20261130 (ILASH/ILHFA). לא צורף קובץ; המקור הוא הטקסט שצורף. לא צוין מספר הסכם או filing, ולא הומצא. תאריך הנפקה נפרד לא צוין; נרשם לפי תחילת התוקף 15.11.2026.",
+      "label": "FAK 15.11.2026–30.11.2026 (ILASH/ILHFA)",
+      "offerTitle": "EVERGREEN LINE update F.A.K rate offer as from 15/11 – 30/11/2026"
     }
   ],
   "ports": [
@@ -491,7 +514,29 @@ window.QUOTE_INDEX =
     "HAKATA, JP",
     "OSAKA, JP",
     "YOKKAICHI, JP",
-    "YOKOHAMA, JP"
+    "YOKOHAMA, JP",
+    "YANGZHOU, CN",
+    "ZHENJIANG, CN",
+    "CHONGQING, CN",
+    "YICHANG, CN",
+    "TAICANG, CN",
+    "CHENGDU (R/O), CN",
+    "JINGZHOU, CN",
+    "JIAXING, CN",
+    "JIUJIANG, CN",
+    "ZHUHAI, CN",
+    "JIUJIANG GUANGDONG, CN",
+    "SANSHUI GUANGDONG, CN",
+    "NANHAI, CN",
+    "HAIKOU, CN",
+    "QUANZHOU, CN",
+    "MACAU, MO",
+    "MOJI, JP",
+    "SHIMIZU, JP",
+    "IWAKUNI, JP",
+    "TANJUNG PELEPAS, MY",
+    "CAGAYAN DE ORO, PH",
+    "TAIPEI, TW"
   ],
   "types": [
     "DV20",
@@ -524,7 +569,8 @@ window.QUOTE_INDEX =
     "ETS לא נוסף (מוצא בסין). לפי הטקסט הנלווה למחירון (לא בתאי האקסל): Foshan, Jiangmen ו-Huangpu via specific terminals only, please contact us for detail. תוספות משקל כבד לא נוספו אוטומטית: CWC ≥18 טון מטען 200$/20׳; CWX ≥24 טון 500$/20׳.",
     "F.A.K. HARMLESS. תוקף 16.08.2026–31.10.2026 (*Effective last container Received for export at train depots, terminals or POL'S). עודכן 15.09.26. DTHC ו-EFS נוספו לסה״כ לפי הטבלה: DTHC 275$/20׳ ו-400$/40׳; EFS IN USD - SEP = 156$ × TEU (156$/20׳, 312$/40׳). OVW כלול בתעריף ל-20׳. 14 ימי demurrage חינם ביעד, אלא אם איש המכירות ציין אחרת. אחסנה ו-demurrage ביעד אינם כלולים מעבר לימי הפטור. Origin THC משולם על ידי השולח ולא נוסף. כפוף לדמי D/O ולהוצאות מקומיות — סכומים לא צוינו במחירון ולא הומצאו. כפוף לתוספות נוספות במועד השילוח. לא כולל תוספות למשקל יתר, ציוד מיוחד ומטען מסוכן. כפוף לביקורת בכל נמל שטעון. לא מקבלים Granite Blocks. לא נוספו אוטומטית (מותנים): EIS 50$/מכולה ל-Coir pith/Flammable (הסכם נפרד) ולמטען harmless עם סכנת בעירה ספונטנית/חימום עצמי; FTS 14$/TEU ל-FlexiTank/FlexiBag; SWB FEE 35$ לסוכן/שולח ב-POL שאינו אשראי; דמי HAZ ב-POL (בלי VIZAK ו-GOA): HIGH RISK PG 1 500$/TEU, LOW RISK PG 3 150$/TEU, MEDIUM RISK PG 2 250$/TEU; OTS 500$ ל-20׳ Open Top ו-1000$ ל-40׳ Open Top/High; Israel THC למטען מסוכן/ציוד מיוחד 320$/20׳ ו-460$/40׳; SOC FEE 500$ × TEU. ביטול הזמנה: 200$/מכולה. תנאי ההובלה: https://www.msc.com/che/contract-of-carriage. הובלה יבשתית עד מחסן הלקוח הוצעה במייל בנפרד ולא תומחרה במחירון.",
     "הובלה באירו (EUR) לפי המחירון; לא הומרה לדולר. Inclusive: EFS, THL, CSS, IFP, MBS, TSL. כפוף ל-OBS ו-EES (דולר ל-TEU, חושב למכולה לפי 1 TEU ל-20׳ ו-2 TEU ל-40׳/HC: OBS 198/396$, EES 72/144$). DTHC: 270$/20׳ ו-390$/40׳–40HC. CMD: 21$ ל-UNIT (טופל כמכולה). כפוף לכל התוספות התקפות במועד השילוח. כפוף ל-FGP (Food Grade Premium) — לא צוין סכום במחירון, לא נוסף לסה״כ. Freight prepaid, בכפוף להגשת תעריף (filing) לפני הזמנה. תאריך דירוג ה-B/L: Proforma ETD (ואם הטעינה בדוברה/פידר — Proforma ETD של הדוברה/פידר). ניתוב סטנדרטי אחד בלבד. כפוף לאישור תפעולי ולזמינות ציוד ומקום. ללקוחות ללא אשראי: תשלום במזומן בשקלים. ריפרים — לפנות מקרה-מקרה (אין תעריפי ריפר במחירון). לפי גיליון General Terms: General cargo / Non IMCO only.",
-    "F.A.K. HARMLESS ליעדי אשדוד (HCT) וחיפה (אותו מחיר). תוקף 01.12.2026–14.12.2026 (until further notice but not beyond 14.12.2026). תעריף 20׳ DV חל רק על מטען במשקל ברוטו עד 22.9 טון (OVW TILL 22.9 TONS) — תוספות למשקל עודף חלות לפי המחירון, אבל סכום התוספת לא צוין בגיליון התעריפים ולא הומצא. THC במחירון (THC IN USD) 275$/20׳ ו-400$/40׳ נוסף לסה״כ כטיפול יעד (Origin THC משולם ע״י השולח). PRS 55$/110$ ו-SCS 36$/72$ (20׳/40׳) נוספו לפי הטבלה. CLS 20$/40$ נוסף רק בשורות שבהן צוין (נמלי סין היבשתית). CRS 131$/262$ נוסף רק בשורות שבהן צוין (הונג קונג ושאר המוצאים שאינם סין היבשתית). EFS לא מופיע במחירון הזה ולא נוסף. מספר SCT לא צוין במחירון (במייל הופיע רק placeholder ולא הועתק כמספר אמיתי). אחרי שחרור הזמנה לא ניתן לשנות את קוד ה-SCT; קוד שגוי — קנס 3,500$ למכולה, ואם אין תעריף בגלל קוד שגוי יחולו תעריפי FAK. יש לאמת מול משרד MSC לפני הזמנה. הובלה מנמלי בסיס לפי תאריך יציאת הפרופורמה; מנמלי out (Sihanoukville, Makassar, Songkhla ונמלי out בסין) לפי היציאה בפועל; בנגקוק לפי פרופורמת Laem Chabang. 12 ימי demurrage חינם ביעד. כפוף לדמי D/O ולהוצאות מקומיות (טבלת Locals מוצגת בנפרד, לא בסה״כ ההובלה). כפוף לתוספות במועד השילוח ולזמינות מקום וציוד. לא נוספו אוטומטית: Flexi/Flexibag 14$ למכולה; מטען עם בעירה ספונטנית/חימום עצמי 50$/מכולה (גיליון SCF — רשימת הסחורות לא הייתה בטקסט מחלץ בגיליון); דמי מועמדות למכולה כבדה בהונג קונג ודרום סין (RMB/HKD לפי הגיליון, לא הומרו); תעריפי pre-carriage / TAO-PRE ו-China inland (גיליונות נפרדים) — להוסיף מעל תעריף נמל האם, לא נכללו בסה״כ."
+    "F.A.K. HARMLESS ליעדי אשדוד (HCT) וחיפה (אותו מחיר). תוקף 01.12.2026–14.12.2026 (until further notice but not beyond 14.12.2026). תעריף 20׳ DV חל רק על מטען במשקל ברוטו עד 22.9 טון (OVW TILL 22.9 TONS) — תוספות למשקל עודף חלות לפי המחירון, אבל סכום התוספת לא צוין בגיליון התעריפים ולא הומצא. THC במחירון (THC IN USD) 275$/20׳ ו-400$/40׳ נוסף לסה״כ כטיפול יעד (Origin THC משולם ע״י השולח). PRS 55$/110$ ו-SCS 36$/72$ (20׳/40׳) נוספו לפי הטבלה. CLS 20$/40$ נוסף רק בשורות שבהן צוין (נמלי סין היבשתית). CRS 131$/262$ נוסף רק בשורות שבהן צוין (הונג קונג ושאר המוצאים שאינם סין היבשתית). EFS לא מופיע במחירון הזה ולא נוסף. מספר SCT לא צוין במחירון (במייל הופיע רק placeholder ולא הועתק כמספר אמיתי). אחרי שחרור הזמנה לא ניתן לשנות את קוד ה-SCT; קוד שגוי — קנס 3,500$ למכולה, ואם אין תעריף בגלל קוד שגוי יחולו תעריפי FAK. יש לאמת מול משרד MSC לפני הזמנה. הובלה מנמלי בסיס לפי תאריך יציאת הפרופורמה; מנמלי out (Sihanoukville, Makassar, Songkhla ונמלי out בסין) לפי היציאה בפועל; בנגקוק לפי פרופורמת Laem Chabang. 12 ימי demurrage חינם ביעד. כפוף לדמי D/O ולהוצאות מקומיות (טבלת Locals מוצגת בנפרד, לא בסה״כ ההובלה). כפוף לתוספות במועד השילוח ולזמינות מקום וציוד. לא נוספו אוטומטית: Flexi/Flexibag 14$ למכולה; מטען עם בעירה ספונטנית/חימום עצמי 50$/מכולה (גיליון SCF — רשימת הסחורות לא הייתה בטקסט מחלץ בגיליון); דמי מועמדות למכולה כבדה בהונג קונג ודרום סין (RMB/HKD לפי הגיליון, לא הומרו); תעריפי pre-carriage / TAO-PRE ו-China inland (גיליונות נפרדים) — להוסיף מעל תעריף נמל האם, לא נכללו בסה״כ.",
+    "F.A.K. ליעדי אשדוד (ILASH) וחיפה (ILHFA), אותו מחיר. תוקף 15.11.2026–30.11.2026. לא צוין במחירון מספר הסכם או filing, ולא הומצא. התעריף כולל EBS, ERC, STF, WRC ו-PSS. 21 ימי BT חינם (ימי לוח שנה). תאריך הדירוג (rating base date) הוא תאריך ה-ETD שפורסם כאשר המכולה המלאה האחרונה נכנסת לשער (Last Full Container Gate In); חובת הסוכן או הספק המקומי במזרח הרחוק לאמת זאת מראש כדי למנוע מחלוקת תעריף. THC/D 295$/20׳ ו-420$/40׳, ISPS/D 20$ למכולה, ו-ISOCC 134$/20׳ ו-268$/40׳–40HC נוספו לסה״כ. EUIS (EU innovation surcharge): לנמלי סין היבשתית כלול בתעריף ולא נוסף; למדינות שאינן סין, כולל הונג קונג וטייוואן, 72 אירו ל-TEU (72€ ל-20׳, 144€ ל-40׳/HC) — נשמר באירו, בלי המרה. LSS: לנמלי סין היבשתית כלול ולא נוסף; למדינות שאינן סין, כולל הונג קונג וטייוואן, 20$ ל-TEU. מקאו (MOMCA) אינה סין יבשתית וטופלה כלא-סין (EUIS ו-LSS נוספו). HWSC רק ל-20׳: משקל ברוטו 18–20.99 טון = 200$ — מותנה במשקל, לא נוסף לסה״כ. 40DV ו-40HC באותו מחיר במחירון. קודי מכולה: 2SD=20'DV, 4SD=40'DV, 4SH=40'HC."
   ],
   "incl": [
     "CNS/AGC/SSD/WR/THC",
@@ -543,7 +589,8 @@ window.QUOTE_INDEX =
     "LSA/PSS/EBS",
     "OVW",
     "CNS/WR/SEH",
-    "EFS/THL/CSS/IFP/MBS/TSL"
+    "EFS/THL/CSS/IFP/MBS/TSL",
+    "EBS/ERC/STF/WRC/PSS"
   ],
   "codes": [
     "GFS",
@@ -599,7 +646,12 @@ window.QUOTE_INDEX =
     "PRS",
     "SCS",
     "CLS",
-    "CRS"
+    "CRS",
+    "THC/D",
+    "ISPS/D",
+    "ISOCC",
+    "EUIS",
+    "LSS"
   ],
   "curs": [
     "USD",
@@ -1188,6 +1240,94 @@ window.QUOTE_INDEX =
     "YOKOHAMA": [
       "JPYOK",
       "Japan"
+    ],
+    "YANGZHOU": [
+      "CNYET",
+      "China"
+    ],
+    "ZHENJIANG": [
+      "CNZJZ",
+      "China"
+    ],
+    "CHONGQING": [
+      "CNCHG",
+      "China"
+    ],
+    "YICHANG": [
+      "CNYCN",
+      "China"
+    ],
+    "TAICANG": [
+      "CNTAC",
+      "China"
+    ],
+    "CHENGDU (R/O)": [
+      "CNCHD",
+      "China"
+    ],
+    "JINGZHOU": [
+      "CNJGZ",
+      "China"
+    ],
+    "JIAXING": [
+      "CNJIX",
+      "China"
+    ],
+    "JIUJIANG": [
+      "CNJIA",
+      "China"
+    ],
+    "ZHUHAI": [
+      "CNZHU",
+      "China"
+    ],
+    "JIUJIANG GUANGDONG": [
+      "CNJJG",
+      "China"
+    ],
+    "SANSHUI GUANGDONG": [
+      "CNSNO",
+      "China"
+    ],
+    "NANHAI": [
+      "CNNHI",
+      "China"
+    ],
+    "HAIKOU": [
+      "CNHAK",
+      "China"
+    ],
+    "QUANZHOU": [
+      "CNQWO",
+      "China"
+    ],
+    "MACAU": [
+      "MOMCA",
+      "Macau"
+    ],
+    "MOJI": [
+      "JPMJI",
+      "Japan"
+    ],
+    "SHIMIZU": [
+      "JPSMZ",
+      "Japan"
+    ],
+    "IWAKUNI": [
+      "JPIWU",
+      "Japan"
+    ],
+    "TANJUNG PELEPAS": [
+      "MYPTP",
+      "Malaysia"
+    ],
+    "CAGAYAN DE ORO": [
+      "PHKGY",
+      "Philippines"
+    ],
+    "TAIPEI": [
+      "TWTPE",
+      "Taiwan"
     ]
   },
   "countryHe": {
@@ -1249,7 +1389,8 @@ window.QUOTE_INDEX =
     "LV": "לטביה",
     "NL": "הולנד",
     "PL": "פולין",
-    "SE": "שוודיה"
+    "SE": "שוודיה",
+    "MO": "מקאו"
   },
   "countryEn": {
     "AL": "Albania",
@@ -1310,7 +1451,8 @@ window.QUOTE_INDEX =
     "LV": "Latvia",
     "NL": "Netherlands",
     "PL": "Poland",
-    "SE": "Sweden"
+    "SE": "Sweden",
+    "MO": "Macau"
   },
   "typeHe": {
     "DV20": "20׳ יבש (DV20 / 20DC / 20GP)",
@@ -1365,7 +1507,10 @@ window.QUOTE_INDEX =
     "OVW": "משקל יתר (OVW) — כלול בתעריף ל-20׳",
     "RFE": "דלק חירום לנהר (River Emergency Fuel)",
     "PRS": "תוספת סיכון פירטיות (Piracy Risk Surcharge)",
-    "SCS": "תוספת תעלת סואץ (Suez Canal Surcharge)"
+    "SCS": "תוספת תעלת סואץ (Suez Canal Surcharge)",
+    "THC/D": "טיפול טרמינל ביעד (THC/D)",
+    "ISPS/D": "אגרת ISPS ביעד",
+    "EUIS": "תוספת חדשנות אירופית (EU Innovation Surcharge)"
   },
   "payHe": {
     "prepaid": "במוצא (Prepaid)",
