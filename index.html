@@ -76,7 +76,9 @@
       margin-bottom: 14px;
     }
     .card-head h2 { margin: 0; }
+    .wrap, .card, header.hero .wrap { max-width: 100%; }
     .grid { display: grid; gap: 12px; }
+    .grid > * { min-width: 0; }
     .grid-2 { grid-template-columns: 1fr 1fr; }
     .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
     label.fld, .fld-label {
@@ -174,7 +176,9 @@
     @media (min-width: 640px) { .props { grid-template-columns: 11rem 1fr; } }
     .props dt { font-size: 0.82rem; font-weight: 600; color: var(--muted); margin: 0; }
     .props dd { margin: 0; }
-    .table-wrap { overflow-x: auto; margin: 12px 0; -webkit-overflow-scrolling: touch; }
+    .table-wrap { overflow-x: auto; margin: 12px 0; -webkit-overflow-scrolling: touch; max-width: 100%; }
+    p, dd, .meta, .hint, .metric .val, .metric .det, .ltr { overflow-wrap: anywhere; word-break: break-word; }
+    select, input { max-width: 100%; }
     table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
     th, td { text-align: start; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
     th { font-size: 0.78rem; color: var(--muted); font-weight: 700; }
@@ -676,7 +680,7 @@
       let line2 = "תוקף כללי: " + fmtDate(addDays(carrier.vf)) + "–" + fmtDate(addDays(carrier.vt));
       if (bookingLine(carrier)) line2 += carrier.email ? " · הזמנות: " + carrier.email : " · " + bookingLine(carrier);
       if (carrier.paymentTerms) line2 += " · תשלום: " + carrier.paymentTerms;
-      carrierMeta = '<p class="meta">' + esc(head) + "</p><p class="meta">' + esc(line2) + "</p>";
+      carrierMeta = '<p class="meta">' + esc(head) + '</p><p class="meta">' + esc(line2) + '</p>';
     }
 
     const originLabelText = state.query.trim()
