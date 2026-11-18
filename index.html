@@ -1167,7 +1167,7 @@
       carrierMeta = "השוואה: מוצג התעריף התקף לתאריך ההפלגה / BL מכל חברה שיש לה שורה במסלול. בחפיפה נבחרת הגרסה שהונפקה לאחרונה.";
     }
 
-    const typOpts = '<option value="">' + (state.originId ? "בחרו סוג מכולה" : "בחרו קודם נמל מוצא") + "</option>" +
+    const typOpts = '<option value="">' + (state.originId ? (state.dest ? "בחרו סוג מכולה" : "בחרו קודם נמל יעד") : "בחרו קודם נמל מוצא") + "</option>" +
       typesInLane.map((typ) =>
         '<option value="' + esc(typ) + '"' + (typ === effectiveTyp ? " selected" : "") + ">" + esc(TYPE_HE[typ] || typ) + "</option>"
       ).join("");
@@ -1180,7 +1180,7 @@
         : "למסלול זה קיימת במחירון רק שורת מטען מסוכן";
       formHaz += '<label class="toggle"><input type="checkbox" id="haz" ' + (effectiveHaz ? "checked " : "") + (!hasNonHaz ? "disabled " : "") + "> <span>" + esc(lab) + "</span></label>";
     }
-    if (state.originId && typesInLane.length === 0) {
+    if (state.originId && state.dest && typesInLane.length === 0) {
       const msg = (carrier.id === "yml" && state.dest.startsWith("HAIFA"))
         ? "במחירון YML שנטען כל שורות ההובלה הימית הן לאשדוד בלבד. יש תוספת TA (Transport Additional Charge) ליעד חיפה (ILHFA): 100$ ל-20DC, 200$ ל-40DC ו־40HQ — בלי תעריף הובלה ימית נפרד לחיפה. לא הומצא מחיר הובלה לחיפה."
         : "לנמל המוצא שנבחר אין שורות אל " + destHe(state.dest) + " במחירון הזה.";
@@ -1408,26 +1408,39 @@
           '<button type="button" data-dest="HAIFA, IL" aria-pressed="' + (state.dest === "HAIFA, IL") + '">חיפה</button>' +
         "</div></div>" +
         '<div><label class="fld" for="typ">סוג מכולה</label><select id="typ"' +
-          (!state.originId || typesInLane.length === 0 ? " disabled" : "") + ">" + typOpts + "</select></div>" +
+          (!state.originId || !state.dest || typesInLane.length === 0 ? " disabled" : "") + ">" + typOpts + "</select></div>" +
         '<div class="fld-date"><label class="fld" for="date">תאריך הפלגה / BL</label><input type="text" id="date" value="' + esc(state.dateText) + '" placeholder="18.11.2026" inputmode="numeric"></div>' +
       "</div>" +
       formWarn +
       '<details class="extras-panel" id="extras-panel"' + (state.extrasOpen ? " open" : "") + "><summary>אפשרויות נוספות</summary>" + extrasInner + "</details>" +
       "</section>" +
-      '<section class="card"><div class="card-head"><h2>הצעת מחיר</h2>' + copyBtn + "</div>" + quoteMeta + (activeVersion ? versionBadgeHtml(activeVersion, shipIso, altVersions) : "") + quoteHtml + "</section>" +
+      (state.originId && state.dest && effectiveTyp
+        ? '<section class="card" id="quote-card"><div class="card-head"><h2>הצעת מחיר</h2>' + copyBtn + "</div>" + quoteMeta + (activeVersion ? versionBadgeHtml(activeVersion, shipIso, altVersions) : "") + quoteHtml + "</section>"
+        : "") +
       '<details class="terms"><summary>תנאים שחשוב לציין</summary><div class="card">' + termsHtml(displayCarrier, shipIso) + "</div></details>";
 
     const $ = (id) => document.getElementById(id);
     $("carrier").addEventListener("change", (e) => {
       const v = e.target.value;
-      const next = rematchOrigin(v, state.originId, origins);
+      comboOpen = false;
+      comboTyped = null;
+      comboHighlight = -1;
       state.carrierId = v;
-      state.originId = next;
-      if (!next) state.typ = "";
+      state.originId = "";
+      state.originKey = "";
+      state.dest = "";
+      state.typ = "";
+      state.dateText = todayText();
+      state.qtyText = "1";
+      state.markupText = "";
       state.haz = false;
       state.copied = false;
       state.copyFallback = "";
+      state.versionOverride = {};
+      state.historyOpen = false;
+      state.extrasOpen = false;
       render();
+      window.scrollTo(0, 0);
     });
     const originInput = $("origin-input");
     if (originInput) {
