@@ -192,6 +192,26 @@
     .callout.warn { background: var(--warn-bg); border-color: var(--warn-bd); color: var(--warn-ink); }
     .callout.info { background: var(--info-bg); border-color: var(--info-bd); color: var(--info-ink); }
     .callout.expired { background: #fdecec; border-color: #e8b4b4; color: #7a1f1f; }
+    .date-jump {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .date-jump .jump-text { flex: 1 1 160px; margin: 0; }
+    .date-jump .btn {
+      padding: 8px 12px;
+      font-size: 0.85rem;
+      white-space: nowrap;
+    }
+    .date-jump .btn-secondary {
+      background: #fff;
+      color: var(--navy);
+      border: 1px solid var(--navy);
+    }
+    .date-jump .btn-secondary:hover { background: #f4f6f8; }
+    .date-jump strong { display: inline; margin: 0; }
     .expired-ref {
       border: 2px dashed #c45c5c;
       border-radius: 14px;
@@ -353,7 +373,7 @@
     <footer class="note">כלי פנימי להצעת מחיר ממחירון. התעריפים כפופים לתוקף, למקום פנוי ולתנאי החברה.</footer>
   </div>
   <noscript><p class="wrap">יש להפעיל JavaScript כדי להשתמש במחשבון.</p></noscript>
-  <script src="data/index.js?v=msc2-20261118"></script>
+  <script src="data/index.js?v=msc-jump-20261118"></script>
   <script>
 (function () {
   const DATA = window.QUOTE_INDEX;
@@ -385,6 +405,10 @@
   function fmtDate(iso) {
     const [y, m, d] = iso.split("-");
     return d + "." + m + "." + y;
+  }
+  function fmtDateShort(iso) {
+    const [y, m, d] = iso.split("-");
+    return d + "." + m;
   }
   function parseDateInput(s) {
     const t = String(s || "").trim();
@@ -774,6 +798,40 @@
     const next = all.filter((v) => addDays(v.vf) > iso).sort((a, b) => addDays(a.vf).localeCompare(addDays(b.vf)))[0] || null;
     return { prev: prev, next: next };
   }
+  function carrierDateStatus(carrierId, iso) {
+    if (!iso) return { kind: "ok", next: null, prev: null };
+    if (coveringVersions(carrierId, iso).length) return { kind: "ok", next: null, prev: null };
+    const near = nearestVersions(carrierId, iso);
+    if (near.next) return { kind: "upcoming", next: near.next, prev: near.prev };
+    if (near.prev) return { kind: "expired", next: null, prev: near.prev };
+    return { kind: "none", next: null, prev: null };
+  }
+  function carrierSelectLabel(c, iso) {
+    const st = carrierDateStatus(c.id, iso);
+    if (st.kind === "upcoming") return c.nameHe + " — מחירון חדש מ־" + fmtDateShort(addDays(st.next.vf));
+    if (st.kind === "expired") return c.nameHe + " — פג תוקף";
+    if (st.kind === "none") return c.nameHe + " — אין מחירון לתאריך";
+    return c.nameHe;
+  }
+  function dateJumpNoticeHtml(carrier, shipIso) {
+    if (!shipIso) return "";
+    const st = carrierDateStatus(carrier.id, shipIso);
+    if (st.kind === "ok") return "";
+    let html = '<div class="callout warn" id="date-jump-notice"><div class="date-jump">';
+    html += '<p class="jump-text"><strong>אין מחירון בתוקף ל־' + esc(fmtDate(shipIso)) + ".</strong> ";
+    if (st.kind === "upcoming") html += "קיים מחירון שמתחיל ב־" + esc(fmtDate(addDays(st.next.vf))) + ".";
+    else if (st.kind === "expired") html += "המחירון האחרון פג תוקף ב־" + esc(fmtDate(addDays(st.prev.vt))) + ".";
+    else html += "לא נמצא מחירון לחברה זו.";
+    html += "</p>";
+    if (st.next) {
+      html += '<button type="button" class="btn" id="jump-next" data-jump-date="' + esc(addDays(st.next.vf)) + '">עבור לתאריך המחירון החדש (' + esc(fmtDate(addDays(st.next.vf))) + ")</button>";
+    }
+    if (st.prev) {
+      html += '<button type="button" class="btn btn-secondary" id="jump-prev" data-jump-date="' + esc(addDays(st.prev.vt)) + '">הצג מחירון אחרון (לעיון)</button>';
+    }
+    html += "</div></div>";
+    return html;
+  }
   function versionTitle(v) {
     if (v.ref && v.version) return "הסכם " + v.ref + " · גרסה " + v.version;
     if (v.label) return v.label;
@@ -802,7 +860,7 @@
     }
     return new Promise(function (resolve, reject) {
       const s = document.createElement("script");
-      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=msc2-20261118";
+      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=msc-jump-20261118";
       s.async = true;
       s.onload = function () {
         const pack = window.QUOTE_PACK && window.QUOTE_PACK[meta.id];
@@ -1238,9 +1296,7 @@
     const saleUsd = t ? (t.shipment.USD || 0) + markup * qty : 0;
 
     const carrierOptions = carriers.map((c) => {
-      const none = shipIso && coveringVersions(c.id, shipIso).length === 0;
-      const expiredBadge = none ? " — אין מחירון לתאריך" : "";
-      return '<option value="' + esc(c.id) + '"' + (!isCompare && carrier.id === c.id ? " selected" : "") + ">" + esc(c.nameHe + expiredBadge) + "</option>";
+      return '<option value="' + esc(c.id) + '"' + (!isCompare && carrier.id === c.id ? " selected" : "") + ">" + esc(carrierSelectLabel(c, shipIso)) + "</option>";
     }).join("") + '<option value="' + COMPARE_ID + '"' + (isCompare ? " selected" : "") + ">השוואה בין חברות</option>";
 
     const activeVersion = isCompare ? null : selectedVersionMeta(carrier.id, shipIso);
@@ -1275,12 +1331,7 @@
       formWarn += '<div class="callout warn"><strong>תאריך לא מזוהה</strong>כתבו את תאריך השילוח בפורמט 18.11.2026 (יום.חודש.שנה).</div>';
     }
     if (!isCompare && shipIso && !activeVersion) {
-      const near = nearestVersions(carrier.id, shipIso);
-      formWarn += '<div class="callout warn"><strong>אין מחירון בתוקף לתאריך זה</strong>לתאריך ההפלגה / BL ' +
-        esc(fmtDate(shipIso)) + " אין מחירון של " + esc(carrier.nameHe) + " שחל באותו תאריך." +
-        (near.prev ? " המחירון הקודם: " + esc(versionTitle(near.prev) + " · " + versionWindow(near.prev)) + "." : "") +
-        (near.next ? " המחירון הבא: " + esc(versionTitle(near.next) + " · " + versionWindow(near.next)) + "." : "") +
-        " אפשר לפתוח מחירון מ«היסטוריית מחירונים» לעיון, או לשנות את התאריך לחלון תקף.</div>";
+      formWarn += dateJumpNoticeHtml(carrier, shipIso);
     }
 
     let quoteHtml = "";
@@ -1533,7 +1584,7 @@
       formWarn +
       '<details class="extras-panel" id="extras-panel"' + (state.extrasOpen ? " open" : "") + "><summary>אפשרויות נוספות</summary>" + extrasInner + "</details>" +
       "</section>" +
-      ((state.originId && state.dest && effectiveTyp) || (!isCompare && shipIso && !activeVersion)
+      (state.originId && state.dest && effectiveTyp
         ? '<section class="card" id="quote-card"><div class="card-head"><h2>הצעת מחיר</h2>' + copyBtn + "</div>" + quoteMeta + (activeVersion ? versionBadgeHtml(activeVersion, shipIso, altVersions) : "") + quoteHtml + "</section>"
         : "") +
       '<details class="terms"><summary>תנאים שחשוב לציין</summary><div class="card">' + termsHtml(displayCarrier, shipIso) + "</div></details>";
@@ -1622,6 +1673,17 @@
     });
     $("date").addEventListener("change", (e) => { state.dateText = e.target.value; state.versionOverride = {}; state.copied = false; state.copyFallback = ""; render(); });
     $("date").addEventListener("blur", (e) => { state.dateText = e.target.value; render(); });
+    document.querySelectorAll("[data-jump-date]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        const iso = btn.getAttribute("data-jump-date");
+        if (!iso) return;
+        state.dateText = fmtDate(iso);
+        state.versionOverride = {};
+        state.copied = false;
+        state.copyFallback = "";
+        render();
+      });
+    });
     $("qty").addEventListener("change", (e) => { state.qtyText = e.target.value; render(); });
     $("markup").addEventListener("change", (e) => { state.markupText = e.target.value; render(); });
     const hazEl = $("haz");
