@@ -178,13 +178,21 @@
     .props dt { font-size: 0.82rem; font-weight: 600; color: var(--muted); margin: 0; }
     .props dd { margin: 0; }
     .table-wrap { overflow-x: auto; margin: 12px 0; -webkit-overflow-scrolling: touch; max-width: 100%; }
-    p, dd, .meta, .hint, .metric .val, .metric .det, .ltr { overflow-wrap: anywhere; word-break: break-word; }
+    p, dd, .meta, .hint, .metric .val, .metric .det { overflow-wrap: anywhere; word-break: break-word; }
     select, input { max-width: 100%; }
     table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
     th, td { text-align: start; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
     th { font-size: 0.78rem; color: var(--muted); font-weight: 700; }
     .num { text-align: end; font-variant-numeric: tabular-nums; direction: ltr; unicode-bidi: isolate; }
-    .ltr { direction: ltr; unicode-bidi: isolate; }
+    .ltr {
+      direction: ltr;
+      unicode-bidi: isolate;
+      display: inline-block;
+      max-width: 100%;
+      overflow-wrap: anywhere;
+      word-break: normal;
+      vertical-align: baseline;
+    }
     hr.div { border: 0; border-top: 1px solid var(--line); margin: 16px 0; }
     details.terms { margin-top: 16px; }
     details.terms summary {
