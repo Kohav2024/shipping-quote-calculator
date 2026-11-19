@@ -66,6 +66,21 @@ window.QUOTE_INDEX =
   ],
   "versions": [
     {
+      "id": "zim-v281",
+      "carrierId": "zim",
+      "file": "data/zim/2026-11-19_v281.js",
+      "ref": "7110068521",
+      "version": "281",
+      "party": "ILHFA03-ZIM ISRAEL LTD.",
+      "vf": 8,
+      "vt": 50,
+      "issued": "2026-11-18",
+      "added": "2026-11-19",
+      "sourceFile": "ZIM agreement 7110068521 v281 (xlsx)",
+      "sourceNote": "Agreement Created On 18.11.2026 12:04:39. תוקף כותרת: 19.11.2026–31.12.2026.",
+      "label": "הסכם 7110068521 · גרסה 281"
+    },
+    {
       "id": "zim-v278",
       "carrierId": "zim",
       "file": "data/zim/2026-11-11_v278.js",
