@@ -197,6 +197,165 @@
       color: var(--navy);
     }
     body.notice-open { overflow: hidden; }
+    .view-tabs {
+      margin: 10px 0 0;
+      position: sticky;
+      top: 0;
+      z-index: 30;
+      background: var(--bg);
+      padding: 6px 0 8px;
+    }
+    .view-tabs button {
+      font-size: 0.84rem;
+      padding: 10px 8px;
+      line-height: 1.25;
+    }
+    .spot-banner {
+      display: block;
+      width: 100%;
+      margin-top: 8px;
+      box-sizing: border-box;
+      border: 1px solid #9eceb8;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border-radius: 10px;
+      padding: 8px 10px;
+      font: inherit;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-align: start;
+      cursor: pointer;
+      line-height: 1.4;
+      max-width: 100%;
+    }
+    .spot-banner:hover { background: #dcefe7; }
+    .spot-filters {
+      margin-top: 0;
+      padding: 12px;
+    }
+    .spot-filters .spot-filter-row {
+      display: grid;
+      gap: 8px;
+      grid-template-columns: 1fr;
+    }
+    .spot-filters select {
+      width: 100%;
+      font: inherit;
+      font-size: 1rem;
+      padding: 8px 10px;
+      border: 1px solid #cfc9bd;
+      border-radius: 10px;
+      background: #fff;
+      color: var(--ink);
+    }
+    .spot-count {
+      margin: 8px 0 0;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .spot-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 10px;
+    }
+    .spot-card {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 12px 12px 14px;
+      max-width: 100%;
+    }
+    .spot-card.is-expired { opacity: 0.72; }
+    .spot-card-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .spot-source {
+      display: inline-block;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border: 1px solid #9eceb8;
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+    .spot-received { font-size: 0.78rem; color: var(--muted); }
+    .spot-expired-tag {
+      display: inline-block;
+      background: #fdecec;
+      color: #7a1f1f;
+      border: 1px solid #e8b4b4;
+      border-radius: 999px;
+      padding: 2px 8px;
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+    .spot-card h2 {
+      margin: 8px 0 2px;
+      font-size: 1.15rem;
+      color: var(--navy);
+      line-height: 1.2;
+    }
+    .spot-lane {
+      margin: 0 0 10px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .spot-sailing {
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 10px;
+      padding: 8px 10px;
+      margin-bottom: 8px;
+    }
+    .spot-sailing.is-expired { opacity: 0.7; }
+    .spot-of {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 6px;
+      margin: 0 0 6px;
+    }
+    .spot-of-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--muted);
+    }
+    .spot-of-price {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: var(--navy);
+    }
+    .spot-of-typ { font-size: 0.9rem; font-weight: 700; color: var(--ink); }
+    .spot-etd-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px 10px;
+      font-size: 0.82rem;
+    }
+    .spot-etd-row .lbl { display: block; color: var(--muted); font-size: 0.75rem; }
+    .spot-etd-row .delayed { font-weight: 800; color: var(--accent); }
+    .spot-avail { margin: 6px 0 0; font-size: 0.84rem; }
+    .spot-facts {
+      margin: 8px 0 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 6px 10px;
+      font-size: 0.84rem;
+    }
+    .spot-facts .full { grid-column: 1 / -1; }
+    .spot-facts dt { color: var(--muted); font-size: 0.75rem; font-weight: 600; }
+    .spot-facts dd { margin: 0; font-weight: 600; }
+    .spot-empty { margin-top: 12px; }
+    @media (min-width: 720px) {
+      .spot-filters .spot-filter-row { grid-template-columns: 1fr 1fr; }
+    }
     body.hist-open { overflow: hidden; }
     .hist-sheet-root {
       position: fixed;
@@ -634,12 +793,17 @@
     </div>
   </header>
   <div class="wrap">
+    <div class="view-tabs seg" id="view-tabs" role="tablist" aria-label="תצוגה">
+      <button type="button" id="tab-rates" role="tab" aria-pressed="true">מחירון</button>
+      <button type="button" id="tab-spots" role="tab" aria-pressed="false">מבצעי ספוט מסוכנים</button>
+    </div>
     <div id="app"><p class="hint">טוען את המחירון…</p></div>
     <footer class="note">כלי פנימי להצעת מחיר ממחירון. התעריפים כפופים לתוקף, למקום פנוי ולתנאי החברה.</footer>
   </div>
   <noscript><p class="wrap">יש להפעיל JavaScript כדי להשתמש במחשבון.</p></noscript>
-  <script src="data/index.js?v=copyguard-20261118"></script>
-  <script src="data/notices.js?v=copyguard-20261118"></script>
+  <script src="data/index.js?v=spots-20261119"></script>
+  <script src="data/notices.js?v=spots-20261119"></script>
+  <script src="data/spots.js?v=spots-20261119"></script>
   <script>
 (function () {
   const DATA = window.QUOTE_INDEX;
@@ -1091,6 +1255,10 @@
     calMonth: null,
     noticeOpen: false,
     noticeId: "",
+    view: "rates",
+    spotOrigin: "",
+    spotCarrier: "",
+    spotShowExpired: false,
   };
 
   function versionsFor(carrierId) {
@@ -1196,7 +1364,7 @@
     }
     return new Promise(function (resolve, reject) {
       const s = document.createElement("script");
-      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=copyguard-20261118";
+      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=spots-20261119";
       s.async = true;
       s.onload = function () {
         const pack = window.QUOTE_PACK && window.QUOTE_PACK[meta.id];
@@ -1695,7 +1863,228 @@
     render();
   }
 
+  const SPOTS = window.AGENT_SPOTS || [];
+  const DEST_HE = { ASHDOD: "אשדוד", HAIFA: "חיפה" };
+  function spotAgentLabel(offer) {
+    const name = offer && String(offer.agentName || "").trim();
+    return name || (offer && offer.source) || "מסוכן";
+  }
+  function typLabel(typ) {
+    const map = { "20GP": "20'GP", "40HQ": "40'HQ", "20DV": "20'DV", "40GP": "40'GP" };
+    return map[typ] || typ;
+  }
+  function typHtml(typ) { return ltrHtml(typLabel(typ)); }
+  function sailingEtd(s) { return s.etdDelayed || s.etd; }
+  function sailingExpired(s, today) {
+    const etd = sailingEtd(s);
+    return !!(today && etd && today > etd);
+  }
+  function spotOfferExpired(offer, today) {
+    if (!today) return false;
+    if (offer.cutoff && today > offer.cutoff) return true;
+    return (offer.sailings || []).every(function (s) { return sailingExpired(s, today); });
+  }
+  function destsHe(offer) {
+    const names = (offer.dests || []).map(function (d) { return DEST_HE[d] || d; });
+    let s = names.join(" / ");
+    if (offer.destOnly) s += " בלבד";
+    return s;
+  }
+  function availHtml(items) {
+    if (!items || !items.length) return "לא צוין";
+    return items.map(function (a) {
+      let t = ltrHtml(a.qty + "×" + typLabel(a.typ)) + " " + esc(DEST_HE[a.dest] || a.dest);
+      if (a.inHand) t += " (ביד)";
+      return t;
+    }).join(" · ");
+  }
+  function restrictHtml(offer) {
+    const parts = [];
+    if (offer.weightLimit) {
+      parts.push(typHtml(offer.weightLimit.typ) + " מתחת ל־" + offer.weightLimit.maxTons + " טון");
+    }
+    if (offer.noMsdsBattery) parts.push("ללא MSDS / סוללות");
+    return parts.length ? parts.join(". ") : "לא צוין";
+  }
+  function owsHtml(offer) {
+    const o = offer.ows;
+    if (!o) return "לא צוין";
+    return ltrHtml(money(o.amount, o.ccy) + " / " + typLabel(o.typ)) + " למטען ≥ " + o.minTons + " טון";
+  }
+  function cancelHtml(offer) {
+    const c = offer.cancelFee;
+    if (!c) return "לא צוין";
+    return ltrHtml(money(c.amount, c.ccy) + " / " + typLabel(c.typ));
+  }
+  function filteredSpots(today) {
+    return SPOTS.filter(function (o) {
+      if (state.spotOrigin && o.originKey !== state.spotOrigin) return false;
+      if (state.spotCarrier && o.carrierId !== state.spotCarrier) return false;
+      if (!state.spotShowExpired && spotOfferExpired(o, today)) return false;
+      return true;
+    });
+  }
+  function activeSpotsForOrigin(originKey, today) {
+    if (!originKey) return [];
+    return SPOTS.filter(function (o) {
+      return o.originKey === originKey && !spotOfferExpired(o, today);
+    });
+  }
+  function currentSpotOriginKey() {
+    if (state.originId) {
+      const originsAll = [];
+      // selected origin key is already on state.originKey after render computes it;
+      if (state.originKey) {
+        const k = String(state.originKey).toUpperCase();
+        if (SPOTS.some(function (o) { return o.originKey === k; })) return k;
+      }
+    }
+    return "";
+  }
+  function spotBannerHtml() {
+    const today = todayIso();
+    const key = currentSpotOriginKey();
+    const list = activeSpotsForOrigin(key, today);
+    if (!list.length) return "";
+    const n = list.length;
+    const offerWord = n === 1 ? "מבצע ספוט מסוכן" : "מבצעי ספוט מסוכנים";
+    return '<button type="button" class="spot-banner" id="spot-banner" data-spot-origin="' + esc(key) + '">יש ' + offerWord + " לנמל זה (" + n + ")</button>";
+  }
+  function openSpotTab(originKey) {
+    state.view = "spots";
+    if (originKey) state.spotOrigin = originKey;
+    state.noticeOpen = false;
+    state.historyOpen = false;
+    state.calOpen = false;
+    render();
+  }
+  function updateViewTabs() {
+    const rates = document.getElementById("tab-rates");
+    const spots = document.getElementById("tab-spots");
+    if (rates) rates.setAttribute("aria-pressed", state.view === "rates" ? "true" : "false");
+    if (spots) spots.setAttribute("aria-pressed", state.view === "spots" ? "true" : "false");
+  }
+  function sailingHtml(s, today, offer) {
+    const expired = sailingExpired(s, today);
+    let html = '<div class="spot-sailing' + (expired ? " is-expired" : "") + '">';
+    html += '<div class="spot-of"><span class="spot-of-label">OF</span>';
+    html += '<span class="spot-of-price" dir="ltr">' + esc(money(s.of, s.ccy || "USD") + " / " + typLabel(s.typ)) + "</span></div>";
+    html += '<div class="spot-etd-row">';
+    html += '<div><span class="lbl">הפלגה מקורית (ETD)</span>' + (s.etd ? esc(fmtDate(s.etd)) : "לא צוין") + "</div>";
+    html += '<div><span class="lbl">הפלגה בדחייה</span>';
+    if (s.etdDelayed) html += '<span class="delayed">' + esc(fmtDate(s.etdDelayed)) + "</span>";
+    else html += "ללא דחייה";
+    html += "</div></div>";
+    html += '<div class="spot-avail"><strong>זמינות: </strong>' + availHtml(s.availability) + "</div>";
+    html += "</div>";
+    return html;
+  }
+  function spotCardHtml(offer, today) {
+    const expired = spotOfferExpired(offer, today);
+    let html = '<article class="spot-card' + (expired ? " is-expired" : "") + '" data-spot-id="' + esc(offer.id) + '">';
+    html += '<div class="spot-card-head"><span class="spot-source">' + esc(spotAgentLabel(offer)) + "</span>";
+    html += '<span class="spot-received">התקבל ' + esc(fmtDate(offer.received)) + "</span>";
+    if (expired) html += '<span class="spot-expired-tag">פג תוקף</span>';
+    html += "</div>";
+    html += "<h2>" + esc(offer.carrierName) + "</h2>";
+    html += '<p class="spot-lane">' + esc(offer.originHe) + " (" + esc(offer.originEn) + ") ← " + esc(destsHe(offer)) + "</p>";
+    const sailings = (offer.sailings || []).filter(function (s) {
+      if (state.spotShowExpired) return true;
+      if (offer.cutoff && today && today > offer.cutoff) return true;
+      return !sailingExpired(s, today);
+    });
+    sailings.forEach(function (s) { html += sailingHtml(s, today, offer); });
+    html += '<dl class="spot-facts">';
+    html += "<div><dt>ימים חופשיים (FT)</dt><dd>" + offer.ft + "</dd></div>";
+    html += "<div><dt>טרנזיט (TT)</dt><dd>" + offer.tt + " ימים</dd></div>";
+    html += '<div><dt>חתך (Cut-off)</dt><dd>' + (offer.cutoff ? esc(fmtDate(offer.cutoff)) : "לא צוין") + "</dd></div>";
+    html += '<div class="full"><dt>הגבלות</dt><dd>' + restrictHtml(offer) + "</dd></div>";
+    html += '<div class="full"><dt>תוספת OWS</dt><dd>' + owsHtml(offer) + "</dd></div>";
+    html += '<div class="full"><dt>דמי ביטול</dt><dd>' + cancelHtml(offer) + "</dd></div>";
+    html += "</dl></article>";
+    return html;
+  }
+  function spotViewHtml() {
+    const today = todayIso();
+    const origins = [];
+    const carriersSeen = [];
+    SPOTS.forEach(function (o) {
+      if (!origins.some(function (x) { return x.key === o.originKey; })) {
+        origins.push({ key: o.originKey, he: o.originHe, en: o.originEn });
+      }
+      if (!carriersSeen.some(function (x) { return x.id === o.carrierId; })) {
+        carriersSeen.push({ id: o.carrierId, name: o.carrierName });
+      }
+    });
+    const list = filteredSpots(today);
+    const activeCount = SPOTS.filter(function (o) {
+      if (state.spotOrigin && o.originKey !== state.spotOrigin) return false;
+      if (state.spotCarrier && o.carrierId !== state.spotCarrier) return false;
+      return !spotOfferExpired(o, today);
+    }).length;
+    const hiddenExpired = SPOTS.filter(function (o) {
+      if (state.spotOrigin && o.originKey !== state.spotOrigin) return false;
+      if (state.spotCarrier && o.carrierId !== state.spotCarrier) return false;
+      return spotOfferExpired(o, today);
+    }).length;
+    let html = '<section class="card search-card spot-filters">';
+    html += '<div class="spot-filter-row">';
+    html += '<div><label class="fld" for="spot-origin">נמל מוצא</label><select id="spot-origin">';
+    html += '<option value="">כל המוצאים</option>';
+    origins.forEach(function (o) {
+      html += '<option value="' + esc(o.key) + '"' + (state.spotOrigin === o.key ? " selected" : "") + ">" + esc(o.he + " (" + o.en + ")") + "</option>";
+    });
+    html += "</select></div>";
+    html += '<div><label class="fld" for="spot-carrier">חברת ספנות</label><select id="spot-carrier">';
+    html += '<option value="">כל החברות</option>';
+    carriersSeen.forEach(function (c) {
+      html += '<option value="' + esc(c.id) + '"' + (state.spotCarrier === c.id ? " selected" : "") + ">" + esc(c.name) + "</option>";
+    });
+    html += "</select></div></div>";
+    html += '<label class="toggle"><input type="checkbox" id="spot-expired" ' + (state.spotShowExpired ? "checked " : "") + '> <span>הצג שפג תוקף</span></label>';
+    html += '<p class="spot-count">' + activeCount + " מבצעים פעילים";
+    if (hiddenExpired && !state.spotShowExpired) html += " · " + hiddenExpired + " שפג תוקפן מוסתרים";
+    if (state.spotShowExpired && hiddenExpired) html += " · מוצגות גם " + hiddenExpired + " שפג תוקפן";
+    html += "</p></section>";
+    if (!list.length) {
+      html += '<div class="callout info spot-empty" id="spot-list"><strong>אין מבצעים להצגה</strong>';
+      if (hiddenExpired && !state.spotShowExpired) {
+        html += "כל המבצעים בסינון זה פג תוקפם. סמנו «הצג שפג תוקף» כדי לראות אותם.";
+      } else {
+        html += "אין מבצעי ספוט התואמים לסינון.";
+      }
+      html += "</div>";
+      return html;
+    }
+    html += '<div class="spot-list" id="spot-list">';
+    list.forEach(function (o) { html += spotCardHtml(o, today); });
+    html += "</div>";
+    return html;
+  }
+  function bindSpotView() {
+    const originSel = document.getElementById("spot-origin");
+    if (originSel) originSel.addEventListener("change", function (e) {
+      state.spotOrigin = e.target.value;
+      render();
+    });
+    const carrierSel = document.getElementById("spot-carrier");
+    if (carrierSel) carrierSel.addEventListener("change", function (e) {
+      state.spotCarrier = e.target.value;
+      render();
+    });
+    const exp = document.getElementById("spot-expired");
+    if (exp) exp.addEventListener("change", function (e) {
+      state.spotShowExpired = e.target.checked;
+      render();
+    });
+  }
   function render() {
+    updateViewTabs();
+    if (state.view === "spots") {
+      document.getElementById("app").innerHTML = spotViewHtml();
+      bindSpotView();
+      return;
+    }
     const isCompare = state.carrierId === COMPARE_ID;
     const carrier = carriers.find((c) => c.id === state.carrierId) ?? carriers[0];
     const shipIsoEarly = parseDateInput(state.dateText);
@@ -2104,6 +2493,7 @@
           '<input type="text" id="origin-input" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="origin-list" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" placeholder="הקלידו אות לחיפוש או בחרו מהרשימה" value="' + esc(selectedOrigin ? originChoiceLabel(selectedOrigin) : "") + '">' +
           '<ul id="origin-list" class="origin-list" role="listbox" hidden></ul>' +
         "</div>" +
+        spotBannerHtml() +
       "</div>" +
       '<div class="search-row">' +
         '<div><div class="fld-label">נמל יעד</div><div class="seg" role="group" aria-label="נמל יעד">' +
@@ -2315,6 +2705,12 @@
         openNotice(btn.getAttribute("data-notice-id"));
       });
     });
+    const spotBanner = document.getElementById("spot-banner");
+    if (spotBanner) {
+      spotBanner.addEventListener("click", function () {
+        openSpotTab(spotBanner.getAttribute("data-spot-origin") || "");
+      });
+    }
     const noticeBackdrop = $("notice-backdrop");
     if (noticeBackdrop) noticeBackdrop.addEventListener("click", function () { closeNotice(); });
     const noticeClose = $("notice-close");
@@ -2381,6 +2777,10 @@
   function onViewportChange() {
     if (comboOpen) positionOriginList();
   }
+  const tabRates = document.getElementById("tab-rates");
+  const tabSpots = document.getElementById("tab-spots");
+  if (tabRates) tabRates.addEventListener("click", function () { state.view = "rates"; render(); });
+  if (tabSpots) tabSpots.addEventListener("click", function () { state.view = "spots"; render(); });
   window.addEventListener("resize", onViewportChange);
   window.addEventListener("scroll", onViewportChange, { passive: true });
   if (window.visualViewport) {
