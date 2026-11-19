@@ -111,6 +111,31 @@ window.QUOTE_INDEX =
       "label": "הסכם 7110068521 · גרסה 274"
     },
     {
+      "id": "yml-2026-12-01",
+      "carrierId": "yml",
+      "file": "data/yml/2026-12-01.js",
+      "ref": "PQ26YML005443",
+      "version": "",
+      "party": "Konmart (ships agent) ltd, as agents for Yang Ming Lines",
+      "vf": 20,
+      "vt": 33,
+      "issued": "2026-12-01",
+      "issuedApprox": true,
+      "added": "2026-11-19",
+      "sourceFile": "YML quotation PQ26YML005443 (PDF)",
+      "sourceNote": "לא צוין במסמך תאריך הנפקה נפרד; נרשם לפי תחילת התוקף 01.12.2026. במייל שליווה את ההצעה צוין 14 FREE DAYS AT POD.",
+      "label": "הצעה PQ26YML005443",
+      "quotes": [
+        {
+          "ref": "PQ26YML005443",
+          "contract": "EMW1728355",
+          "tradeId": "MEDW40753000"
+        }
+      ],
+      "paymentTerms": "COLLECT",
+      "agent": "Konmart (ships agent) ltd, as agents for Yang Ming Lines"
+    },
+    {
       "id": "yml-2026-11-16",
       "carrierId": "yml",
       "file": "data/yml/2026-11-16.js",

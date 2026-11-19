@@ -801,9 +801,9 @@
     <footer class="note">כלי פנימי להצעת מחיר ממחירון. התעריפים כפופים לתוקף, למקום פנוי ולתנאי החברה.</footer>
   </div>
   <noscript><p class="wrap">יש להפעיל JavaScript כדי להשתמש במחשבון.</p></noscript>
-  <script src="data/index.js?v=zim-v281-20261119"></script>
-  <script src="data/notices.js?v=zim-v281-20261119"></script>
-  <script src="data/spots.js?v=zim-v281-20261119"></script>
+  <script src="data/index.js?v=yml-20261201-20261119"></script>
+  <script src="data/notices.js?v=yml-20261201-20261119"></script>
+  <script src="data/spots.js?v=yml-20261201-20261119"></script>
   <script>
 (function () {
   const DATA = window.QUOTE_INDEX;
@@ -1364,7 +1364,7 @@
     }
     return new Promise(function (resolve, reject) {
       const s = document.createElement("script");
-      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=zim-v281-20261119";
+      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=yml-20261201-20261119";
       s.async = true;
       s.onload = function () {
         const pack = window.QUOTE_PACK && window.QUOTE_PACK[meta.id];
@@ -1604,6 +1604,13 @@
       return head + "ל-MSC יש במחשבון יותר ממחירון אחד. לתאריך שנבחר אין מחירון בתוקף, או שלא נבחרה גרסה. גרסאות זמינות בהיסטוריית המחירונים: Ex India + Sri Lanka (תוקף 16.08.2026–31.10.2026) ו-FAK Far East / SE Asia (תוקף 01.12.2026–14.12.2026). תנאי ההובלה: <span class=\"ltr\">https://www.msc.com/che/contract-of-carriage</span>.</p>";
     }
     if (displayCarrier.id === "yml") {
+      const ymlVid = displayCarrier.versionId || "";
+      if (ymlVid === "yml-2026-12-01") {
+        return "<p>הוטענה הצעת YML PQ26YML005443 (חוזה EMW1728355, Trade ID MEDW40753000), בתוקף 01.12.2026–14.12.2026, והוצאה ל־Mayan Logistics (1977) Ltd. הסוכן במחירון: Konmart (ships agent) ltd, as agents for Yang Ming Lines. לא צוין במסמך דוא״ל להזמנה.</p>" +
+          "<p>תנאי תשלום: COLLECT. התעריפים כפופים לתוספות החלות במועד השילוח, בלי הודעה מוקדמת; אינם כוללים שחרור מכס וחיובים מקומיים; כפופים לדמי דמורג׳; וההובלה הימית חלה לפי ETB/ETD המקורי בכפוף להוראות POL/POD. יש לפנות למשרד לאימות התוקף לפחות שבוע לפני פקיעת ההצעה. זמן ההגעה עשוי להשתנות בגלל עומס בטרמינל, מזג אוויר או עיכובים בכלי השיט וברכבת.</p>" +
+          "<p>במייל שצורף להצעה צוין: 14 FREE DAYS AT POD (14 ימי חופש ביעד).</p>" +
+          "<p>תוספת TA (Transport Additional Charge) ליעד חיפה (ILHFA): 100$ ל-20DC, 200$ ל-40DC ו־40HQ — לא כלולה בהצעת אשדוד, ואין במחירון תעריף הובלה ימית לחיפה. תוספת משקל יתר OW: Over 18Ton/26Ton gross weight: 350$/700$ — לא נוספה לסה״כ. EU (ETS) מופיע עם ההערה FROM CHINA PORTS EU INCLUDED: ממוצא סין מטופל ככלול בהובלה; ממוצא אחר לא נוסף, כי לא ברור אם חל.</p>";
+      }
       return "<p>שתי הצעות YML הוטענו: PQ26YML005163 (חוזה EMW1721467, Trade ID MEDW40753000) ו־PQ26YML005151 (חוזה EMW1721484, Trade ID MEDW02099000). שתיהן בתוקף 16.11.2026–30.11.2026, והוצאו ל־Mayan Logistics (1977) Ltd. הסוכן במחירון: Konmart (ships agent) ltd, as agents for Yang Ming Lines. לא צוין במסמכים דוא״ל להזמנה.</p>" +
         "<p>תנאי תשלום: COLLECT. התעריפים כפופים לתוספות החלות במועד השילוח, בלי הודעה מוקדמת; אינם כוללים שחרור מכס וחיובים מקומיים; כפופים לדמי דמורג׳; וההובלה הימית חלה לפי ETB/ETD המקורי בכפוף להוראות POL/POD. יש לפנות למשרד לאימות התוקף לפחות שבוע לפני פקיעת ההצעה. זמן ההגעה עשוי להשתנות בגלל עומס בטרמינל, מזג אוויר או עיכובים בכלי השיט וברכבת.</p>" +
         "<p>תוספת TA (Transport Additional Charge) ליעד חיפה (ILHFA): 100$ ל-20DC, 200$ ל-40DC ו־40HQ — לא כלולה בהצעת אשדוד, ואין במחירון תעריף הובלה ימית לחיפה. תוספת משקל יתר OW: Over 18Ton/26Ton gross weight: 350$/700$ — לא נוספה לסה״כ. EU (ETS) מופיע עם ההערה FROM CHINA PORTS EU INCLUDED: ממוצא סין מטופל ככלול בהובלה; ממוצא אחר לא נוסף, כי לא ברור אם חל.</p>";
