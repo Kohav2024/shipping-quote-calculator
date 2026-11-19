@@ -157,6 +157,12 @@
       background: #fff6e5;
       border: 1px solid #f0d9a8;
     }
+    tr.sc-rule-note td {
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-weight: 500;
+      padding-top: 0;
+    }
     .quote-notice {
       margin: 0 0 14px;
       padding: 12px 14px;
@@ -801,9 +807,9 @@
     <footer class="note">כלי פנימי להצעת מחיר ממחירון. התעריפים כפופים לתוקף, למקום פנוי ולתנאי החברה.</footer>
   </div>
   <noscript><p class="wrap">יש להפעיל JavaScript כדי להשתמש במחשבון.</p></noscript>
-  <script src="data/index.js?v=yml-20261201-20261119"></script>
-  <script src="data/notices.js?v=yml-20261201-20261119"></script>
-  <script src="data/spots.js?v=yml-20261201-20261119"></script>
+  <script src="data/index.js?v=zim-wr-20261119"></script>
+  <script src="data/notices.js?v=zim-wr-20261119"></script>
+  <script src="data/spots.js?v=zim-wr-20261119"></script>
   <script>
 (function () {
   const DATA = window.QUOTE_INDEX;
@@ -1138,12 +1144,101 @@
     for (const c of currencies) shipment[c] = (perCtr[c] || 0) * qty + (perBl[c] || 0);
     return { perCtr, perBl, currencies, shipment };
   }
+  function allSurchargeRules() {
+    const standalone = window.CARRIER_SURCHARGE_RULES || [];
+    const fromNotices = (window.CARRIER_NOTICES || []).filter(function (n) { return n.surcharge; }).map(function (n) {
+      const r = Object.assign({}, n.surcharge);
+      r.carrierIds = r.carrierIds || n.carrierIds.slice();
+      r.ruleId = r.ruleId || n.id;
+      return r;
+    });
+    return standalone.concat(fromNotices);
+  }
+  function portCountry(name) {
+    if (!name) return "";
+    const m = String(name).match(/,\s*([A-Z]{2})\s*$/i);
+    return m ? m[1].toUpperCase() : "";
+  }
+  function rulePortHit(name, ports) {
+    if (!name || !ports || !ports.length) return false;
+    const key = bareKey(name);
+    for (let i = 0; i < ports.length; i++) {
+      if (bareKey(ports[i]) === key) return true;
+    }
+    return false;
+  }
+  function teuForRule(rule, typ) {
+    const map = rule.teuByType || {};
+    if (Object.prototype.hasOwnProperty.call(map, typ)) return map[typ];
+    return null;
+  }
+  function surchargeRuleApplies(rule, carrierId, rate, iso) {
+    if (!rule || !rate || !iso || !carrierId) return false;
+    if ((rule.carrierIds || []).indexOf(carrierId) < 0) return false;
+    if (rule.effectiveFrom && iso < rule.effectiveFrom) return false;
+    if (rule.effectiveTo && iso > rule.effectiveTo) return false;
+    const match = rule.match || {};
+    const ports = match.ports || [];
+    const side = match.side || "any";
+    const hitOrigin = rulePortHit(rate.origin, ports) || rulePortHit(rate.pol, ports);
+    const hitDest = rulePortHit(rate.pod, ports);
+    if (side === "origin" && !hitOrigin) return false;
+    if (side === "dest" && !hitDest) return false;
+    if ((side === "any" || !side) && !hitOrigin && !hitDest) return false;
+    const excl = match.excludeDestCountries || rule.excludeDestCountries;
+    if (excl && excl.length && excl.indexOf(portCountry(rate.pod)) >= 0) return false;
+    if (teuForRule(rule, rate.typ) == null) return false;
+    return true;
+  }
+  function extraSurchargesFor(carrierId, rate, iso) {
+    const extras = [];
+    const rules = allSurchargeRules();
+    for (let i = 0; i < rules.length; i++) {
+      const rule = rules[i];
+      if (!surchargeRuleApplies(rule, carrierId, rate, iso)) continue;
+      const teu = teuForRule(rule, rate.typ);
+      extras.push({
+        code: rule.code,
+        label: rule.label || rule.code,
+        amount: rule.perTeu * teu,
+        currency: rule.currency || "USD",
+        basis: rule.basis || "Container",
+        pay: rule.pay || "",
+        kind: rule.kind || "",
+        ruleId: rule.ruleId || rule.code,
+        ruleNote: rule.note || ""
+      });
+    }
+    return extras;
+  }
+  function applyCarrierRules(rate, carrierId, iso) {
+    if (!rate) return rate;
+    const extras = extraSurchargesFor(carrierId, rate, iso);
+    if (!extras.length) return rate;
+    const have = {};
+    (rate.sc || []).forEach(function (s) { if (s.ruleId) have[s.ruleId] = true; });
+    const add = extras.filter(function (e) { return !have[e.ruleId]; });
+    if (!add.length) return rate;
+    return Object.assign({}, rate, { sc: (rate.sc || []).concat(add) });
+  }
+  function surchargeLabelOf(s) {
+    if (s && s.label) return s.label;
+    return surchargeLabel(s && s.code ? s.code : s);
+  }
+  function surchargePayHe(s) {
+    return (s && s.pay && PAY_HE[s.pay]) || "—";
+  }
+  function surchargeKindHe(s) {
+    return (s && s.kind && KIND_HE[s.kind]) || "—";
+  }
   function destHe(pod) {
+
     if (pod.startsWith("ASHDOD")) return "אשדוד";
     if (pod.startsWith("HAIFA")) return "חיפה";
     return pod;
   }
   function quoteText(carrier, origin, destName, rate, qty, markup, shipDate, expired) {
+    rate = applyCarrierRules(rate, carrier && carrier.id, shipDate);
     const t = totalsOf(rate, qty);
     const lines = [];
     if (expired) {
@@ -1173,7 +1268,11 @@
     lines.push("הובלה ימית (FRT): " + money(rate.frt, frtCcy(rate)) + " למכולה");
     for (const s of rate.sc) {
       const basis = s.basis === "BL" || s.basis === "B/L" ? "לשטר מטען" : "למכולה";
-      lines.push(surchargeLabel(s.code) + ": " + money(s.amount, s.currency) + " " + basis + " · " + PAY_HE[s.pay] + " · " + KIND_HE[s.kind]);
+      let line = surchargeLabelOf(s) + ": " + money(s.amount, s.currency) + " " + basis;
+      if (s.pay && PAY_HE[s.pay]) line += " · " + PAY_HE[s.pay];
+      if (s.kind && KIND_HE[s.kind]) line += " · " + KIND_HE[s.kind];
+      if (s.ruleNote) line += " · " + s.ruleNote;
+      lines.push(line);
     }
     if (rate.incl.length) lines.push("כלול במחיר ההובלה: " + rate.incl.join(", "));
     lines.push("");
@@ -1364,7 +1463,7 @@
     }
     return new Promise(function (resolve, reject) {
       const s = document.createElement("script");
-      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=yml-20261201-20261119";
+      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=zim-wr-20261119";
       s.async = true;
       s.onload = function () {
         const pack = window.QUOTE_PACK && window.QUOTE_PACK[meta.id];
@@ -1528,14 +1627,14 @@
     return match ? match.id : "";
   }
 
-  function windowsTableHtml(rates) {
+  function windowsTableHtml(rates, carrierId, iso) {
     const sorted = rates.slice().sort((a, b) => a.vf.localeCompare(b.vf) || a.frt - b.frt);
     const showRoute = sorted.some((r) => routingOf(r));
     const head = showRoute
       ? "<tr><th>תוקף</th><th>ניתוב</th><th>הובלה (FRT)</th><th>סה״כ למכולה</th><th>זמן הפלגה</th></tr>"
       : "<tr><th>תוקף</th><th>הובלה (FRT)</th><th>סה״כ למכולה</th><th>זמן הפלגה</th></tr>";
     const body = sorted.map((r) => {
-      const t = totalsOf(r, 1);
+      const t = totalsOf(applyCarrierRules(r, carrierId, iso), 1);
       const allIn = t.currencies.map((c) => money(t.perCtr[c] || 0, c)).join(" + ");
       const route = showRoute ? "<td>" + esc(routingOf(r) || "") + "</td>" : "";
       return "<tr><td>" + esc(fmtDate(r.vf) + "–" + fmtDate(r.vt)) + "</td>" + route +
@@ -1698,10 +1797,17 @@
     if (iso && noticeIsActive(n, iso)) return "valid";
     return "expired";
   }
-  function quoteNoticesFor(carrierId, iso) {
+  function quoteNoticesFor(carrierId, iso, rate) {
     return activeNoticesFor(carrierId, iso).filter(function (n) {
       const when = n.appliesWhen || "always";
       if (when === "haz") return !!state.haz;
+      if (when === "surcharge") {
+        if (!n.surcharge || !rate) return false;
+        const rule = Object.assign({}, n.surcharge);
+        rule.carrierIds = rule.carrierIds || n.carrierIds;
+        rule.ruleId = rule.ruleId || n.id;
+        return surchargeRuleApplies(rule, carrierId, rate, iso);
+      }
       return true;
     });
   }
@@ -1773,9 +1879,9 @@
     }
     return esc(text);
   }
-  function quoteNoticeHtml(carrier, iso) {
+  function quoteNoticeHtml(carrier, iso, rate) {
     if (!carrier) return "";
-    const list = quoteNoticesFor(carrier.id, iso);
+    const list = quoteNoticesFor(carrier.id, iso, rate);
     if (!list.length) return "";
     return list.map(function (n, i) {
       const idAttr = i === 0 ? ' id="quote-notice"' : "";
@@ -1786,7 +1892,9 @@
   }
   function dgNoticeMark(carrierId, iso) {
     if (!state.haz) return "";
-    const list = quoteNoticesFor(carrierId, iso);
+    const list = activeNoticesFor(carrierId, iso).filter(function (n) {
+      return (n.appliesWhen || "always") === "haz";
+    });
     if (!list.length) return "";
     return '<span class="cmp-dg-warn">⚠️ הודעת DG</span>';
   }
@@ -2182,6 +2290,7 @@
         )) { displayCarrier = x.c; break; }
       }
     }
+    const pricedQuote = applyCarrierRules(quoteRate, displayCarrier.id, shipIso);
     const peerQuotes = [];
     if (selectedOrigin && effectiveTyp && shipIso) {
       const key = bareKey(selectedOrigin.name);
@@ -2196,7 +2305,7 @@
             isValidOn(r, shipIso),
           )
           .sort((a, b) => a.frt - b.frt);
-        for (const rate of hits) peerQuotes.push({ c: x.c, rate });
+        for (const rate of hits) peerQuotes.push({ c: x.c, rate: applyCarrierRules(rate, x.c.id, shipIso) });
       }
     }
     const expiredPeerQuotes = [];
@@ -2215,10 +2324,10 @@
             !(quoteRate && r.pol === quoteRate.pol && r.pod === quoteRate.pod && r.typ === quoteRate.typ && r.frt === quoteRate.frt && r.vf === quoteRate.vf && r.vt === quoteRate.vt && r.haz === quoteRate.haz)
           )
           .sort((a, b) => a.frt - b.frt);
-        if (hits[0]) expiredPeerQuotes.push({ c: x.c, rate: hits[0] });
+        if (hits[0]) expiredPeerQuotes.push({ c: x.c, rate: applyCarrierRules(hits[0], x.c.id, shipIso) });
       }
     }
-    const t = quoteRate ? totalsOf(quoteRate, qty) : null;
+    const t = pricedQuote ? totalsOf(pricedQuote, qty) : null;
     const saleUsd = t ? (t.shipment.USD || 0) + markup * qty : 0;
 
     const carrierOptions = carriers.map((c) => {
@@ -2305,13 +2414,15 @@
       if (displayCarrier.paymentTerms) props += "<dt>תנאי תשלום</dt><dd>" + esc(displayCarrier.paymentTerms) + "</dd>";
       props += "</dl>";
 
+      const ruleNotes = (pricedQuote.sc || []).map(function (s) { return s.ruleNote; }).filter(Boolean);
       let metrics = '<div class="metrics">';
       for (const c of t.currencies) {
         metrics += '<div class="metric"><div class="val">' + moneyHtml(t.perCtr[c] || 0, c) + '</div><div class="lab">' +
           esc(!validRate
             ? ("סה״כ למכולה לעיון בלבד" + (t.currencies.length > 1 ? " · " + c : "") + " — לא הצעת מחיר בתוקף")
             : (t.currencies.length > 1 ? "סה״כ למכולה · " + c : "סה״כ למכולה (All-in)")) +
-          '</div><div class="det">' + esc(!validRate ? "חישוב מהמחירון שפג תוקפו, לעיון בלבד" : "הובלה + תוספות למכולה, בלי חיוב לשטר מטען") + "</div></div>";
+          '</div><div class="det">' + esc(!validRate ? "חישוב מהמחירון שפג תוקפו, לעיון בלבד" : "הובלה + תוספות למכולה, בלי חיוב לשטר מטען") +
+            (ruleNotes.length ? "<br>" + esc(ruleNotes.join(" · ")) : "") + "</div></div>";
       }
       const ttDet = quoteRate.ett
         ? "ETT לפי המחירון (טווח ימים משוער, ללא התחייבות)"
@@ -2325,12 +2436,19 @@
       metrics += "</div>";
 
       let table = '<div class="table-wrap"><table><thead><tr><th>חיוב</th><th>סכום</th><th>בסיס</th><th>תשלום</th><th>סוג מחיר</th></tr></thead><tbody>';
-      table += "<tr><td>הובלה ימית (FRT)</td><td class='num'>" + esc(money(quoteRate.frt, frtCcy(quoteRate))) + "</td><td>למכולה</td><td>הובלה</td><td></td></tr>";
-      const scSorted = quoteRate.sc.slice().sort((a, b) => PAY_ORDER.indexOf(a.pay) - PAY_ORDER.indexOf(b.pay));
+      table += "<tr><td>הובלה ימית (FRT)</td><td class='num'>" + esc(money(pricedQuote.frt, frtCcy(pricedQuote))) + "</td><td>למכולה</td><td>הובלה</td><td></td></tr>";
+      const scSorted = pricedQuote.sc.slice().sort(function (a, b) {
+        const ia = PAY_ORDER.indexOf(a.pay);
+        const ib = PAY_ORDER.indexOf(b.pay);
+        return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib);
+      });
       for (const s of scSorted) {
-        table += "<tr><td>" + esc(surchargeLabel(s.code)) + "</td><td class='num'>" + esc(money(s.amount, s.currency)) + "</td><td>" +
+        table += "<tr><td>" + esc(surchargeLabelOf(s)) + "</td><td class='num'>" + esc(money(s.amount, s.currency)) + "</td><td>" +
           esc(s.basis === "BL" || s.basis === "B/L" ? "לשטר מטען (B/L)" : "למכולה") + "</td><td>" +
-          esc(PAY_HE[s.pay]) + "</td><td>" + esc(KIND_HE[s.kind]) + "</td></tr>";
+          esc(surchargePayHe(s)) + "</td><td>" + esc(surchargeKindHe(s)) + "</td></tr>";
+        if (s.ruleNote) {
+          table += "<tr class='sc-rule-note'><td colspan='5'>" + esc(s.ruleNote) + "</td></tr>";
+        }
       }
       table += "</tbody></table></div>";
 
@@ -2409,10 +2527,10 @@
         : "";
       let alts = "";
       if (altQuotes.length > 0) {
-        alts += '<div class="callout info"><strong>הצעת מחיר נוספת לאותו מסלול ותאריך</strong>יש במחירון יותר מהצעה אחת בתוקף לאותו מסלול (מספרי הצעה שונים). למעלה מוצגת ההצעה עם ההובלה הנמוכה יותר. ההצעות האחרות בתוקף:</div>' + windowsTableHtml(altQuotes);
+        alts += '<div class="callout info"><strong>הצעת מחיר נוספת לאותו מסלול ותאריך</strong>יש במחירון יותר מהצעה אחת בתוקף לאותו מסלול (מספרי הצעה שונים). למעלה מוצגת ההצעה עם ההובלה הנמוכה יותר. ההצעות האחרות בתוקף:</div>' + windowsTableHtml(altQuotes, displayCarrier.id, shipIso);
       }
       if (otherWindows.length > 0) {
-        alts += '<div class="callout info"><strong>חלונות תוקף נוספים לאותו מסלול</strong>לאותו נמל, יעד וסוג מכולה יש במחירון יותר מחלון אחד, והמחיר משתנה ביניהם. למעלה מוצג החלון שחל בתאריך שנבחר. החלונות האחרים:</div>' + windowsTableHtml(otherWindows);
+        alts += '<div class="callout info"><strong>חלונות תוקף נוספים לאותו מסלול</strong>לאותו נמל, יעד וסוג מכולה יש במחירון יותר מחלון אחד, והמחיר משתנה ביניהם. למעלה מוצג החלון שחל בתאריך שנבחר. החלונות האחרים:</div>' + windowsTableHtml(otherWindows, displayCarrier.id, shipIso);
       }
 
       let peers = "";
@@ -2518,7 +2636,7 @@
       '<details class="extras-panel" id="extras-panel"' + (state.extrasOpen ? " open" : "") + "><summary>אפשרויות נוספות</summary>" + extrasInner + "</details>" +
       "</section>" +
       (state.originId && state.dest && effectiveTyp
-        ? '<section class="card" id="quote-card"><div class="card-head"><h2>הצעת מחיר</h2>' + copyBtn + "</div>" + quoteMeta + quoteNoticeHtml(displayCarrier, shipIso) + (activeVersion ? versionBadgeHtml(activeVersion, shipIso, altVersions) : "") + quoteHtml + "</section>"
+        ? '<section class="card" id="quote-card"><div class="card-head"><h2>הצעת מחיר</h2>' + copyBtn + "</div>" + quoteMeta + quoteNoticeHtml(displayCarrier, shipIso, quoteRate) + (activeVersion ? versionBadgeHtml(activeVersion, shipIso, altVersions) : "") + quoteHtml + "</section>"
         : "") +
       '<details class="terms"><summary>תנאים שחשוב לציין</summary><div class="card">' + termsHtml(displayCarrier, shipIso) + "</div></details>" +
       (!isCompare ? historySheetHtml(carrier, shipIso) : "") +
