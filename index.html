@@ -542,6 +542,31 @@
     .callout.warn { background: var(--warn-bg); border-color: var(--warn-bd); color: var(--warn-ink); }
     .callout.info { background: var(--info-bg); border-color: var(--info-bd); color: var(--info-ink); }
     .callout.expired { background: #fdecec; border-color: #e8b4b4; color: #7a1f1f; }
+    .sailings {
+      margin: 14px 0 0;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid var(--info-bd);
+      background: var(--info-bg);
+      color: var(--ink);
+    }
+    .sailings h3 {
+      margin: 0 0 8px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--navy);
+    }
+    .sailing {
+      padding: 10px 0 2px;
+      border-top: 1px solid var(--line);
+    }
+    .sailing:first-of-type { border-top: 0; padding-top: 4px; }
+    .sailing .svessel { font-weight: 700; }
+    .sailing .smeta { font-size: 0.88rem; color: var(--muted); margin-top: 2px; }
+    .sailing .scall { font-size: 0.92rem; margin-top: 4px; overflow-wrap: anywhere; }
+    .sailing .sstar { margin-top: 6px; }
+    .sailing .sstar-lab { font-weight: 700; margin-inline-end: 4px; }
+
     .date-jump {
       display: flex;
       flex-wrap: wrap;
@@ -807,9 +832,10 @@
     <footer class="note">כלי פנימי להצעת מחיר ממחירון. התעריפים כפופים לתוקף, למקום פנוי ולתנאי החברה.</footer>
   </div>
   <noscript><p class="wrap">יש להפעיל JavaScript כדי להשתמש במחשבון.</p></noscript>
-  <script src="data/index.js?v=zim-wr-20261119"></script>
-  <script src="data/notices.js?v=zim-wr-20261119"></script>
-  <script src="data/spots.js?v=zim-wr-20261119"></script>
+  <script src="data/index.js?v=yml-sched-20261119"></script>
+  <script src="data/notices.js?v=yml-sched-20261119"></script>
+  <script src="data/spots.js?v=yml-sched-20261119"></script>
+  <script src="data/schedules.js?v=yml-sched-20261119"></script>
   <script>
 (function () {
   const DATA = window.QUOTE_INDEX;
@@ -1264,6 +1290,11 @@
     lines.push("תאריך שילוח: " + fmtDate(shipDate) + " · תוקף התעריף: " + fmtDate(rate.vf) + "–" + fmtDate(rate.vt));
     if (routingOf(rate)) lines.push("ניתוב: " + routingOf(rate));
     lines.push("זמן הפלגה משוער: " + ttLabel(rate));
+    const sailingLines = sailingsTextLines(carrier, origin, shipDate);
+    if (sailingLines.length) {
+      lines.push("");
+      for (let i = 0; i < sailingLines.length; i++) lines.push(sailingLines[i]);
+    }
     lines.push("");
     lines.push("הובלה ימית (FRT): " + money(rate.frt, frtCcy(rate)) + " למכולה");
     for (const s of rate.sc) {
@@ -1331,6 +1362,127 @@
   }
   function ltrHtml(s) {
     return '<span class="ltr" dir="ltr">' + esc(s) + "</span>";
+  }
+  function schedulesForCarrier(carrierId) {
+    return (window.CARRIER_SCHEDULES || []).filter(function (s) {
+      return (s.carrierIds || []).indexOf(carrierId) >= 0;
+    });
+  }
+  function originSchedulePort(sched, originName) {
+    if (!originName || !sched) return null;
+    const key = bareKey(originName);
+    const allowed = sched.matchCodes || [];
+    const ports = sched.ports || [];
+    for (let i = 0; i < ports.length; i++) {
+      const p = ports[i];
+      if (allowed.length && allowed.indexOf(p.code) < 0) continue;
+      if (bareKey(p.key) === key) return p;
+    }
+    return null;
+  }
+  function voyageQualifyingEtd(voyage, portCode, iso) {
+    const dates = [];
+    if (voyage.calls && voyage.calls[portCode] && voyage.calls[portCode].etd && iso && voyage.calls[portCode].etd >= iso) {
+      dates.push(voyage.calls[portCode].etd);
+    }
+    if (voyage.starCalls && voyage.starCalls[portCode] && voyage.starCalls[portCode].etd && iso && voyage.starCalls[portCode].etd >= iso) {
+      dates.push(voyage.starCalls[portCode].etd);
+    }
+    if (!dates.length) return null;
+    dates.sort();
+    return dates[0];
+  }
+  function matchingSailings(carrierId, originName, iso) {
+    if (!carrierId || !originName || !iso) return null;
+    const scheds = schedulesForCarrier(carrierId);
+    let best = null;
+    for (let i = 0; i < scheds.length; i++) {
+      const sched = scheds[i];
+      const port = originSchedulePort(sched, originName);
+      if (!port) continue;
+      const scored = [];
+      (sched.voyages || []).forEach(function (v, idx) {
+        const etd = voyageQualifyingEtd(v, port.code, iso);
+        if (etd) scored.push({ voyage: v, sortEtd: etd, idx: idx });
+      });
+      scored.sort(function (a, b) {
+        if (a.sortEtd !== b.sortEtd) return a.sortEtd < b.sortEtd ? -1 : 1;
+        return a.idx - b.idx;
+      });
+      const items = scored.slice(0, 3);
+      if (!items.length) continue;
+      if (!best || (sched.received || "") > (best.sched.received || "")) {
+        best = { sched: sched, port: port, items: items };
+      }
+    }
+    return best;
+  }
+  function etbEtdText(call) {
+    if (!call || !call.etb || !call.etd) return "";
+    return fmtDate(call.etb) + "–" + fmtDate(call.etd);
+  }
+  function etbEtdHtml(call) {
+    const text = etbEtdText(call);
+    return text ? ltrHtml(text) : "";
+  }
+  function sailingsHtml(carrier, origin, iso) {
+    const hit = matchingSailings(carrier && carrier.id, origin && origin.name, iso);
+    if (!hit) return "";
+    const title = hit.sched.titleHe || ("הפלגות קרובות (לוח " + (hit.sched.service || "") + ", התקבל " + fmtDate(hit.sched.received) + ")");
+    const lastCode = hit.sched.lastPort || "EGDAM";
+    let html = '<div class="sailings" id="quote-sailings"><h3>' + esc(title) + "</h3>";
+    hit.items.forEach(function (item) {
+      const v = item.voyage;
+      const main = v.calls && v.calls[hit.port.code];
+      const dam = v.calls && v.calls[lastCode];
+      html += '<div class="sailing">';
+      html += '<div class="svessel">' + esc(v.vessel) + "</div>";
+      html += '<div class="smeta">' + esc(v.newVoy) + " · Comn. Voy " + esc(v.comnVoy) + "</div>";
+      if (main && etbEtdText(main)) {
+        html += '<div class="scall">' + esc(origin.name) + " ETB/ETD: " + etbEtdHtml(main) + "</div>";
+      }
+      if (dam && etbEtdText(dam)) {
+        html += '<div class="scall">Damietta (EGDAM) ETB/ETD: ' + etbEtdHtml(dam) + "</div>";
+      }
+      if (v.starCalls) {
+        const starMain = v.starCalls[hit.port.code];
+        const starDam = v.starCalls[lastCode];
+        html += '<div class="sstar">';
+        if (starMain && etbEtdText(starMain)) {
+          html += '<div class="scall"><span class="sstar-lab">*</span> ' + esc(origin.name) + " ETB/ETD: " + etbEtdHtml(starMain) + "</div>";
+        }
+        if (starDam && etbEtdText(starDam)) {
+          html += '<div class="scall"><span class="sstar-lab">*</span> Damietta (EGDAM) ETB/ETD: ' + etbEtdHtml(starDam) + "</div>";
+        }
+        html += "</div>";
+      }
+      html += "</div>";
+    });
+    html += "</div>";
+    return html;
+  }
+  function sailingsTextLines(carrier, origin, iso) {
+    const hit = matchingSailings(carrier && carrier.id, origin && origin.name, iso);
+    if (!hit) return [];
+    const title = hit.sched.titleHe || ("הפלגות קרובות (לוח " + (hit.sched.service || "") + ", התקבל " + fmtDate(hit.sched.received) + ")");
+    const lastCode = hit.sched.lastPort || "EGDAM";
+    const lines = [title];
+    hit.items.forEach(function (item) {
+      const v = item.voyage;
+      const main = v.calls && v.calls[hit.port.code];
+      const dam = v.calls && v.calls[lastCode];
+      lines.push(v.vessel);
+      lines.push(v.newVoy + " · Comn. Voy " + v.comnVoy);
+      if (main && etbEtdText(main)) lines.push(origin.name + " ETB/ETD: " + etbEtdText(main));
+      if (dam && etbEtdText(dam)) lines.push("Damietta (EGDAM) ETB/ETD: " + etbEtdText(dam));
+      if (v.starCalls) {
+        const starMain = v.starCalls[hit.port.code];
+        const starDam = v.starCalls[lastCode];
+        if (starMain && etbEtdText(starMain)) lines.push("* " + origin.name + " ETB/ETD: " + etbEtdText(starMain));
+        if (starDam && etbEtdText(starDam)) lines.push("* Damietta (EGDAM) ETB/ETD: " + etbEtdText(starDam));
+      }
+    });
+    return lines;
   }
 
   const versionCache = {};
@@ -1463,7 +1615,7 @@
     }
     return new Promise(function (resolve, reject) {
       const s = document.createElement("script");
-      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=zim-wr-20261119";
+      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=yml-sched-20261119";
       s.async = true;
       s.onload = function () {
         const pack = window.QUOTE_PACK && window.QUOTE_PACK[meta.id];
@@ -2577,7 +2729,8 @@
         ? '<div class="copy-fallback"><label class="fld">סיכום להעתקה ידנית</label><textarea id="copy-text" readonly>' + esc(state.copyFallback) + "</textarea></div>"
         : "";
 
-      const inner = props + metrics + table + inclHtml + how + shipBlock + nis + notes + alts + peers + payNote + fallback;
+      const sailings = sailingsHtml(displayCarrier, selectedOrigin, shipIso);
+      const inner = props + metrics + table + inclHtml + how + shipBlock + nis + notes + sailings + alts + peers + payNote + fallback;
       quoteHtml = expiredBanner + (!validRate ? '<div class="expired-ref">' + inner + "</div>" : inner);
     }
 
