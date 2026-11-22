@@ -107,5 +107,50 @@ window.CARRIER_NOTICES = [
       { "kind": "p", "text": "התוספת באה בנוסף להובלה, ל־THC, לבונקר ולשאר התוספות. קווים לרוסיה לא כלולים, ועליהם צריך לברר מול צים." }
     ]
 
+  },
+  {
+    "id": "zim-klg-ow-2026-12-01",
+    "carrierIds": ["zim"],
+    "title": "ZIM: תוספת משקל יתר (KLG) למכולות 20׳ מסין והמזרח הרחוק",
+    "banner": "⚠️ תוספת משקל יתר (KLG) למכולת 20׳ מסין והמזרח הרחוק, לפי משקל ברוטו (01.12–14.12.26)",
+    "publishedDate": "2026-12-01",
+    "added": "2026-11-22",
+    "effectiveFromVessel": null,
+    "validTo": "2026-12-14",
+    "appliesWhen": "surcharge",
+    "severity": "warning",
+    "quoteWarningTitle": "⚠️ תוספת משקל יתר (KLG) למכולת 20׳",
+    "quoteWarning": "כל מכולת 20׳ (DV20/OT20/FL20) כבדה מסין ומהמזרח הרחוק לישראל תחויב בתוספת משקל יתר (KLG) לפי משקל ברוטו: 20–24 טון 200$, 24–27 טון 400$, 27 טון ומעלה 600$. בתוקף להפלגות/BL מ־01.12.2026 עד 14.12.2026. לא חל על סחר הודו.",
+    "surcharge": {
+      "code": "KLG",
+      "label": "KLG – תוספת משקל יתר",
+      "currency": "USD",
+      "basis": "Container",
+      "effectiveFrom": "2026-12-01",
+      "effectiveTo": "2026-12-14",
+      "match": {
+        "types": ["DV20", "OT20", "FL20"],
+        "originCountries": ["CN", "HK", "TW", "JP", "KR", "VN", "TH", "PH", "ID", "SG"],
+        "side": "origin",
+        "excludeIfIncl": ["KLG"]
+      },
+      "weightBands": [
+        {"min": 20, "max": 24, "maxInclusive": false, "amount": 200},
+        {"min": 24, "max": 27, "maxInclusive": false, "amount": 400},
+        {"min": 27, "amount": 600}
+      ],
+      "emptyWeightNote": "תוספת משקל יתר (KLG) למכולת 20׳ מסין והמזרח הרחוק: 20–24 טון 200$ · 24–27 טון 400$ · 27 טון ומעלה 600$. הזינו משקל ברוטו כדי לחשב. לא חל על הודו.",
+      "belowBandNote": "משקל מתחת ל־20 טון — אין תוספת KLG לפי המדרגות שנמסרו.",
+      "note": "חל על מכולת 20׳ מסין והמזרח הרחוק לישראל, לפי משקל ברוטו. לא חל על הודו."
+    },
+    "sections": [
+      { "kind": "meta", "text": "התקבל: 22.11.2026. בתוקף להפלגות/BL: 01.12.2026–14.12.2026" },
+      { "kind": "p", "text": "כל מכולת 20׳ כבדה (DV20/OT20/FL20) מסין ומהמזרח הרחוק לישראל (W/B) תחויב בתוספת משקל יתר (KLG Overweight Surcharge) לפי משקל ברוטו:" },
+      { "kind": "p", "text": "20–24 טון: 200$ · 24–27 טון: 400$ · 27 טון ומעלה: 600$." },
+      { "kind": "p", "text": "המדרגות חלות מ־20 טון ומעלה. בדיוק 24 טון מחויב לפי מדרגת 24–27 (400$), ובדיוק 27 טון לפי 27 ומעלה (600$). אם לא הוזן משקל ברוטו, המדרגות מוצגות בהצעה בלי חיוב." },
+      { "kind": "p", "text": "התוספת לא חלה על סחר הודו. בשורות הודו, סרי לנקה וצ׳טגונג במחירון צוין KLG included, והסכום לא נוסף שם שוב." },
+      { "kind": "original", "lead": "נוסח מקורי", "text": "All heavy 20' from China and the Far-East will be charged over wt charge as follow:\nKLG Overweight Surcharge – Tariff for DV20/OT20/FL20\nTon (Gross)\n20-24 $200 · 24-27 $400 · 27+ $600\nF.East → Israel W/B" }
+    ]
   }
+
 ];

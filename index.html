@@ -81,6 +81,9 @@
     .search-top, .search-row { display: grid; gap: 8px; }
     .search-top { margin: 0; }
     .search-row { margin-top: 8px; }
+    .wt-row { margin-top: 8px; }
+    .wt-row input { width: 100%; }
+    .wt-row .hint { margin: 4px 0 0; font-size: 12px; line-height: 1.4; }
     .search-card .origin-combo { margin-top: 0; }
     .search-card label.fld, .search-card .fld-label { margin-bottom: 4px; font-size: 0.78rem; }
     .search-card input[type="text"], .search-card input[type="number"], .search-card select {
@@ -855,10 +858,10 @@
     <footer class="note">כלי פנימי להצעת מחיר ממחירון. התעריפים כפופים לתוקף, למקום פנוי ולתנאי החברה.</footer>
   </div>
   <noscript><p class="wrap">יש להפעיל JavaScript כדי להשתמש במחשבון.</p></noscript>
-  <script src="data/index.js?v=yml-dg-20261122"></script>
-  <script src="data/notices.js?v=yml-dg-20261122"></script>
-  <script src="data/spots.js?v=yml-dg-20261122"></script>
-  <script src="data/schedules.js?v=yml-dg-20261122"></script>
+  <script src="data/index.js?v=zim-v204-20261122"></script>
+  <script src="data/notices.js?v=zim-v204-20261122"></script>
+  <script src="data/spots.js?v=zim-v204-20261122"></script>
+  <script src="data/schedules.js?v=zim-v204-20261122"></script>
   <script>
 (function () {
   const DATA = window.QUOTE_INDEX;
@@ -1216,24 +1219,68 @@
     if (rule.effectiveFrom && iso < rule.effectiveFrom) return false;
     if (rule.effectiveTo && iso > rule.effectiveTo) return false;
     const match = rule.match || {};
+    if (match.types && match.types.length && match.types.indexOf(rate.typ) < 0) return false;
+    if (match.originCountries && match.originCountries.length) {
+      const oc = portCountry(rate.origin) || portCountry(rate.pol);
+      if (match.originCountries.indexOf(oc) < 0) return false;
+    }
+    if (match.excludeIfIncl && match.excludeIfIncl.length) {
+      const incl = rateInclText(rate);
+      const notes = String(rate.notes || "");
+      for (let i = 0; i < match.excludeIfIncl.length; i++) {
+        const tok = match.excludeIfIncl[i];
+        if (incl.split("/").indexOf(tok) >= 0) return false;
+        if (notes.indexOf(tok) >= 0) return false;
+      }
+    }
     const ports = match.ports || [];
-    const side = match.side || "any";
-    const hitOrigin = rulePortHit(rate.origin, ports) || rulePortHit(rate.pol, ports);
-    const hitDest = rulePortHit(rate.pod, ports);
-    if (side === "origin" && !hitOrigin) return false;
-    if (side === "dest" && !hitDest) return false;
-    if ((side === "any" || !side) && !hitOrigin && !hitDest) return false;
+    if (ports.length) {
+      const side = match.side || "any";
+      const hitOrigin = rulePortHit(rate.origin, ports) || rulePortHit(rate.pol, ports);
+      const hitDest = rulePortHit(rate.pod, ports);
+      if (side === "origin" && !hitOrigin) return false;
+      if (side === "dest" && !hitDest) return false;
+      if ((side === "any" || !side) && !hitOrigin && !hitDest) return false;
+    } else if (!(match.originCountries && match.originCountries.length)) {
+      return false;
+    }
     const excl = match.excludeDestCountries || rule.excludeDestCountries;
     if (excl && excl.length && excl.indexOf(portCountry(rate.pod)) >= 0) return false;
+    if (rule.weightBands) return true;
     if (teuForRule(rule, rate.typ) == null) return false;
     return true;
   }
   function extraSurchargesFor(carrierId, rate, iso) {
     const extras = [];
+    const weightNotes = [];
     const rules = allSurchargeRules();
     for (let i = 0; i < rules.length; i++) {
       const rule = rules[i];
       if (!surchargeRuleApplies(rule, carrierId, rate, iso)) continue;
+      if (rule.weightBands) {
+        const wt = parseGrossWt(state.grossWtText);
+        if (wt == null) {
+          if (rule.emptyWeightNote) weightNotes.push(rule.emptyWeightNote);
+          continue;
+        }
+        const amt = weightBandAmount(rule.weightBands, wt);
+        if (amt == null) {
+          if (rule.belowBandNote) weightNotes.push(rule.belowBandNote);
+          continue;
+        }
+        extras.push({
+          code: rule.code,
+          label: rule.label || rule.code,
+          amount: amt,
+          currency: rule.currency || "USD",
+          basis: rule.basis || "Container",
+          pay: rule.pay || "",
+          kind: rule.kind || "",
+          ruleId: rule.ruleId || rule.code,
+          ruleNote: rule.note || ""
+        });
+        continue;
+      }
       const teu = teuForRule(rule, rate.typ);
       extras.push({
         code: rule.code,
@@ -1247,17 +1294,21 @@
         ruleNote: rule.note || ""
       });
     }
-    return extras;
+    return { extras: extras, weightNotes: weightNotes };
   }
   function applyCarrierRules(rate, carrierId, iso) {
     if (!rate) return rate;
-    const extras = extraSurchargesFor(carrierId, rate, iso);
-    if (!extras.length) return rate;
+    const found = extraSurchargesFor(carrierId, rate, iso);
+    const extras = found.extras || [];
+    const weightNote = (found.weightNotes || []).filter(Boolean).join(" ");
     const have = {};
     (rate.sc || []).forEach(function (s) { if (s.ruleId) have[s.ruleId] = true; });
     const add = extras.filter(function (e) { return !have[e.ruleId]; });
-    if (!add.length) return rate;
-    return Object.assign({}, rate, { sc: (rate.sc || []).concat(add) });
+    if (!add.length && !weightNote) return rate;
+    const next = Object.assign({}, rate);
+    if (add.length) next.sc = (rate.sc || []).concat(add);
+    if (weightNote) next.weightNote = weightNote;
+    return next;
   }
   function surchargeLabelOf(s) {
     if (s && s.label) return s.label;
@@ -1328,6 +1379,10 @@
     if (markup > 0) {
       lines.push("רווח: " + money(markup, "USD") + " למכולה · " + money(markup * qty, "USD") + " למשלוח");
       lines.push("מחיר מכירה (USD): " + money((t.shipment.USD || 0) + markup * qty, "USD"));
+    }
+    if (rate.weightNote) {
+      lines.push("");
+      lines.push(rate.weightNote);
     }
     if (rate.notes) {
       lines.push("");
@@ -1510,6 +1565,7 @@
     haz: false,
     copied: false,
     copyFallback: "",
+    grossWtText: "",
     versionOverride: {},
     historyOpen: false,
     extrasOpen: false,
@@ -1626,7 +1682,7 @@
     }
     return new Promise(function (resolve, reject) {
       const s = document.createElement("script");
-      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=yml-dg-20261122";
+      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=zim-v204-20261122";
       s.async = true;
       s.onload = function () {
         const pack = window.QUOTE_PACK && window.QUOTE_PACK[meta.id];
@@ -1640,13 +1696,106 @@
   }
   function neededVersions(isCompare, carrier, shipIso) {
     if (isCompare) {
-      return carriers.map((c) => selectedVersionMeta(c.id, shipIso)).filter(Boolean);
+      const out = [];
+      const seen = {};
+      carriers.forEach(function (c) {
+        versionsForDate(c.id, shipIso).forEach(function (v) {
+          if (!seen[v.id]) { seen[v.id] = true; out.push(v); }
+        });
+      });
+      return out;
     }
-    const v = selectedVersionMeta(carrier.id, shipIso);
-    return v ? [v] : [];
+    return versionsForDate(carrier.id, shipIso);
   }
   function ratesOfLoaded(meta) {
     return meta && versionCache[meta.id] ? versionCache[meta.id].rates : [];
+  }
+  function isTwentyFootTyp(typ) {
+    return typ === "DV20" || typ === "OT20" || typ === "FL20";
+  }
+  function parseGrossWt(text) {
+    if (text == null || String(text).trim() === "") return null;
+    const n = Number(String(text).trim().replace(",", "."));
+    if (!isFinite(n) || n < 0) return null;
+    return n;
+  }
+  function weightBandAmount(bands, wt) {
+    if (wt == null || !bands) return null;
+    for (let i = 0; i < bands.length; i++) {
+      const b = bands[i];
+      const minOk = wt >= b.min;
+      let maxOk = true;
+      if (b.max != null) maxOk = b.maxInclusive ? wt <= b.max : wt < b.max;
+      if (minOk && maxOk) return b.amount;
+    }
+    return null;
+  }
+  function rateInclText(rate) {
+    if (!rate) return "";
+    if (Array.isArray(rate.incl)) return rate.incl.join("/");
+    return String(rate.incl || "");
+  }
+  function laneKey(r) {
+    return [r.origin || "", r.pol || "", r.pod || "", r.typ || "", r.haz ? "1" : "0", r.mode || "", r.mot || "", r.thru || ""].join("|");
+  }
+  function versionsForDate(carrierId, iso) {
+    const pinned = state.versionOverride[carrierId];
+    if (pinned) {
+      const v = versionMeta(pinned);
+      return v ? [v] : [];
+    }
+    if (!iso) {
+      const v = versionsFor(carrierId).slice().sort(compareVersionsNewest)[0];
+      return v ? [v] : [];
+    }
+    const cov = coveringVersions(carrierId, iso);
+    if (!cov.length) return [];
+    const full = cov.filter(function (v) { return !v.partialCoverage; });
+    const partials = cov.filter(function (v) { return v.partialCoverage; });
+    const base = full[0] || cov[0];
+    const out = [];
+    const seen = {};
+    function add(v) {
+      if (v && !seen[v.id]) { seen[v.id] = true; out.push(v); }
+    }
+    add(base);
+    partials.forEach(add);
+    return out;
+  }
+  function ratesForDate(carrierId, iso) {
+    const pinned = state.versionOverride[carrierId];
+    if (pinned) {
+      const v = versionMeta(pinned);
+      return tagRates(ratesOfLoaded(v), v && v.id);
+    }
+    const cov = iso ? coveringVersions(carrierId, iso) : [];
+    if (!iso || !cov.length) {
+      const v = selectedVersionMeta(carrierId, iso);
+      return tagRates(ratesOfLoaded(v), v && v.id);
+    }
+    const full = cov.filter(function (v) { return !v.partialCoverage; });
+    const partials = cov.filter(function (v) { return v.partialCoverage; });
+    const base = full[0] || cov[0];
+    const newer = partials.filter(function (p) { return compareVersionsNewest(p, base) < 0; });
+    const older = partials.filter(function (p) { return compareVersionsNewest(p, base) >= 0; });
+    const sequence = newer.concat([base], older);
+    const seen = {};
+    const out = [];
+    sequence.forEach(function (v) {
+      tagRates(ratesOfLoaded(v), v.id).forEach(function (r) {
+        const k = laneKey(r);
+        if (seen[k]) return;
+        seen[k] = true;
+        out.push(r);
+      });
+    });
+    return out;
+  }
+  function tagRates(rates, versionId) {
+    if (!rates || !rates.length) return [];
+    return rates.map(function (r) {
+      return r.versionId ? r : Object.assign({}, r, { versionId: versionId || r.versionId });
+    });
   }
 
   let comboOrigins = [];
@@ -1777,11 +1926,10 @@
     let nextRates = [];
     if (nextIsCompare) {
       carriers.forEach((c) => {
-        const v = selectedVersionMeta(c.id, shipIso);
-        nextRates = nextRates.concat(ratesOfLoaded(v));
+        nextRates = nextRates.concat(ratesForDate(c.id, shipIso));
       });
     } else {
-      nextRates = ratesOfLoaded(selectedVersionMeta(nextId, shipIso));
+      nextRates = ratesForDate(nextId, shipIso);
     }
     const nextOrigins = nextIsCompare
       ? buildOrigins(nextRates).map((o) => Object.assign({}, o, { id: "cmp::" + bareKey(o.name) }))
@@ -2387,8 +2535,8 @@
       return;
     }
     const rates = isCompare
-      ? carriers.flatMap((c) => ratesOfLoaded(selectedVersionMeta(c.id, shipIsoEarly)))
-      : ratesOfLoaded(selectedVersionMeta(carrier.id, shipIsoEarly));
+      ? carriers.flatMap((c) => ratesForDate(c.id, shipIsoEarly))
+      : ratesForDate(carrier.id, shipIsoEarly);
     let origins;
     if (!isCompare) origins = buildOrigins(rates);
     else {
@@ -2448,11 +2596,13 @@
     const allByCarrier = isCompare
       ? carriers.map((c) => {
           const v = selectedVersionMeta(c.id, shipIso);
-          return { c: mergeDisplay(c, v), rates: ratesOfLoaded(v), version: v };
+          const cr = ratesForDate(c.id, shipIso);
+          return { c: mergeDisplay(c, v), rates: cr, version: v };
         })
       : [{ c: mergeDisplay(carrier, selectedVersionMeta(carrier.id, shipIso)), rates: rates, version: selectedVersionMeta(carrier.id, shipIso) }];
 
-    let displayCarrier = mergeDisplay(carrier, selectedVersionMeta(carrier.id, shipIso));
+    const quoteVersion = (quoteRate && quoteRate.versionId && versionMeta(quoteRate.versionId)) || selectedVersionMeta(carrier.id, shipIso);
+    let displayCarrier = mergeDisplay(carrier, quoteVersion);
     if (isCompare && quoteRate) {
       for (const x of allByCarrier) {
         if (x.rates.some((r) =>
@@ -2693,9 +2843,13 @@
           "</tbody></table></div>";
       }
 
-      let notes = quoteRate.notes
-        ? '<div class="callout warn"><strong>הערה מהמחירון — לציין ללקוח</strong>' + esc(quoteRate.notes) + "</div>"
-        : "";
+      let notes = "";
+      if (pricedQuote && pricedQuote.weightNote) {
+        notes += '<div class="callout info"><strong>תוספת משקל יתר (KLG)</strong>' + esc(pricedQuote.weightNote) + "</div>";
+      }
+      if (quoteRate.notes) {
+        notes += '<div class="callout warn"><strong>הערה מהמחירון — לציין ללקוח</strong>' + esc(quoteRate.notes) + "</div>";
+      }
       let alts = "";
       if (altQuotes.length > 0) {
         alts += '<div class="callout info"><strong>הצעת מחיר נוספת לאותו מסלול ותאריך</strong>יש במחירון יותר מהצעה אחת בתוקף לאותו מסלול (מספרי הצעה שונים). למעלה מוצגת ההצעה עם ההובלה הנמוכה יותר. ההצעות האחרות בתוקף:</div>' + windowsTableHtml(altQuotes, displayCarrier.id, shipIso);
@@ -2767,6 +2921,19 @@
         (state.copied ? "הסיכום הועתק" : (validRate ? "העתק סיכום" : "העתק סיכום לעיון (פג תוקף)")) + "</button>"
       : "";
 
+    const badgeVersion = (!isCompare && quoteRate && quoteRate.versionId && versionMeta(quoteRate.versionId)) || activeVersion;
+    const badgeAlts = (shipIso && !isCompare && badgeVersion)
+      ? coveringForDate.filter(function (v) { return v.id !== badgeVersion.id; })
+      : altVersions;
+
+    const showWt = !isCompare && carrier.id === "zim" && isTwentyFootTyp(effectiveTyp || state.typ);
+    const wtField = !showWt ? "" :
+      '<div class="wt-row">' +
+        '<div><label class="fld" for="gross-wt">משקל ברוטו (טון)</label>' +
+        '<input type="number" id="gross-wt" min="0" step="0.1" inputmode="decimal" placeholder="רשות" value="' + esc(state.grossWtText || "") + '"></div>' +
+        '<p class="hint">תוספת KLG למכולת 20׳ מסין והמזרח הרחוק, לפי משקל ברוטו. אם השדה ריק — יוצגו המדרגות בלי חיוב. לא חל על הודו.</p>' +
+      "</div>";
+
     const app = document.getElementById("app");
     const extrasInner =
       '<div class="extras-body">' +
@@ -2804,11 +2971,12 @@
           '<button type="button" class="cal-toggle" id="cal-open" aria-label="פתח לוח שנה" aria-expanded="' + (state.calOpen ? "true" : "false") + '">' +
           '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M8 3.5v3M16 3.5v3M3.5 9.5h17"/></svg></button></div></div>' +
       "</div>" +
+      wtField +
       formWarn +
       '<details class="extras-panel" id="extras-panel"' + (state.extrasOpen ? " open" : "") + "><summary>אפשרויות נוספות</summary>" + extrasInner + "</details>" +
       "</section>" +
       (state.originId && state.dest && effectiveTyp
-        ? '<section class="card" id="quote-card"><div class="card-head"><h2>הצעת מחיר</h2>' + copyBtn + "</div>" + quoteMeta + quoteNoticeHtml(displayCarrier, shipIso, quoteRate) + (activeVersion ? versionBadgeHtml(activeVersion, shipIso, altVersions) : "") + quoteHtml + "</section>"
+        ? '<section class="card" id="quote-card"><div class="card-head"><h2>הצעת מחיר</h2>' + copyBtn + "</div>" + quoteMeta + quoteNoticeHtml(displayCarrier, shipIso, quoteRate) + (badgeVersion ? versionBadgeHtml(badgeVersion, shipIso, badgeAlts) : "") + quoteHtml + "</section>"
         : "") +
       '<details class="terms"><summary>תנאים שחשוב לציין</summary><div class="card">' + termsHtml(displayCarrier, shipIso) + "</div></details>" +
       (!isCompare ? historySheetHtml(carrier, shipIso) : "") +
@@ -2940,6 +3108,10 @@
     });
     $("qty").addEventListener("change", (e) => { state.qtyText = e.target.value; render(); });
     $("markup").addEventListener("change", (e) => { state.markupText = e.target.value; render(); });
+    const grossWtEl = $("gross-wt");
+    if (grossWtEl) {
+      grossWtEl.addEventListener("change", (e) => { state.grossWtText = e.target.value; state.copied = false; render(); });
+    }
     const hazEl = $("haz");
     if (hazEl && !hazEl.disabled) {
       hazEl.addEventListener("change", (e) => { state.haz = e.target.checked; state.copied = false; render(); });
