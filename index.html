@@ -157,6 +157,29 @@
       background: #fff6e5;
       border: 1px solid #f0d9a8;
     }
+    .notice-original {
+      margin: 12px 0 0;
+      padding: 0;
+    }
+    .notice-original summary {
+      cursor: pointer;
+      font-weight: 700;
+      color: var(--navy);
+      list-style: revert;
+    }
+    .notice-original-text {
+      margin: 8px 0 0;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: #f4f1ea;
+      direction: ltr;
+      text-align: left;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      word-break: break-word;
+      font-size: 0.86rem;
+      line-height: 1.45;
+    }
     tr.sc-rule-note td {
       font-size: 0.78rem;
       color: var(--muted);
@@ -832,10 +855,10 @@
     <footer class="note">כלי פנימי להצעת מחיר ממחירון. התעריפים כפופים לתוקף, למקום פנוי ולתנאי החברה.</footer>
   </div>
   <noscript><p class="wrap">יש להפעיל JavaScript כדי להשתמש במחשבון.</p></noscript>
-  <script src="data/index.js?v=no-ids-20261119"></script>
-  <script src="data/notices.js?v=no-ids-20261119"></script>
-  <script src="data/spots.js?v=no-ids-20261119"></script>
-  <script src="data/schedules.js?v=no-ids-20261119"></script>
+  <script src="data/index.js?v=yml-dg-20261122"></script>
+  <script src="data/notices.js?v=yml-dg-20261122"></script>
+  <script src="data/spots.js?v=yml-dg-20261122"></script>
+  <script src="data/schedules.js?v=yml-dg-20261122"></script>
   <script>
 (function () {
   const DATA = window.QUOTE_INDEX;
@@ -1603,7 +1626,7 @@
     }
     return new Promise(function (resolve, reject) {
       const s = document.createElement("script");
-      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=no-ids-20261119";
+      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=yml-dg-20261122";
       s.async = true;
       s.onload = function () {
         const pack = window.QUOTE_PACK && window.QUOTE_PACK[meta.id];
@@ -1990,6 +2013,13 @@
     (n.sections || []).forEach(function (s) {
       if (s.kind === "meta") {
         html += '<p class="notice-meta">' + esc(s.text) + "</p>";
+        return;
+      }
+      if (s.kind === "original") {
+        const title = s.lead || "נוסח מקורי";
+        html += '<details class="notice-original"><summary>' + esc(title) + "</summary>";
+        html += '<div class="notice-original-text" dir="ltr">' + esc(s.text) + "</div>";
+        html += "</details>";
         return;
       }
       const lead = s.lead ? '<span class="lead">' + esc(s.lead) + "</span> " : "";

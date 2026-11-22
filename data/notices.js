@@ -40,7 +40,7 @@ window.CARRIER_NOTICES = [
     "publishedDate": "2026-11-18",
     "added": "2026-11-18",
     "effectiveFromVessel": null,
-    "validTo": null,
+    "validTo": "2026-11-21",
     "appliesWhen": "haz",
     "service": "MD1",
     "severity": "warning",
@@ -51,6 +51,28 @@ window.CARRIER_NOTICES = [
       { "kind": "p", "lead": "YML:", "text": "YML פועלת גם היא בשירות MD1, ועדיין לא הגיעה ממנה הודעה רשמית, אבל ביום שלפני ההודעה התקבל סירוב למטען Class 3. לכן כדאי לבדוק מראש כל מטען מסוכן שעומד לצאת עם YML בשירות הזה." }
     ]
 
+  },
+  {
+    "id": "yml-dg-2026-11-22",
+    "carrierIds": ["yml"],
+    "title": "YML: הגבלות על מטענים מסוכנים (DG)",
+    "banner": "⚠️ הודעה חשובה: הגבלות על מטענים מסוכנים (DG) (22.11.26)",
+    "publishedDate": "2026-11-22",
+    "added": "2026-11-22",
+    "effectiveFromVessel": null,
+    "validTo": null,
+    "appliesWhen": "haz",
+    "severity": "warning",
+    "quoteWarningTitle": "⚠️ הודעה חשובה: הגבלות על מטענים מסוכנים (DG)",
+    "quoteWarning": "ב־YML מתקבלים לשילוח רק מטענים שסיווגי הסיכון הראשי ו/או המשני שלהם מסווגים כ־Class 6.1, Class 8 או Class 9. מטענים כגון Class 5.1, Class 2.2, Class 3 וכו׳ אינם מתקבלים. גם מטעני Class 9 עם המספרים UN2211, UN3480, UN3481, UN3090, UN3091, UN3536, UN3551, UN3552, UN3556, UN3557, UN3558 ו־UN3166 אינם מתקבלים. הודעה מ־22.11.2026, בתוקף עד להודעה חדשה.",
+    "sections": [
+      { "kind": "meta", "text": "תאריך ההודעה: 22.11.2026" },
+      { "kind": "meta", "text": "בתוקף: עד להודעה חדשה" },
+      { "kind": "p", "lead": "1.", "text": "רק מטענים שסיווגי הסיכון הראשי ו/או המשני שלהם מסווגים כ־Class 6.1, Class 8 או Class 9 יתקבלו לשילוח. משמעות הדבר היא שמטענים כגון Class 5.1, Class 2.2, Class 3 וכו׳ אינם מתקבלים." },
+      { "kind": "p", "lead": "2.", "text": "גם אם המטענים הבאים הם Class 9, הם עדיין לא יתקבלו:" },
+      { "kind": "p", "text": "UN2211 / UN3480 / UN3481 / UN3090 / UN3091 / UN3536 / UN3551 / UN3552 / UN3556 / UN3557 / UN3558 / UN3166" },
+      { "kind": "original", "lead": "נוסח מקורי", "text": "1. Only cargoes whose primary and/or subsidiary hazard classes are classified as Class 6.1, Class 8, or Class 9 will be accepted for shipment.\nWhich means such like Class 5.1, Class 2.2, Class 3 and etc are not acceptable.\n2. even though below cargo are Class 9, but still not acceptable:\n - UN2211 / UN3480/ UN3481/ UN3090/ UN3091/ UN3536/ UN3551/ UN3552/ UN3556/ UN3557/ UN3558/ UN3166" }
+    ]
   },
   {
     "id": "zim-black-sea-wr-2026-11-19",
