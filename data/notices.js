@@ -304,6 +304,52 @@ window.CARRIER_NOTICES = [
     ]
   },
   {
+    "id": "zim-nef-2026-12-01",
+    "carrierIds": ["zim"],
+    "title": "צים: עדכון אגרת פליטות (NEF) מ־1.12.2026 ליבוא לישראל ממדינות האיחוד האירופי",
+    "banner": "צים: עדכון NEF מ־1.12.2026 ועד להודעה חדשה — יבוא לישראל ממדינות האיחוד האירופי",
+    "publishedDate": "2026-12-01",
+    "added": "2026-11-23",
+    "effectiveFromVessel": null,
+    "validTo": null,
+    "appliesWhen": "always",
+    "originCountries": ["IT", "FR", "ES", "GR", "SI", "BG", "RO", "CY", "PT"],
+    "severity": "warning",
+    "quoteWarningTitle": "צים: עדכון אגרת פליטות (NEF) מ־1.12.2026",
+    "quoteWarning": "מ־1.12.2026 ועד להודעה חדשה עודכנה אגרת הפליטות (NEF) ליבוא לישראל ממדינות האיחוד האירופי. בתוך הים התיכון (כולל איטליה, צרפת, רומניה, בולגריה, סלובניה, וכן ספרד ויוון) הרמה היא 61€ ל־TEU (20׳ = 61€, 40׳/HC = 122€). בנובמבר נשאר הסכום הקודם שבמחירון. פירוט, כולל קפריסין ופורטוגל, בהודעה.",
+    "surcharges": [
+      {
+        "code": "NEF",
+        "label": "NEF — אגרת פליטות",
+        "replaceCode": "NEF",
+        "currency": "EUR",
+        "perTeu": 61,
+        "teuByType": { "DV20": 1, "FL20": 1, "OT20": 1, "DV40": 2, "HC40": 2, "FL40": 2, "OT40": 2 },
+        "effectiveFrom": "2026-12-01",
+        "effectiveTo": null,
+        "match": {
+          "originCountries": ["IT", "FR", "ES", "GR", "SI", "BG", "RO"],
+          "side": "origin"
+        },
+        "note": "מ־1.12.2026, לפי הודעת צים: NEF ביבוא ממדינות Intra Mediterranean באיחוד האירופי הוא 61€ ל־TEU (20׳ = 61€, 40׳/HC = 122€). בנובמבר נשאר הסכום הקודם שבמחירון."
+      }
+    ],
+    "sections": [
+      { "kind": "meta", "text": "התקבל: 23.11.2026. בתוקף מ־1.12.2026 ועד להודעה חדשה. חל על יבוא לישראל ממדינות האיחוד האירופי. 20׳ = 1 TEU, 40׳ או HC = 2 TEU." },
+      { "kind": "p", "text": "צים פרסמה רמות מעודכנות של New Emission Fee (NEF) מ־1.12.2026 ועד להודעה חדשה, לישראל אל מדינות האיחוד האירופי ומהן. במחשבון מיושם רק היבוא לישראל. המחירונים עצמם לא נערכו; בנובמבר נשאר הסכום שבמחירון, ומ־1.12.2026 מוחלף סכום ה־NEF לפי החוזר." },
+      { "kind": "list", "lead": "NEF לפי החוזר:", "items": [
+        "ים תיכון אל/מ בריטניה: 15$ ל־TEU (אין במחירון מוצאים בבריטניה, ולכן לא נוסף).",
+        "תוך־ים־תיכוני (כולל, בין היתר, איטליה, צרפת, רומניה, בולגריה, סלובניה): 61€ ל־TEU. לפי גיאוגרפיה ברורה של הים התיכון באיחוד חלים גם ספרד ויוון.",
+        "צפון אירופה לים התיכון ולים השחור (כולל, בין היתר, גרמניה, הולנד, בלגיה, קפריסין): 67€ ל־TEU.",
+        "הים התיכון והים השחור לצפון אירופה (כולל אותן מדינות): 67€ ל־TEU — יצוא מישראל, לא מיושם במחשבון היבוא."
+      ]},
+      { "kind": "p", "text": "לא חל על מוצאים שאינם באיחוד האירופי (למשל אלבניה, מצרים, גאורגיה/פוטי, טורקיה)." },
+      { "kind": "p", "lead": "קפריסין:", "text": "בחוזר מסווגת קפריסין תחת צפון אירופה (67€ ל־TEU). במחירון הקיים NEF כלול במחיר ההובלה (CNS/WR/NEF) בלי סכום נפרד, ולכן לא נוסף ולא הוחלף אוטומטית — יש לוודא מול צים." },
+      { "kind": "p", "lead": "פורטוגל:", "text": "ליסבון ולשיש מופיעות במחירון עם NEF 60€/120€ כמו בתוך הים התיכון, אבל בחוזר פורטוגל לא צוינה, והסיווג בין Intra Med ל־North Europe אינו חד־משמעי. הסכום לא עודכן אוטומטית — יש לוודא מול צים." },
+      { "kind": "original", "lead": "נוסח מקורי", "text": "The following are the updated New Emission fee (NEF) levels effective from December 1st, 2026 till further notice, applies for Israel to/from EU union countries.\n\nMediterranean to/from UK: $15/TEU\nIntra Mediterranean (including, but not limited to Italy; France; Romania; Bulgaria, Slovenia): €61/TEU\nNorth Europe to Mediterranean & Black Sea (including, but not limited to Germany; Netherland; Belgium; Cyprus): €67/TEU\nMediterranean & Black Sea to North Europe (including, but not limited to Germany; Netherland; Belgium; Cyprus): €67/TEU" }
+    ]
+  },
+  {
     "id": "borchard-import-fob-2026-12",
     "carrierIds": ["borchard"],
     "title": "לוסי בוכרד: מחירון יבוא FOB למכולות יבשות (NON IMO), דצמבר 2026",
