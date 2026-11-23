@@ -204,5 +204,52 @@ window.CARRIER_NOTICES = [
       ]},
       { "kind": "original", "lead": "נוסח מקורי", "text": "Pls note that NBF and EFS levels for dry cargo will remain the same in December 2026 as November 2026\n\nNBF\nIsrael to/from North America & Central America & Caribbean: $393/TEU\nIndia Sub Continent to Israel: $447/TEU\nIsrael to India Sub Continent: $393/TEU\nFar East (excluding China) to Israel: $793/TEU\nChina to Israel: $850/TEU\nIsrael to the Far East: $355/TEU\nIntra Mediterranean (East & West) & Black Sea: $246/TEU\nNorth Europe and Baltic/Scand. to Israel: $320/TEU\nIsrael to North Europe and Baltic/Scand.: $272/TEU\nIsrael to South America: $236/TEU\nSouth America to Israel: $272/TEU\n\nEFS\nIsrael to/from North America & Central America & Caribbean: $125/TEU\nIntra Mediterranean (East & West) & Black Sea: 0\nNorth Europe and Baltic/Scand. to Israel: $52/TEU\nIsrael to North Europe and Baltic/Scand.: $52/TEU" }
     ]
+  },
+  {
+    "id": "zim-gfs-2026-12-01",
+    "carrierIds": ["zim"],
+    "title": "ZIM: עדכון GFS מ־1.12.2026 ועד להודעה חדשה",
+    "banner": "צים: עדכון GFS מ־1.12.2026 ועד להודעה חדשה (מטען FAK). השינוי היחיד: מסלולי דרום אמריקה",
+    "publishedDate": "2026-11-23",
+    "added": "2026-11-23",
+    "effectiveFromVessel": null,
+    "validTo": null,
+    "appliesWhen": "always",
+    "severity": "warning",
+    "quoteWarningTitle": "צים: עדכון GFS מ־1.12.2026",
+    "quoteWarning": "עודכנו רמות GFS למטען FAK מ־1.12.2026 ועד להודעה חדשה. השינוי היחיד הוא במסלולי דרום אמריקה. 20׳ = 1 TEU, 40׳/HC = 2 TEU. פירוט הסכומים בהודעה.",
+    "surcharge": {
+      "code": "GFS",
+      "label": "GFS — תוספת דלק ירוק",
+      "replaceCode": "GFS",
+      "currency": "USD",
+      "perTeu": 29,
+      "teuByType": { "DV20": 1, "FL20": 1, "OT20": 1, "DV40": 2, "HC40": 2, "FL40": 2, "OT40": 2 },
+      "effectiveFrom": "2026-12-01",
+      "effectiveTo": null,
+      "match": {
+        "originCountries": ["BR", "AR", "UY"],
+        "side": "origin",
+        "dryOnly": true
+      },
+      "note": "מ־1.12.2026, לפי הודעת צים: GFS ביבוא מחוף מזרח דרום אמריקה הוא 29$ ל־TEU (20׳ = 29$, 40׳/HC = 58$). בנובמבר נשאר הסכום הקודם שבמחירון."
+    },
+    "sections": [
+      { "kind": "meta", "text": "התקבל: 23.11.2026. בתוקף מ־1.12.2026 ועד להודעה חדשה. חל על מטען FAK." },
+      { "kind": "p", "text": "צים פרסמה רמות GFS מעודכנות מ־1.12.2026 ועד להודעה חדשה, למטען FAK (Freight All Kind). צוין שהשינוי היחיד הוא במסלולים אל דרום אמריקה וממנה. הסכומים הם ל־TEU: מכולת 20׳ = 1 TEU, מכולת 40׳ או HC = 2 TEU." },
+      { "kind": "list", "lead": "GFS", "items": [
+        "ישראל אל/מ צפון אמריקה, מרכז אמריקה, הקריביים וחוף מערב דרום אמריקה: 203$ ל־TEU",
+        "המזרח הרחוק לישראל: 57$ ל־TEU",
+        "ישראל למזרח הרחוק: 18$ ל־TEU",
+        "תת־היבשת ההודית לישראל: 57$ ל־TEU",
+        "ישראל לתת־היבשת ההודית: 18$ ל־TEU",
+        "תוך־ים־תיכוני (יבוא ויצוא) אל/מ ישראל: 231$ ל־TEU",
+        "צפון אירופה והבלטי/סקנדינביה לישראל: 248$ ל־TEU",
+        "ישראל לצפון אירופה והבלטי/סקנדינביה: 211$ ל־TEU",
+        "ישראל לחוף מזרח דרום אמריקה: 27$ ל־TEU",
+        "חוף מזרח דרום אמריקה לישראל: 29$ ל־TEU"
+      ]},
+      { "kind": "original", "lead": "נוסח מקורי", "text": "The following are the updated GFS effective from December 1st, 2026 till further notice, applying to FAK (Freight All Kind) cargo, in the trades as detailed below:\n(Only change is to/from South America)\n\nIsrael to/from North America & Central America & Caribbean & West Coast South America: $203/TEU\nFar East to Israel: $57/TEU\nIsrael to the Far East: $18/TEU\nIndia Sub-Continent to Israel: $57/TEU\nIsrael to India Sub-Continent: $18/TEU\nIntra Mediterranean (Import & Export) from/to Israel: $231/TEU\nNorth Europe and Baltic/Scand. to Israel: $248/TEU\nIsrael to North Europe and Baltic/Scand.: $211/TEU\nIsrael to east coast south America: $27/TEU\nEast coast south America to Israel: $29/TEU" }
+    ]
   }
 ];

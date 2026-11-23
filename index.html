@@ -869,10 +869,10 @@
     <footer class="note">כלי פנימי להצעת מחיר ממחירון. התעריפים כפופים לתוקף, למקום פנוי ולתנאי החברה.</footer>
   </div>
   <noscript><p class="wrap">יש להפעיל JavaScript כדי להשתמש במחשבון.</p></noscript>
-  <script src="data/index.js?v=zim-nbf-dec-20261123"></script>
-  <script src="data/notices.js?v=zim-nbf-dec-20261123"></script>
-  <script src="data/spots.js?v=zim-nbf-dec-20261123"></script>
-  <script src="data/schedules.js?v=zim-nbf-dec-20261123"></script>
+  <script src="data/index.js?v=zim-gfs-dec-20261123"></script>
+  <script src="data/notices.js?v=zim-gfs-dec-20261123"></script>
+  <script src="data/spots.js?v=zim-gfs-dec-20261123"></script>
+  <script src="data/schedules.js?v=zim-gfs-dec-20261123"></script>
   <script>
 (function () {
   const DATA = window.QUOTE_INDEX;
@@ -1303,7 +1303,8 @@
         pay: rule.pay || "",
         kind: rule.kind || "",
         ruleId: rule.ruleId || rule.code,
-        ruleNote: rule.note || ""
+        ruleNote: rule.note || "",
+        replaceCode: rule.replaceCode || ""
       });
     }
     return { extras: extras, weightNotes: weightNotes };
@@ -1315,10 +1316,30 @@
     const weightNote = (found.weightNotes || []).filter(Boolean).join(" ");
     const have = {};
     (rate.sc || []).forEach(function (s) { if (s.ruleId) have[s.ruleId] = true; });
-    const add = extras.filter(function (e) { return !have[e.ruleId]; });
-    if (!add.length && !weightNote) return rate;
+    let sc = (rate.sc || []).slice();
+    let mutated = false;
+    const add = [];
+    extras.forEach(function (e) {
+      if (have[e.ruleId]) return;
+      if (e.replaceCode) {
+        const i = sc.findIndex(function (s) { return s.code === e.replaceCode; });
+        if (i >= 0) {
+          sc[i] = Object.assign({}, sc[i], {
+            amount: e.amount,
+            currency: e.currency || sc[i].currency,
+            label: e.label || sc[i].label,
+            ruleId: e.ruleId,
+            ruleNote: e.ruleNote || ""
+          });
+          mutated = true;
+        }
+        return;
+      }
+      add.push(e);
+    });
+    if (!mutated && !add.length && !weightNote) return rate;
     const next = Object.assign({}, rate);
-    if (add.length) next.sc = (rate.sc || []).concat(add);
+    next.sc = add.length ? sc.concat(add) : sc;
     if (weightNote) next.weightNote = weightNote;
     return next;
   }
@@ -1694,7 +1715,7 @@
     }
     return new Promise(function (resolve, reject) {
       const s = document.createElement("script");
-      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=zim-nbf-dec-20261123";
+      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=zim-gfs-dec-20261123";
       s.async = true;
       s.onload = function () {
         const pack = window.QUOTE_PACK && window.QUOTE_PACK[meta.id];
