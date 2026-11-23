@@ -271,5 +271,35 @@ window.CARRIER_NOTICES = [
       ]},
       { "kind": "original", "lead": "נוסח מקורי", "text": "The following are the updated GFS effective from December 1st, 2026 till further notice, applying to FAK (Freight All Kind) cargo, in the trades as detailed below:\n(Only change is to/from South America)\n\nIsrael to/from North America & Central America & Caribbean & West Coast South America: $203/TEU\nFar East to Israel: $57/TEU\nIsrael to the Far East: $18/TEU\nIndia Sub-Continent to Israel: $57/TEU\nIsrael to India Sub-Continent: $18/TEU\nIntra Mediterranean (Import & Export) from/to Israel: $231/TEU\nNorth Europe and Baltic/Scand. to Israel: $248/TEU\nIsrael to North Europe and Baltic/Scand.: $211/TEU\nIsrael to east coast south America: $27/TEU\nEast coast south America to Israel: $29/TEU" }
     ]
+  },
+  {
+    "id": "borchard-import-fob-2026-12",
+    "carrierIds": ["borchard"],
+    "title": "לוסי בוכרד: מחירון יבוא FOB למכולות יבשות (NON IMO), דצמבר 2026",
+    "banner": "לוסי בוכרד: מחירון יבוא FOB למכולות יבשות (NON IMO) לדצמבר 2026, בתוקף עד 31.12.2026",
+    "publishedDate": "2026-11-23",
+    "added": "2026-11-23",
+    "effectiveFromVessel": null,
+    "validTo": "2026-12-31",
+    "appliesWhen": "always",
+    "severity": "info",
+    "quoteWarningTitle": "לוסי בוכרד: יבוא FOB יבש / NON IMO, דצמבר 2026",
+    "quoteWarning": "מחירון יבוא FOB למכולות יבשות, NON IMO, בתוקף עד 31.12.2026. הובלה בדולר (כולל BAF, או לפי הפירוט בשורה). ETS באירו; פידר מבלפסט לליברפול בליש\"ט. DETENTION מופיע בהערה לפי יעד ולא נוסף לסה״כ. חיובים מקומיים מוצגים בנפרד ולא נכללים בסה״כ ההובלה.",
+    "sections": [
+      { "kind": "meta", "text": "התקבל: 23.11.2026. תוקף: דצמבר 2026 עד 31.12.2026. Lucy Borchard Shipping LTD, as Agents Only of Borchard Lines." },
+      { "kind": "p", "text": "המחירון הוא ליבוא FOB למכולות יבשות (DRY), NON IMO, ליעדי אשדוד וחיפה (אותם מחירי הובלה). זמני המעבר (T/T) במסמך מצוינים כ-approx. בלפסט מתומחר via Liverpool, כולל הובלת פידר." },
+      { "kind": "p", "text": "DETENTION מופיע בטבלה לפי יעד: 20׳ אשדוד 21$ / חיפה 17$; 40׳/HC אשדוד 42$ / חיפה 34$. באנטוורפן, רוונה/ונציה ואלכסנדריה הוא כלול בהובלה. הסכום לא נוסף לסה״כ, כי במחירון לא צוין אם הוא ליום או חד-פעמי. ימי Demurrage פטורים וחיובים — לפי המסמך, זמינים במשרדי החברה לפי תנאי המוביל." },
+      { "kind": "p", "text": "מגבלות מהמסמך: IMCO / מטען מסוכן — כפוף לאישור נפרד של המוביל. אין מטען פסולת, אין נשק, תחמושת או ציוד צבאי. כפוף למקום פנוי ולזמינות ציוד. קסטלון: Dry FAK only, not Ceramics. מקסימום משקל: 24 טון ל-20׳ (24–26 טון — תוספת 70$), 24 טון ל-40׳ (24–26 טון — תוספת 140$) — לא נוסף אוטומטית. Captain Mail ו-Self-Guarantee (Telex release) מותנים ומופיעים בחיובים המקומיים." },
+      { "kind": "list", "lead": "תנאים מהמסמך", "items": [
+        "To the above you should add all surcharges and relevant taxes.",
+        "All rates subject to change.",
+        "The carrier has the right to modify or suspend the service and or offer, or apply surcharges upon the implementation of (or in advance of,) any Emissions Trading Scheme and/or Emissions regulations (including EEXI/CII) introduced by the EU or other national, international or regional authorities.",
+        "SHOULD BE ANY SURCHARGES COMING INTO FORCE AT TIME OF SHIPMENT (I.E. WAR RISK, BAF, CAF, CONGESTION, THC OR OTHERS), THESE WILL BE ADDED ON TOP OF THE ABOVE MENTIONED RATE. RATES CAN CHANGE WITHOUT PRIOR NOTICE.",
+        "התשלום בש״ח עפ״י שער ספנות ביום התשלום.",
+        "STANDARD BORCHARD BILL OF LADING TERMS/CONDITIONS: WWW.BORLINES.COM — Conditions of Carriage: www.borlines.com/info/legal-terms"
+      ]},
+      { "kind": "p", "text": "יצירת קשר לפי הכותרת: TEL 03-5207500, FAX 03-5249099, main@lubor.co.il. במכתב מופיע גם טלפון 03-5207521 ואימייל oren@lubor.co.il." },
+      { "kind": "original", "lead": "נוסח מקורי (עמוד 4)", "text": "IMPORT FOB RATES · DRY · NON IMO\nDecember 2026\nValid till 31.12.2026\n\nPlease see below our IMPORT FOB rates for dry containers, NON IMO for December 2026.\nVALID TILL 31.12.2026\n\nMAX INTAKE 24 T/20' (24-26 T - Additional $70) , 24 T/40' (24-26 T – Additional $140)\nIMCO Cargo – subject to separate Acceptance by the Carrier\nNo Waste cargo allowed, No Weapons, No Ammunition or Military Equipment Allowed.\nSubject to both space & Equipment Availability\n\n• To the above you should add all surcharges and relevant taxes.\n• All rates subject to change.\n• The carrier has the right to modify or suspend the service and or offer, or apply surcharges upon the implementation of (or in advance of,) any Emissions Trading Scheme and/or Emissions regulations (including EEXI/CII) introduced by the EU or other national, international or regional authorities\nSHOULD BE ANY SURCHARGES COMING INTO FORCE AT TIME OF SHIPMENT (I.E. WAR RISK, BAF, CAF, CONGESTION, THC OR OTHERS), THESE WILL BE ADDED ON TOP OF THE ABOVE MENTIONED RATE. RATES CAN CHANGE WITHOUT PRIOR NOTICE.\n** התשלום בש\"ח עפ\"י שער ספנות ביום התשלום.\nSTANDARD BORCHARD BILL OF LADING TERMS/CONDITIONS PUBLISHED AT: WWW.BORLINES.COM\nDemurrage free days /Demurrage charges available at our offices as per carrier's terms and conditions.\n\nLucy Borchard Shipping LTD. · As Agents Only of Borchard Lines\nTel: 03-5207521 · Fax: 03-5249099 · Email: oren@lubor.co.il\nAll shipments are subject to Borchard Lines Ltd Conditions of Carriage which are available at www.borlines.com/info/legal-terms. Lucy Borchard Shipping LTD are acting as agents for and on behalf of Borchard Lines Ltd." }
+    ]
   }
 ];

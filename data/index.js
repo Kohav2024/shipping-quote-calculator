@@ -62,6 +62,17 @@ window.QUOTE_INDEX =
       "name": "Evergreen",
       "nameHe": "אברגרין (Evergreen Line / EMC)",
       "party": "EVERGREEN LINE (EMC)"
+    },
+    {
+      "id": "borchard",
+      "name": "Lucy Borchard",
+      "nameHe": "לוסי בוכרד (Lucy Borchard Shipping LTD)",
+      "email": "main@lubor.co.il",
+      "website": "https://www.borlines.com",
+      "termsUrl": "https://www.borlines.com/info/legal-terms",
+      "agent": "Lucy Borchard Shipping LTD, as Agents Only of Borchard Lines",
+      "party": "Lucy Borchard Shipping LTD, as Agents Only of Borchard Lines",
+      "paymentTerms": "התשלום בש״ח עפ״י שער ספנות ביום התשלום."
     }
   ],
   "versions": [
@@ -364,6 +375,46 @@ window.QUOTE_INDEX =
       "sourceNote": "FAK RATE GUIDELINE 20261115-20261130 (ILASH/ILHFA). לא צורף קובץ; המקור הוא הטקסט שצורף. לא צוין מספר הסכם או filing, ולא הומצא. תאריך הנפקה נפרד לא צוין; נרשם לפי תחילת התוקף 15.11.2026.",
       "label": "FAK 15.11.2026–30.11.2026 (ILASH/ILHFA)",
       "offerTitle": "EVERGREEN LINE update F.A.K rate offer as from 15/11 – 30/11/2026"
+    },
+    {
+      "id": "borchard-2026-12-01",
+      "carrierId": "borchard",
+      "file": "data/borchard/2026-12-01.js",
+      "version": "",
+      "party": "Lucy Borchard Shipping LTD, as Agents Only of Borchard Lines",
+      "vf": 20,
+      "vt": 50,
+      "issued": "2026-11-23",
+      "issuedApprox": true,
+      "added": "2026-11-23",
+      "sourceFile": "Lucy Borchard Shipping LTD Import FOB rates December 2026 (PDF, 4 pages)",
+      "sourceNote": "יבוא FOB, מכולות יבשות NON IMO, לדצמבר 2026, בתוקף עד 31.12.2026. תאריך הנפקה נפרד לא צוין במסמך ולא הומצא; נוסף ב־23.11.2026. T/T במחירון מצוין כ-approx. DETENTION מופיע לפי יעד (אשדוד/חיפה) ולא נוסף לסה״כ, כי לא צוין אם הסכום ליום או חד-פעמי. Demurrage free days לא צוינו בסכום — לפי המסמך זמינים במשרדי החברה.",
+      "label": "יבוא FOB יבש / NON IMO, דצמבר 2026",
+      "offerTitle": "IMPORT FOB RATES · DRY · NON IMO — December 2026",
+      "email": "main@lubor.co.il",
+      "website": "https://www.borlines.com",
+      "termsUrl": "https://www.borlines.com/info/legal-terms",
+      "agent": "Lucy Borchard Shipping LTD, as Agents Only of Borchard Lines",
+      "paymentTerms": "התשלום בש״ח עפ״י שער ספנות ביום התשלום.",
+      "localCharges": {
+        "title": "LOCAL CHARGES",
+        "items": [
+          {"name": "Cleaning Charge", "basis": "Per Cntr", "currency": "USD", "amount": 15},
+          {"name": "Israel Port Security", "basis": "Per Cntr", "currency": "USD", "amount": 23},
+          {"name": "World Gate Fee", "basis": "Per B/L", "currency": "ILS", "amount": 35},
+          {"name": "Communication Fee", "basis": "Per B/L", "currency": "ILS", "amount": 70},
+          {"name": "IT charge", "basis": "Per B/L", "currency": "ILS", "amount": 150},
+          {"name": "Agency Fee / Delivery Order", "basis": "Per Cntr", "currency": "ILS", "amount": 50, "remarks": "Minimum ₪ 100 per B/L"},
+          {"name": "Transfer Fee", "basis": "Per Cntr", "currency": "ILS", "amount20": 50, "amount40": 65, "remarks": "RH - ₪ 85 (Minimum ₪ 100 per B/L)"},
+          {"name": "Container Check. Admin fee", "basis": "Per Cntr", "currency": "USD", "amount": 9},
+          {"name": "Captain Mail (if needed)", "basis": "Per B/L", "currency": "USD", "amount": 35, "remarks": "if needed"},
+          {"name": "Self-Guarantee (Telex release)", "basis": "Per B/L", "currency": "ILS", "amount": 150, "remarks": "release without presentation of Original BL"}
+        ],
+        "notes": [
+          "MAX INTAKE 24 T/20' (24-26 T - Additional $70) , 24 T/40' (24-26 T – Additional $140) — מותנה במשקל, לא נוסף אוטומטית לסה״כ.",
+          "התשלום בש״ח עפ״י שער ספנות ביום התשלום."
+        ]
+      }
     }
   ],
   "ports": [
@@ -623,7 +674,10 @@ window.QUOTE_INDEX =
     "NANSHA (GD), CN",
     "NANTONG (JS), CN",
     "GAOLAN (GD), CN",
-    "QINGDAO (SD), CN"
+    "QINGDAO (SD), CN",
+    "LIVERPOOL, GB",
+    "BELFAST, GB",
+    "MARSEILLE, FR"
   ],
   "types": [
     "DV20",
@@ -659,7 +713,11 @@ window.QUOTE_INDEX =
     "הובלה באירו (EUR) לפי המחירון; לא הומרה לדולר. Inclusive: EFS, THL, CSS, IFP, MBS, TSL. כפוף ל-OBS ו-EES (דולר ל-TEU, חושב למכולה לפי 1 TEU ל-20׳ ו-2 TEU ל-40׳/HC: OBS 198/396$, EES 72/144$). DTHC: 270$/20׳ ו-390$/40׳–40HC. CMD: 21$ ל-UNIT (טופל כמכולה). כפוף לכל התוספות התקפות במועד השילוח. כפוף ל-FGP (Food Grade Premium) — לא צוין סכום במחירון, לא נוסף לסה״כ. Freight prepaid, בכפוף להגשת תעריף (filing) לפני הזמנה. תאריך דירוג ה-B/L: Proforma ETD (ואם הטעינה בדוברה/פידר — Proforma ETD של הדוברה/פידר). ניתוב סטנדרטי אחד בלבד. כפוף לאישור תפעולי ולזמינות ציוד ומקום. ללקוחות ללא אשראי: תשלום במזומן בשקלים. ריפרים — לפנות מקרה-מקרה (אין תעריפי ריפר במחירון). לפי גיליון General Terms: General cargo / Non IMCO only.",
     "F.A.K. HARMLESS ליעדי אשדוד (HCT) וחיפה (אותו מחיר). תוקף 01.12.2026–14.12.2026 (until further notice but not beyond 14.12.2026). תעריף 20׳ DV חל רק על מטען במשקל ברוטו עד 22.9 טון (OVW TILL 22.9 TONS) — תוספות למשקל עודף חלות לפי המחירון, אבל סכום התוספת לא צוין בגיליון התעריפים ולא הומצא. THC במחירון (THC IN USD) 275$/20׳ ו-400$/40׳ נוסף לסה״כ כטיפול יעד (Origin THC משולם ע״י השולח). PRS 55$/110$ ו-SCS 36$/72$ (20׳/40׳) נוספו לפי הטבלה. CLS 20$/40$ נוסף רק בשורות שבהן צוין (נמלי סין היבשתית). CRS 131$/262$ נוסף רק בשורות שבהן צוין (הונג קונג ושאר המוצאים שאינם סין היבשתית). EFS לא מופיע במחירון הזה ולא נוסף. מספר SCT לא צוין במחירון (במייל הופיע רק placeholder ולא הועתק כמספר אמיתי). אחרי שחרור הזמנה לא ניתן לשנות את קוד ה-SCT; קוד שגוי — קנס 3,500$ למכולה, ואם אין תעריף בגלל קוד שגוי יחולו תעריפי FAK. יש לאמת מול משרד MSC לפני הזמנה. הובלה מנמלי בסיס לפי תאריך יציאת הפרופורמה; מנמלי out (Sihanoukville, Makassar, Songkhla ונמלי out בסין) לפי היציאה בפועל; בנגקוק לפי פרופורמת Laem Chabang. 12 ימי demurrage חינם ביעד. כפוף לדמי D/O ולהוצאות מקומיות (טבלת Locals מוצגת בנפרד, לא בסה״כ ההובלה). כפוף לתוספות במועד השילוח ולזמינות מקום וציוד. לא נוספו אוטומטית: Flexi/Flexibag 14$ למכולה; מטען עם בעירה ספונטנית/חימום עצמי 50$/מכולה (גיליון SCF — רשימת הסחורות לא הייתה בטקסט מחלץ בגיליון); דמי מועמדות למכולה כבדה בהונג קונג ודרום סין (RMB/HKD לפי הגיליון, לא הומרו); תעריפי pre-carriage / TAO-PRE ו-China inland (גיליונות נפרדים) — להוסיף מעל תעריף נמל האם, לא נכללו בסה״כ.",
     "F.A.K. ליעדי אשדוד (ILASH) וחיפה (ILHFA), אותו מחיר. תוקף 15.11.2026–30.11.2026. לא צוין במחירון מספר הסכם או filing, ולא הומצא. התעריף כולל EBS, ERC, STF, WRC ו-PSS. 21 ימי BT חינם (ימי לוח שנה). תאריך הדירוג (rating base date) הוא תאריך ה-ETD שפורסם כאשר המכולה המלאה האחרונה נכנסת לשער (Last Full Container Gate In); חובת הסוכן או הספק המקומי במזרח הרחוק לאמת זאת מראש כדי למנוע מחלוקת תעריף. THC/D 295$/20׳ ו-420$/40׳, ISPS/D 20$ למכולה, ו-ISOCC 134$/20׳ ו-268$/40׳–40HC נוספו לסה״כ. EUIS (EU innovation surcharge): לנמלי סין היבשתית כלול בתעריף ולא נוסף; למדינות שאינן סין, כולל הונג קונג וטייוואן, 72 אירו ל-TEU (72€ ל-20׳, 144€ ל-40׳/HC) — נשמר באירו, בלי המרה. LSS: לנמלי סין היבשתית כלול ולא נוסף; למדינות שאינן סין, כולל הונג קונג וטייוואן, 20$ ל-TEU. מקאו (MOMCA) אינה סין יבשתית וטופלה כלא-סין (EUIS ו-LSS נוספו). HWSC רק ל-20׳: משקל ברוטו 18–20.99 טון = 200$ — מותנה במשקל, לא נוסף לסה״כ. 40DV ו-40HC באותו מחיר במחירון. קודי מכולה: 2SD=20'DV, 4SD=40'DV, 4SH=40'HC.",
-    "KLG included"
+    "KLG included",
+    "DETENTION: ASH - $ 21 ; HFA - $ 17",
+    "DETENTION: ASH - $ 42 ; HFA - $ 34",
+    "Dry FAK only, not Ceramics. DETENTION: ASH - $ 21 ; HFA - $ 17",
+    "Dry FAK only, not Ceramics. DETENTION: ASH - $ 42 ; HFA - $ 34"
   ],
   "incl": [
     "CNS/AGC/SSD/WR/THC",
@@ -685,7 +743,10 @@ window.QUOTE_INDEX =
     "CNS/AGC/SSD/WR/KLG/IPS",
     "CNS/AGC/SSD/WR/SEH/KLG/IPS/THC",
     "CNS/AGC/SSD/WR/LTO",
-    "CNS/AGC/SSD/WR/LTO/OCS"
+    "CNS/AGC/SSD/WR/LTO/OCS",
+    "BAF",
+    "BAF/War/Detention",
+    "BAF/War/V. ISPS/Detention/ES"
   ],
   "codes": [
     "GFS",
@@ -750,7 +811,12 @@ window.QUOTE_INDEX =
     "RCC",
     "OCS",
     "CRP",
-    "SEC"
+    "SEC",
+    "VISPS",
+    "EIS",
+    "ENV",
+    "EWR",
+    "FEEDER"
   ],
   "curs": [
     "USD",
@@ -764,7 +830,8 @@ window.QUOTE_INDEX =
     "JPY",
     "KRW",
     "SGD",
-    "THB"
+    "THB",
+    "GBP"
   ],
   "bases": [
     "Container",
@@ -1692,6 +1759,18 @@ window.QUOTE_INDEX =
     "CAI MEP": [
       "VNTOT",
       "Vietnam"
+    ],
+    "LIVERPOOL": [
+      "GBLIV",
+      "United Kingdom"
+    ],
+    "BELFAST": [
+      "GBBEL",
+      "United Kingdom"
+    ],
+    "MARSEILLE": [
+      "FRMRS",
+      "France"
     ]
   },
   "countryHe": {
@@ -1879,7 +1958,12 @@ window.QUOTE_INDEX =
     "RCC": "חיוב קבלה במוצא",
     "OCS": "תוספת ICD ביצוא",
     "CRP": "תוספת כיסוי עלויות",
-    "SEC": "תוספת ביטחון"
+    "SEC": "תוספת ביטחון",
+    "VISPS": "אגרת ISPS לאונייה (Vessel ISPS)",
+    "EIS": "EIS",
+    "ENV": "תוספת סביבתית (Environmental)",
+    "EWR": "EWR",
+    "FEEDER": "הובלת פידר (Feeder Freight)"
   },
   "payHe": {
     "prepaid": "במוצא (Prepaid)",
