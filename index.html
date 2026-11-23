@@ -876,10 +876,10 @@
     <footer class="note">כלי פנימי להצעת מחיר ממחירון. התעריפים כפופים לתוקף, למקום פנוי ולתנאי החברה.</footer>
   </div>
   <noscript><p class="wrap">יש להפעיל JavaScript כדי להשתמש במחשבון.</p></noscript>
-  <script src="data/index.js?v=fallback-20261123"></script>
-  <script src="data/notices.js?v=fallback-20261123"></script>
-  <script src="data/spots.js?v=fallback-20261123"></script>
-  <script src="data/schedules.js?v=fallback-20261123"></script>
+  <script src="data/index.js?v=contracts-20261123"></script>
+  <script src="data/notices.js?v=contracts-20261123"></script>
+  <script src="data/spots.js?v=contracts-20261123"></script>
+  <script src="data/schedules.js?v=contracts-20261123"></script>
   <script>
 (function () {
   const DATA = window.QUOTE_INDEX;
@@ -1103,7 +1103,24 @@
     });
   }
   function quoteLabel(carrier, rate) {
-    return versionTitle(carrier);
+    const qs = carrier && carrier.quotes;
+    if (qs && qs.length) {
+      if (rate && rate.quoteIdx === -1) {
+        return qs.map(function (q) {
+          return q.ref + " (חוזה " + q.contract + ", Trade " + q.tradeId + ")";
+        }).join(" וגם ");
+      }
+      if (rate && rate.quoteIdx >= 0 && qs[rate.quoteIdx]) {
+        const q = qs[rate.quoteIdx];
+        return q.ref + " · חוזה " + q.contract + " · Trade " + q.tradeId;
+      }
+    }
+    if (!carrier || !carrier.ref) return "";
+    if (carrier.version) return "הסכם " + carrier.ref + " (גרסה " + carrier.version + ")";
+    if (/^0\d+$/.test(String(carrier.ref)) || (carrier.sourceFile && /filing/i.test(carrier.sourceFile))) {
+      return "Filing " + carrier.ref;
+    }
+    return String(carrier.ref);
   }
   function bookingLine(carrier) {
     if (carrier.agent) return carrier.agent;
@@ -1393,13 +1410,15 @@
       lines.push("");
     }
     lines.push(carrier.nameHe);
-    if (carrier.versionId || carrier.version || carrier.label) {
-      lines.push(versionTitle(carrier) +
+    if (carrier.versionId || carrier.version || carrier.ref || carrier.label) {
+      lines.push((carrier.ref && carrier.version ? ("הסכם " + carrier.ref + " · גרסה " + carrier.version) : versionTitle(carrier)) +
         (carrier.vf ? " · תוקף " + fmtDate(addDays(carrier.vf)) + "–" + fmtDate(addDays(carrier.vt)) : "") +
         (carrier.issued ? " · הונפק " + fmtDate(carrier.issued) : "") +
         (carrier.added ? " · נוסף למחשבון " + fmtDate(carrier.added) : ""));
     }
     if (carrier.party) lines.push(carrier.party);
+    const contractNo = quoteLabel(carrier, rate);
+    if (contractNo) lines.push("מס' חוזה/הסכם: " + contractNo);
     if (origin.kind === "inland") {
       lines.push("מוצא: " + origin.name + " (" + origin.mode + (origin.mot ? " / " + origin.mot : "") + ") דרך " + origin.pol);
     } else {
@@ -1447,7 +1466,11 @@
     }
     lines.push("");
     const book = bookingLine(carrier);
-    lines.push("להזמנה ציינו את " + quoteLabel(carrier, rate) + (book ? " ופנו אל " + book : ""));
+    if (contractNo) {
+      lines.push("מס' חוזה/הסכם לציין בהזמנה: " + contractNo + (book ? " · פנו אל " + book : ""));
+    } else if (book) {
+      lines.push("להזמנה פנו אל " + book);
+    }
     if (carrier.paymentTerms) lines.push("תנאי תשלום לפי המחירון: " + carrier.paymentTerms);
     const lc = carrier.localCharges;
     if (lc && lc.items) {
@@ -1713,8 +1736,10 @@
     return html;
   }
   function versionTitle(v) {
-    if (v.version) return "גרסה " + v.version;
+    if (v.ref && v.version) return "הסכם " + v.ref + " · גרסה " + v.version;
     if (v.label) return v.label;
+    if (v.ref) return "הסכם " + v.ref;
+    if (v.version) return "גרסה " + v.version;
     return v.id;
   }
   function versionWindow(v) {
@@ -1739,7 +1764,7 @@
     }
     return new Promise(function (resolve, reject) {
       const s = document.createElement("script");
-      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=fallback-20261123";
+      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=contracts-20261123";
       s.async = true;
       s.onload = function () {
         const pack = window.QUOTE_PACK && window.QUOTE_PACK[meta.id];
@@ -2155,12 +2180,12 @@
     if (displayCarrier.id === "yml") {
       const ymlVid = displayCarrier.versionId || "";
       if (ymlVid === "yml-2026-12-01") {
-        return "<p>הוטען מחירון YML בתוקף 01.12.2026–14.12.2026, והוצא ל־Mayan Logistics (1977) Ltd. הסוכן במחירון: Konmart (ships agent) ltd, as agents for Yang Ming Lines. לא צוין במסמך דוא״ל להזמנה.</p>" +
+        return "<p>הוטענה הצעת YML PQ26YML005443 (חוזה EMW1728355, Trade ID MEDW40753000), בתוקף 01.12.2026–14.12.2026, והוצאה ל־Mayan Logistics (1977) Ltd. הסוכן במחירון: Konmart (ships agent) ltd, as agents for Yang Ming Lines. לא צוין במסמך דוא״ל להזמנה.</p>" +
           "<p>תנאי תשלום: COLLECT. התעריפים כפופים לתוספות החלות במועד השילוח, בלי הודעה מוקדמת; אינם כוללים שחרור מכס וחיובים מקומיים; כפופים לדמי דמורג׳; וההובלה הימית חלה לפי ETB/ETD המקורי בכפוף להוראות POL/POD. יש לפנות למשרד לאימות התוקף לפחות שבוע לפני פקיעת ההצעה. זמן ההגעה עשוי להשתנות בגלל עומס בטרמינל, מזג אוויר או עיכובים בכלי השיט וברכבת.</p>" +
           "<p>במייל שצורף להצעה צוין: 14 FREE DAYS AT POD (14 ימי חופש ביעד).</p>" +
           "<p>תוספת TA (Transport Additional Charge) ליעד חיפה (ILHFA): 100$ ל-20DC, 200$ ל-40DC ו־40HQ — לא כלולה בהצעת אשדוד, ואין במחירון תעריף הובלה ימית לחיפה. תוספת משקל יתר OW: Over 18Ton/26Ton gross weight: 350$/700$ — לא נוספה לסה״כ. EU (ETS) מופיע עם ההערה FROM CHINA PORTS EU INCLUDED: ממוצא סין מטופל ככלול בהובלה; ממוצא אחר לא נוסף, כי לא ברור אם חל.</p>";
       }
-      return "<p>הוטען מחירון YML בתוקף 16.11.2026–30.11.2026, והוצא ל־Mayan Logistics (1977) Ltd. הסוכן במחירון: Konmart (ships agent) ltd, as agents for Yang Ming Lines. לא צוין במסמכים דוא״ל להזמנה.</p>" +
+      return "<p>שתי הצעות YML הוטענו: PQ26YML005163 (חוזה EMW1721467, Trade ID MEDW40753000) ו־PQ26YML005151 (חוזה EMW1721484, Trade ID MEDW02099000). שתיהן בתוקף 16.11.2026–30.11.2026, והוצאו ל־Mayan Logistics (1977) Ltd. הסוכן במחירון: Konmart (ships agent) ltd, as agents for Yang Ming Lines. לא צוין במסמכים דוא״ל להזמנה.</p>" +
         "<p>תנאי תשלום: COLLECT. התעריפים כפופים לתוספות החלות במועד השילוח, בלי הודעה מוקדמת; אינם כוללים שחרור מכס וחיובים מקומיים; כפופים לדמי דמורג׳; וההובלה הימית חלה לפי ETB/ETD המקורי בכפוף להוראות POL/POD. יש לפנות למשרד לאימות התוקף לפחות שבוע לפני פקיעת ההצעה. זמן ההגעה עשוי להשתנות בגלל עומס בטרמינל, מזג אוויר או עיכובים בכלי השיט וברכבת.</p>" +
         "<p>תוספת TA (Transport Additional Charge) ליעד חיפה (ILHFA): 100$ ל-20DC, 200$ ל-40DC ו־40HQ — לא כלולה בהצעת אשדוד, ואין במחירון תעריף הובלה ימית לחיפה. תוספת משקל יתר OW: Over 18Ton/26Ton gross weight: 350$/700$ — לא נוספה לסה״כ. EU (ETS) מופיע עם ההערה FROM CHINA PORTS EU INCLUDED: ממוצא סין מטופל ככלול בהובלה; ממוצא אחר לא נוסף, כי לא ברור אם חל.</p>";
     }
@@ -2187,6 +2212,8 @@
         + "דמי הובלה יבשתית (6%, מינימום 58 ₪) לא נוספו כי אין במחירון תעריף inland.</p>";
     }
     let html = "<p>";
+    const termsContract = quoteLabel(displayCarrier, null) || displayCarrier.ref || "";
+    if (termsContract) html += "בעת הזמנה יש למסור את מספר ההסכם/ההצעה " + ltrHtml(termsContract) + ". ";
     if (displayCarrier.scheduleUrl) html += 'לוח הפלגות: <span class="ltr">' + esc(displayCarrier.scheduleUrl) + "</span>.";
     html += "</p>";
     html += "<p>התעריפים כפופים לתוספות התקפות במועד השילוח, ועשויים להשתנות עד לקבלת הזמנה סופית. החברה שומרת לעצמה את הזכות להוסיף תוספות כגון Peak Season ו־War Risk Premium.</p>";
@@ -2884,6 +2911,8 @@
         "<dt>סוג</dt><dd>" + esc((TYPE_HE[quoteRate.typ] || quoteRate.typ) + (quoteRate.haz ? " · מטען מסוכן" : "")) + "</dd>" +
         "<dt>קבלת מטען</dt><dd>" + esc(recv) + "</dd>";
       if (routingOf(quoteRate)) props += "<dt>ניתוב</dt><dd>" + esc(routingOf(quoteRate)) + "</dd>";
+      const contractNoHtml = quoteLabel(displayCarrier, quoteRate);
+      if (contractNoHtml) props += "<dt>מס' חוזה/הסכם</dt><dd>" + ltrHtml(contractNoHtml) + "</dd>";
       props += "<dt>גורם מטפל</dt><dd>" +
         (bookingLine(displayCarrier) ? ltrHtml(bookingLine(displayCarrier)) : "לא צוין במחירון") + "</dd>";
       if (displayCarrier.paymentTerms) props += "<dt>תנאי תשלום</dt><dd>" + esc(displayCarrier.paymentTerms) + "</dd>";
@@ -3024,11 +3053,11 @@
             ? "התעריפים התקפים לתאריך שנבחר, לפי כל חברה שיש לה שורה במחירון."
             : "נמצא תעריף תקף גם אצל חברה אחרת לאותו מסלול, יעד, סוג מכולה ותאריך.") +
           "</div>";
-        peers += '<div class="table-wrap"><table><thead><tr><th>חברה</th><th>מחירון</th><th>ניתוב</th><th>הובלה (FRT)</th><th>סה״כ למכולה</th><th>תוקף</th><th>זמן הפלגה</th></tr></thead><tbody>';
+        peers += '<div class="table-wrap"><table><thead><tr><th>חברה</th><th>הצעה / הסכם</th><th>ניתוב</th><th>הובלה (FRT)</th><th>סה״כ למכולה</th><th>תוקף</th><th>זמן הפלגה</th></tr></thead><tbody>';
         for (const { c, rate } of peerQuotes) {
           const tot = totalsOf(rate, 1);
           const allIn = tot.currencies.map((cur) => money(tot.perCtr[cur] || 0, cur)).join(" + ");
-          peers += "<tr><td>" + esc(c.nameHe) + dgNoticeMark(c.id, shipIso) + "</td><td>" + esc(quoteLabel(c, rate)) + "</td><td>" +
+          peers += "<tr><td>" + esc(c.nameHe) + dgNoticeMark(c.id, shipIso) + "</td><td>" + (quoteLabel(c, rate) ? ltrHtml(quoteLabel(c, rate)) : "—") + "</td><td>" +
             esc(routingOf(rate) || "—") + "</td><td class='num'>" + esc(money(rate.frt, frtCcy(rate))) +
             "</td><td class='num'>" + esc(allIn) + "</td><td>" + esc(fmtDate(rate.vf) + "–" + fmtDate(rate.vt)) +
             "</td><td>" + esc(ttLabel(rate)) + "</td></tr>";
@@ -3039,11 +3068,11 @@
       }
       if (expiredPeerQuotes.length > 0) {
         peers += '<div class="callout expired"><strong>מחירון שפג תוקפו במסלול זה (לעיון בלבד)</strong>התעריפים האלה אינם בתוקף לתאריך שנבחר, ומוצגים להשוואה היסטורית בלבד — לא כהצעת מחיר נוכחית.</div>';
-        peers += '<div class="table-wrap"><table><thead><tr><th>חברה</th><th>מחירון</th><th>ניתוב</th><th>הובלה (FRT)</th><th>סה״כ למכולה</th><th>תוקף</th><th>זמן הפלגה</th></tr></thead><tbody>';
+        peers += '<div class="table-wrap"><table><thead><tr><th>חברה</th><th>הצעה / הסכם</th><th>ניתוב</th><th>הובלה (FRT)</th><th>סה״כ למכולה</th><th>תוקף</th><th>זמן הפלגה</th></tr></thead><tbody>';
         for (const { c, rate } of expiredPeerQuotes) {
           const tot = totalsOf(rate, 1);
           const allIn = tot.currencies.map((cur) => money(tot.perCtr[cur] || 0, cur)).join(" + ");
-          peers += "<tr><td>" + esc(c.nameHe) + " · פג תוקף</td><td>" + esc(quoteLabel(c, rate)) + "</td><td>" +
+          peers += "<tr><td>" + esc(c.nameHe) + " · פג תוקף</td><td>" + (quoteLabel(c, rate) ? ltrHtml(quoteLabel(c, rate)) : "—") + "</td><td>" +
             esc(routingOf(rate) || "—") + "</td><td class='num'>" + esc(money(rate.frt, frtCcy(rate))) +
             "</td><td class='num'>" + esc(allIn) + "</td><td>" + esc(fmtDate(rate.vf) + "–" + fmtDate(rate.vt)) +
             "</td><td>" + esc(ttLabel(rate)) + "</td></tr>";

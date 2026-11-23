@@ -76,63 +76,68 @@ window.QUOTE_INDEX =
       "id": "zim-v204",
       "carrierId": "zim",
       "file": "data/zim/2026-12-01_v204.js",
+      "ref": "7110070812",
       "version": "204",
       "party": "ILHFA01-ZIM INTEGRATED SHIPPING SERVICES LT",
       "vf": 20,
       "vt": 33,
       "issued": "2026-11-08",
       "added": "2026-11-22",
-      "sourceFile": "ZIM v204 (xlsx)",
+      "sourceFile": "ZIM agreement 7110070812 v204 (xlsx)",
       "sourceNote": "נוצר ב־08.11.2026 12:44:01. תוקף כותרת: 09.11.2026–14.12.2026. כל שורות המחירון בתוקף 01.12.2026–14.12.2026. המחירון מכסה סין, המזרח הרחוק והודו בלבד; נתיבים אחרים נשארים לפי גרסה 281.",
-      "label": "גרסה 204",
+      "label": "הסכם 7110070812 · גרסה 204",
       "partialCoverage": true
     },
     {
       "id": "zim-v281",
       "carrierId": "zim",
       "file": "data/zim/2026-11-19_v281.js",
+      "ref": "7110068521",
       "version": "281",
       "party": "ILHFA03-ZIM ISRAEL LTD.",
       "vf": 8,
       "vt": 50,
       "issued": "2026-11-18",
       "added": "2026-11-19",
-      "sourceFile": "ZIM v281 (xlsx)",
+      "sourceFile": "ZIM agreement 7110068521 v281 (xlsx)",
       "sourceNote": "נוצר ב־18.11.2026 12:04:39. תוקף כותרת: 19.11.2026–31.12.2026.",
-      "label": "גרסה 281"
+      "label": "הסכם 7110068521 · גרסה 281"
     },
     {
       "id": "zim-v278",
       "carrierId": "zim",
       "file": "data/zim/2026-11-11_v278.js",
+      "ref": "7110068521",
       "version": "278",
       "party": "ILHFA03-ZIM ISRAEL LTD.",
       "vf": 0,
       "vt": 50,
       "issued": "2026-11-10",
       "added": "2026-11-18",
-      "sourceFile": "ZIM v278 (xlsx)",
+      "sourceFile": "ZIM agreement 7110068521 v278 (xlsx)",
       "sourceNote": "נוצר ב־10.11.2026 15:05:44. תוקף כותרת: 11.11.2026–31.12.2026.",
-      "label": "גרסה 278"
+      "label": "הסכם 7110068521 · גרסה 278"
     },
     {
       "id": "zim-v274",
       "carrierId": "zim",
       "file": "data/zim/2026-11-01_v274.js",
+      "ref": "7110068521",
       "version": "274",
       "party": "ILHFA03-ZIM ISRAEL LTD.",
       "vf": -10,
       "vt": 50,
       "issued": "2026-10-25",
       "added": "2026-11-18",
-      "sourceFile": "ZIM v274 (xlsx)",
+      "sourceFile": "ZIM agreement 7110068521 v274 (xlsx)",
       "sourceNote": "נוצר ב־25.10.2026 15:38:40. תוקף כותרת: 01.11.2026–31.12.2026.",
-      "label": "גרסה 274"
+      "label": "הסכם 7110068521 · גרסה 274"
     },
     {
       "id": "yml-2026-12-01",
       "carrierId": "yml",
       "file": "data/yml/2026-12-01.js",
+      "ref": "PQ26YML005443",
       "version": "",
       "party": "Konmart (ships agent) ltd, as agents for Yang Ming Lines",
       "vf": 20,
@@ -140,9 +145,16 @@ window.QUOTE_INDEX =
       "issued": "2026-12-01",
       "issuedApprox": true,
       "added": "2026-11-19",
-      "sourceFile": "YML (PDF)",
+      "sourceFile": "YML quotation PQ26YML005443 (PDF)",
       "sourceNote": "לא צוין במסמך תאריך הנפקה נפרד; נרשם לפי תחילת התוקף 01.12.2026. במייל שליווה את ההצעה צוין 14 FREE DAYS AT POD.",
-      "label": "01.12.2026–14.12.2026",
+      "label": "הצעה PQ26YML005443",
+      "quotes": [
+        {
+          "ref": "PQ26YML005443",
+          "contract": "EMW1728355",
+          "tradeId": "MEDW40753000"
+        }
+      ],
       "paymentTerms": "COLLECT",
       "agent": "Konmart (ships agent) ltd, as agents for Yang Ming Lines"
     },
@@ -150,6 +162,7 @@ window.QUOTE_INDEX =
       "id": "yml-2026-11-16",
       "carrierId": "yml",
       "file": "data/yml/2026-11-16.js",
+      "ref": "PQ26YML005163",
       "version": "",
       "party": "Konmart (ships agent) ltd, as agents for Yang Ming Lines",
       "vf": 5,
@@ -157,9 +170,21 @@ window.QUOTE_INDEX =
       "issued": "2026-11-16",
       "issuedApprox": true,
       "added": "2026-11-18",
-      "sourceFile": "YML (PDF)",
+      "sourceFile": "YML quotations PQ26YML005163 + PQ26YML005151 (PDF)",
       "sourceNote": "לא צוין במסמכים תאריך הנפקה נפרד; נרשם לפי תחילת התוקף 16.11.2026.",
-      "label": "16.11.2026–30.11.2026",
+      "label": "הצעות PQ26YML005163 / PQ26YML005151",
+      "quotes": [
+        {
+          "ref": "PQ26YML005163",
+          "contract": "EMW1721467",
+          "tradeId": "MEDW40753000"
+        },
+        {
+          "ref": "PQ26YML005151",
+          "contract": "EMW1721484",
+          "tradeId": "MEDW02099000"
+        }
+      ],
       "paymentTerms": "COLLECT",
       "agent": "Konmart (ships agent) ltd, as agents for Yang Ming Lines"
     },
@@ -167,6 +192,7 @@ window.QUOTE_INDEX =
       "id": "oocl-2026-11-15",
       "carrierId": "oocl",
       "file": "data/oocl/2026-11-15.js",
+      "ref": "00007640",
       "version": "",
       "party": "Israel Scandinavian Maritime Agency Ltd, as agent for OOCL",
       "vf": 4,
@@ -174,9 +200,9 @@ window.QUOTE_INDEX =
       "issued": "2026-11-15",
       "issuedApprox": true,
       "added": "2026-11-18",
-      "sourceFile": "OOCL (xlsx)",
+      "sourceFile": "OOCL filing 00007640 (xlsx)",
       "sourceNote": "לא צוין במחירון תאריך הנפקה נפרד; נרשם לפי תחילת התוקף 15.11.2026.",
-      "label": "15.11.2026–30.11.2026",
+      "label": "Filing 00007640",
       "website": "https://www.oocl.com",
       "agent": "Israel Scandinavian Maritime Agency Ltd",
       "paymentTerms": "COLLECT",
