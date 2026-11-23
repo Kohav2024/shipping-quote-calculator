@@ -89,6 +89,38 @@ window.QUOTE_INDEX =
       "partialCoverage": true
     },
     {
+      "id": "zim-v203",
+      "carrierId": "zim",
+      "file": "data/zim/2026-11-15_v203.js",
+      "ref": "7110070812",
+      "version": "203",
+      "party": "ILHFA01-ZIM INTEGRATED SHIPPING SERVICES LT",
+      "vf": -7,
+      "vt": 19,
+      "issued": "2026-11-03",
+      "added": "2026-11-23",
+      "sourceFile": "ZIM agreement 7110070812 v203 (xlsx)",
+      "sourceNote": "נוצר ב־03.11.2026 11:15:56. תוקף כותרת: 04.11.2026–30.11.2026. במכתב צוין שהמחירון בתוקף 15.11.2026–30.11.2026; לפי שורות הקובץ, המזרח הרחוק בתוקף 15.11.2026–30.11.2026, ושורות הודו, סרי לנקה וצ׳טגונג (כולל Visakhapatnam שנוסף במכתב) בתוקף 04.11.2026–30.11.2026. התאריכים בהצעה לפי השורות, בלי להמציא. המחירון מכסה סין, המזרח הרחוק והודו בלבד; נתיבים אחרים נשארים לפי הסכם 7110068521.",
+      "label": "הסכם 7110070812 · גרסה 203",
+      "partialCoverage": true
+    },
+    {
+      "id": "zim-v201",
+      "carrierId": "zim",
+      "file": "data/zim/2026-11-01_v201.js",
+      "ref": "7110070812",
+      "version": "201",
+      "party": "ILHFA01-ZIM INTEGRATED SHIPPING SERVICES LT",
+      "vf": -10,
+      "vt": 3,
+      "issued": "2026-10-25",
+      "added": "2026-11-23",
+      "sourceFile": "ZIM agreement 7110070812 v201 (xlsx)",
+      "sourceNote": "נוצר ב־25.10.2026 13:04:46. תוקף כותרת: 26.10.2026–14.11.2026. כל שורות המחירון בתוקף 01.11.2026–14.11.2026. במכתב צוין Incheon Korea added. המחירון מכסה סין, המזרח הרחוק והודו בלבד; נתיבים אחרים נשארים לפי הסכם 7110068521.",
+      "label": "הסכם 7110070812 · גרסה 201",
+      "partialCoverage": true
+    },
+    {
       "id": "zim-v281",
       "carrierId": "zim",
       "file": "data/zim/2026-11-19_v281.js",
@@ -696,7 +728,8 @@ window.QUOTE_INDEX =
     "QINGDAO (SD), CN",
     "LIVERPOOL, GB",
     "BELFAST, GB",
-    "MARSEILLE, FR"
+    "MARSEILLE, FR",
+    "VISAKHAPATNAM, IN"
   ],
   "types": [
     "DV20",
@@ -765,7 +798,8 @@ window.QUOTE_INDEX =
     "CNS/AGC/SSD/WR/LTO/OCS",
     "BAF",
     "BAF/War/Detention",
-    "BAF/War/V. ISPS/Detention/ES"
+    "BAF/War/V. ISPS/Detention/ES",
+    "CNS/AGC/SSD/WR/IPS"
   ],
   "codes": [
     "GFS",

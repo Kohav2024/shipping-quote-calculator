@@ -876,10 +876,10 @@
     <footer class="note">כלי פנימי להצעת מחיר ממחירון. התעריפים כפופים לתוקף, למקום פנוי ולתנאי החברה.</footer>
   </div>
   <noscript><p class="wrap">יש להפעיל JavaScript כדי להשתמש במחשבון.</p></noscript>
-  <script src="data/index.js?v=yml-md1-20261123"></script>
-  <script src="data/notices.js?v=yml-md1-20261123"></script>
-  <script src="data/spots.js?v=yml-md1-20261123"></script>
-  <script src="data/schedules.js?v=yml-md1-20261123"></script>
+  <script src="data/index.js?v=zim-msg-20261123"></script>
+  <script src="data/notices.js?v=zim-msg-20261123"></script>
+  <script src="data/spots.js?v=zim-msg-20261123"></script>
+  <script src="data/schedules.js?v=zim-msg-20261123"></script>
   <script>
 (function () {
   const DATA = window.QUOTE_INDEX;
@@ -1764,7 +1764,7 @@
     }
     return new Promise(function (resolve, reject) {
       const s = document.createElement("script");
-      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=yml-md1-20261123";
+      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=zim-msg-20261123";
       s.async = true;
       s.onload = function () {
         const pack = window.QUOTE_PACK && window.QUOTE_PACK[meta.id];
@@ -1871,6 +1871,7 @@
     const out = [];
     sequence.forEach(function (v) {
       tagRates(ratesOfLoaded(v), v.id).forEach(function (r) {
+        if (iso && !isValidOn(r, iso)) return;
         const k = laneKey(r);
         if (seen[k]) return;
         seen[k] = true;
