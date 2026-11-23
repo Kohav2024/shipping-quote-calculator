@@ -869,10 +869,10 @@
     <footer class="note">כלי פנימי להצעת מחיר ממחירון. התעריפים כפופים לתוקף, למקום פנוי ולתנאי החברה.</footer>
   </div>
   <noscript><p class="wrap">יש להפעיל JavaScript כדי להשתמש במחשבון.</p></noscript>
-  <script src="data/index.js?v=zim-gfs-dec-20261123"></script>
-  <script src="data/notices.js?v=zim-gfs-dec-20261123"></script>
-  <script src="data/spots.js?v=zim-gfs-dec-20261123"></script>
-  <script src="data/schedules.js?v=zim-gfs-dec-20261123"></script>
+  <script src="data/index.js?v=zim-gfs-cn-20261123"></script>
+  <script src="data/notices.js?v=zim-gfs-cn-20261123"></script>
+  <script src="data/spots.js?v=zim-gfs-cn-20261123"></script>
+  <script src="data/schedules.js?v=zim-gfs-cn-20261123"></script>
   <script>
 (function () {
   const DATA = window.QUOTE_INDEX;
@@ -1198,11 +1198,19 @@
   }
   function allSurchargeRules() {
     const standalone = window.CARRIER_SURCHARGE_RULES || [];
-    const fromNotices = (window.CARRIER_NOTICES || []).filter(function (n) { return n.surcharge; }).map(function (n) {
-      const r = Object.assign({}, n.surcharge);
-      r.carrierIds = r.carrierIds || n.carrierIds.slice();
-      r.ruleId = r.ruleId || n.id;
-      return r;
+    const fromNotices = [];
+    (window.CARRIER_NOTICES || []).forEach(function (n) {
+      const list = [];
+      if (n.surcharge) list.push(n.surcharge);
+      if (n.surcharges && n.surcharges.length) {
+        for (let i = 0; i < n.surcharges.length; i++) list.push(n.surcharges[i]);
+      }
+      list.forEach(function (s, i) {
+        const r = Object.assign({}, s);
+        r.carrierIds = r.carrierIds || n.carrierIds.slice();
+        r.ruleId = r.ruleId || (list.length > 1 ? n.id + ":" + (r.code || "sc") + ":" + i : n.id);
+        fromNotices.push(r);
+      });
     });
     return standalone.concat(fromNotices);
   }
@@ -1304,7 +1312,8 @@
         kind: rule.kind || "",
         ruleId: rule.ruleId || rule.code,
         ruleNote: rule.note || "",
-        replaceCode: rule.replaceCode || ""
+        replaceCode: rule.replaceCode || "",
+        addIfMissing: rule.addIfMissing || ""
       });
     }
     return { extras: extras, weightNotes: weightNotes };
@@ -1333,6 +1342,11 @@
           });
           mutated = true;
         }
+        return;
+      }
+      if (e.addIfMissing) {
+        const exists = sc.some(function (s) { return s.code === e.addIfMissing; });
+        if (!exists) add.push(e);
         return;
       }
       add.push(e);
@@ -1715,7 +1729,7 @@
     }
     return new Promise(function (resolve, reject) {
       const s = document.createElement("script");
-      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=zim-gfs-dec-20261123";
+      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=zim-gfs-cn-20261123";
       s.async = true;
       s.onload = function () {
         const pack = window.QUOTE_PACK && window.QUOTE_PACK[meta.id];
