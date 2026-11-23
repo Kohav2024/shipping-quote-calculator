@@ -746,6 +746,15 @@
     @media (min-width: 640px) { .props { grid-template-columns: 11rem 1fr; } }
     .props dt { font-size: 0.82rem; font-weight: 600; color: var(--muted); margin: 0; }
     .props dd { margin: 0; }
+    caption.route-caption {
+      text-align: start;
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: var(--navy);
+      padding: 0 0 8px;
+      caption-side: top;
+    }
+    caption.route-caption span { font-size: 0.82rem; font-weight: 600; color: var(--muted); margin-inline-end: 8px; }
     .table-wrap { overflow-x: auto; margin: 12px 0; -webkit-overflow-scrolling: touch; max-width: 100%; }
     p, dd, .meta, .hint, .metric .val, .metric .det { overflow-wrap: anywhere; word-break: break-word; }
     select, input { max-width: 100%; }
@@ -876,10 +885,10 @@
     <footer class="note">כלי פנימי להצעת מחיר ממחירון. התעריפים כפופים לתוקף, למקום פנוי ולתנאי החברה.</footer>
   </div>
   <noscript><p class="wrap">יש להפעיל JavaScript כדי להשתמש במחשבון.</p></noscript>
-  <script src="data/index.js?v=zim-nef-dec-20261123"></script>
-  <script src="data/notices.js?v=zim-nef-dec-20261123"></script>
-  <script src="data/spots.js?v=zim-nef-dec-20261123"></script>
-  <script src="data/schedules.js?v=zim-nef-dec-20261123"></script>
+  <script src="data/index.js?v=route-ltr-20261123"></script>
+  <script src="data/notices.js?v=route-ltr-20261123"></script>
+  <script src="data/spots.js?v=route-ltr-20261123"></script>
+  <script src="data/schedules.js?v=route-ltr-20261123"></script>
   <script>
 (function () {
   const DATA = window.QUOTE_INDEX;
@@ -1391,10 +1400,26 @@
     return (s && s.kind && KIND_HE[s.kind]) || "—";
   }
   function destHe(pod) {
-
     if (pod.startsWith("ASHDOD")) return "אשדוד";
     if (pod.startsWith("HAIFA")) return "חיפה";
     return pod;
+  }
+  function destEn(pod) {
+    return String(pod || "").trim();
+  }
+  function routePath(origin, dest) {
+    const originName = (origin && origin.name) || "";
+    const pod = destEn(dest);
+    if (origin && origin.kind === "inland") {
+      return originName + " → " + pod + " (via " + (origin.pol || "") + ")";
+    }
+    return originName + " → " + pod;
+  }
+  function routeHtml(origin, dest) {
+    return ltrHtml(routePath(origin, dest));
+  }
+  function routePlain(origin, dest) {
+    return "\u2066" + routePath(origin, dest) + "\u2069";
   }
   function quoteText(carrier, origin, destName, rate, qty, markup, shipDate, expired) {
     rate = applyCarrierRules(rate, carrier && carrier.id, shipDate);
@@ -1419,12 +1444,13 @@
     if (carrier.party) lines.push(carrier.party);
     const contractNo = quoteLabel(carrier, rate);
     if (contractNo) lines.push("מס' חוזה/הסכם: " + contractNo);
+    lines.push("מסלול: " + routePlain(origin, destName));
     if (origin.kind === "inland") {
       lines.push("מוצא: " + origin.name + " (" + origin.mode + (origin.mot ? " / " + origin.mot : "") + ") דרך " + origin.pol);
     } else {
       lines.push("מוצא: " + origin.name);
     }
-    lines.push("יעד: " + destName);
+    lines.push("יעד: " + destEn(destName));
     lines.push("סוג מכולה: " + (TYPE_HE[rate.typ] || rate.typ) + " · " + (rate.haz ? "מטען מסוכן (HAZ)" : "לא מסוכן"));
     lines.push("תאריך שילוח: " + fmtDate(shipDate) + " · תוקף התעריף: " + fmtDate(rate.vf) + "–" + fmtDate(rate.vt));
     if (routingOf(rate)) lines.push("ניתוב: " + routingOf(rate));
@@ -1764,7 +1790,7 @@
     }
     return new Promise(function (resolve, reject) {
       const s = document.createElement("script");
-      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=zim-nef-dec-20261123";
+      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=route-ltr-20261123";
       s.async = true;
       s.onload = function () {
         const pack = window.QUOTE_PACK && window.QUOTE_PACK[meta.id];
@@ -2920,16 +2946,13 @@
       quoteHtml = '<div class="callout warn"><strong>אין שורה במחירון</strong>אין תעריף למסלול הזה בסוג המכולה' +
         (effectiveHaz ? " ולמטען מסוכן" : "") + " שנבחרו.</div>";
     } else {
-      const pathVal = selectedOrigin.kind === "inland"
-        ? selectedOrigin.name + " → " + destHe(state.dest) + " (דרך " + selectedOrigin.pol + ")"
-        : selectedOrigin.name + " → " + destHe(state.dest);
       let expiredBanner = "";
       if (fallbackNote) {
         expiredBanner = '<div class="callout warn fallback-banner" role="status"><strong>' + esc(fallbackNote) + "</strong></div>";
       } else if (!validRate && isExpiredRef) {
         expiredBanner = '<div class="callout expired"><strong>המחירון פג תוקף</strong>תוקף המחירון: ' +
           esc(fmtDate(quoteRate.vf) + "–" + fmtDate(quoteRate.vt)) +
-          ". למסלול " + esc((selectedOrigin && selectedOrigin.name) || "") + " → " + esc(destHe(state.dest)) +
+          ". למסלול " + routeHtml(selectedOrigin, state.dest) +
           " (" + esc(TYPE_HE[effectiveTyp] || effectiveTyp) + (effectiveHaz ? ", מטען מסוכן" : "") +
           ") אין תעריף שחל ב־" + esc(fmtDate(shipIso)) +
           ". המספרים למטה הם לעיון בלבד, ולא הצעת מחיר בתוקף.</div>";
@@ -2939,14 +2962,14 @@
           ". תאריך השילוח (" + esc(fmtDate(shipIso)) + ") מוקדם מתחילת החלון. מוצג לעיון בלבד, לא כהצעת מחיר בתוקף.</div>";
       } else if (!validRate) {
         expiredBanner = '<div class="callout warn"><strong>אין תעריף בתוקף לתאריך שנבחר</strong>למסלול ' +
-          esc((selectedOrigin && selectedOrigin.name) || "") + " → " + esc(destHe(state.dest)) + " (" + esc(TYPE_HE[effectiveTyp] || effectiveTyp) +
+          routeHtml(selectedOrigin, state.dest) + " (" + esc(TYPE_HE[effectiveTyp] || effectiveTyp) +
           (effectiveHaz ? ", מטען מסוכן" : "") + ") אין שורה שחלה ב־" + esc(fmtDate(shipIso)) +
           ". החלונות הקיימים מוצגים למטה לעיון — לא משתמשים בהם כמחיר נוכחי.</div>";
       }
       const recv = quoteRate.mode + (quoteRate.mot ? " / " + quoteRate.mot : "") + (quoteRate.thru === "EX" ? " · Thru rate (EX)" : "");
       let props = "<dl class='props'>" +
         "<dt>חברה</dt><dd>" + esc(displayCarrier.nameHe) + "</dd>" +
-        "<dt>מסלול</dt><dd>" + esc(pathVal) + "</dd>" +
+        "<dt>מסלול</dt><dd>" + routeHtml(selectedOrigin, state.dest) + "</dd>" +
         "<dt>סוג</dt><dd>" + esc((TYPE_HE[quoteRate.typ] || quoteRate.typ) + (quoteRate.haz ? " · מטען מסוכן" : "")) + "</dd>" +
         "<dt>קבלת מטען</dt><dd>" + esc(recv) + "</dd>";
       if (routingOf(quoteRate)) props += "<dt>ניתוב</dt><dd>" + esc(routingOf(quoteRate)) + "</dd>";
@@ -3092,7 +3115,7 @@
             ? "התעריפים התקפים לתאריך שנבחר, לפי כל חברה שיש לה שורה במחירון."
             : "נמצא תעריף תקף גם אצל חברה אחרת לאותו מסלול, יעד, סוג מכולה ותאריך.") +
           "</div>";
-        peers += '<div class="table-wrap"><table><thead><tr><th>חברה</th><th>הצעה / הסכם</th><th>ניתוב</th><th>הובלה (FRT)</th><th>סה״כ למכולה</th><th>תוקף</th><th>זמן הפלגה</th></tr></thead><tbody>';
+        peers += '<div class="table-wrap"><table><caption class="route-caption"><span>מסלול</span> ' + routeHtml(selectedOrigin, state.dest) + '</caption><thead><tr><th>חברה</th><th>הצעה / הסכם</th><th>ניתוב</th><th>הובלה (FRT)</th><th>סה״כ למכולה</th><th>תוקף</th><th>זמן הפלגה</th></tr></thead><tbody>';
         for (const { c, rate } of peerQuotes) {
           const tot = totalsOf(rate, 1);
           const allIn = tot.currencies.map((cur) => money(tot.perCtr[cur] || 0, cur)).join(" + ");
@@ -3107,7 +3130,7 @@
       }
       if (expiredPeerQuotes.length > 0) {
         peers += '<div class="callout expired"><strong>מחירון שפג תוקפו במסלול זה (לעיון בלבד)</strong>התעריפים האלה אינם בתוקף לתאריך שנבחר, ומוצגים להשוואה היסטורית בלבד — לא כהצעת מחיר נוכחית.</div>';
-        peers += '<div class="table-wrap"><table><thead><tr><th>חברה</th><th>הצעה / הסכם</th><th>ניתוב</th><th>הובלה (FRT)</th><th>סה״כ למכולה</th><th>תוקף</th><th>זמן הפלגה</th></tr></thead><tbody>';
+        peers += '<div class="table-wrap"><table><caption class="route-caption"><span>מסלול</span> ' + routeHtml(selectedOrigin, state.dest) + '</caption><thead><tr><th>חברה</th><th>הצעה / הסכם</th><th>ניתוב</th><th>הובלה (FRT)</th><th>סה״כ למכולה</th><th>תוקף</th><th>זמן הפלגה</th></tr></thead><tbody>';
         for (const { c, rate } of expiredPeerQuotes) {
           const tot = totalsOf(rate, 1);
           const allIn = tot.currencies.map((cur) => money(tot.perCtr[cur] || 0, cur)).join(" + ");
@@ -3341,7 +3364,7 @@
     const copyBtnEl = $("copy-btn");
     if (copyBtnEl && quoteRate && selectedOrigin && shipIso) {
       copyBtnEl.addEventListener("click", async () => {
-        const text = quoteText(displayCarrier, selectedOrigin, destHe(state.dest), quoteRate, qty, markup, shipIso, !validRate);
+        const text = quoteText(displayCarrier, selectedOrigin, state.dest, quoteRate, qty, markup, shipIso, !validRate);
         try {
           if (navigator.clipboard && navigator.clipboard.writeText) {
             await navigator.clipboard.writeText(text);
