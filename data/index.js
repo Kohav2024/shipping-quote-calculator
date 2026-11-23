@@ -203,7 +203,7 @@ window.QUOTE_INDEX =
       "issuedApprox": true,
       "added": "2026-11-18",
       "sourceFile": "YML quotations PQ26YML005163 + PQ26YML005151 (PDF)",
-      "sourceNote": "לא צוין במסמכים תאריך הנפקה נפרד; נרשם לפי תחילת התוקף 16.11.2026.",
+      "sourceNote": "לא צוין במסמכים תאריך הנפקה נפרד; נרשם לפי תחילת התוקף 16.11.2026. במייל שליווה את ההצעות (16.11.2026–30.11.2026) צוין 14 FREE DAYS AT POD, וכן שתעריפי טייוואן הם ל־FAK בלבד ולא ל־CONSOL.",
       "label": "הצעות PQ26YML005163 / PQ26YML005151",
       "quotes": [
         {
@@ -214,6 +214,36 @@ window.QUOTE_INDEX =
         {
           "ref": "PQ26YML005151",
           "contract": "EMW1721484",
+          "tradeId": "MEDW02099000"
+        }
+      ],
+      "paymentTerms": "COLLECT",
+      "agent": "Konmart (ships agent) ltd, as agents for Yang Ming Lines"
+    },
+    {
+      "id": "yml-2026-11-01",
+      "carrierId": "yml",
+      "file": "data/yml/2026-11-01.js",
+      "ref": "PQ26YML004920",
+      "version": "",
+      "party": "Konmart (ships agent) ltd, as agents for Yang Ming Lines",
+      "vf": -10,
+      "vt": 4,
+      "issued": "2026-11-01",
+      "issuedApprox": true,
+      "added": "2026-11-23",
+      "sourceFile": "YML quotations PQ26YML004920 + PQ26YML004908 (PDF)",
+      "sourceNote": "לא צוין במסמכים תאריך הנפקה נפרד; נרשם לפי תחילת התוקף 01.11.2026. המייל שליווה את ההצעות התקבל ב־28.10.2026. צוין 14 FREE DAYS AT POD, ושתעריפי טייוואן הם ל־FAK בלבד ולא ל־CONSOL. צוין שתעריף DM בישראל יעודכן בגלל ביקוש במזרח הרחוק, בלי סכום — לא הומצא. שאר התוספות והעלויות המקומיות נשארות כפי שהיו.",
+      "label": "הצעות PQ26YML004920 / PQ26YML004908",
+      "quotes": [
+        {
+          "ref": "PQ26YML004920",
+          "contract": "EMW1719048",
+          "tradeId": "MEDW40753000"
+        },
+        {
+          "ref": "PQ26YML004908",
+          "contract": "EMW1719065",
           "tradeId": "MEDW02099000"
         }
       ],

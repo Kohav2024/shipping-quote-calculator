@@ -106,6 +106,38 @@ window.CARRIER_NOTICES = [
     ]
   },
   {
+    "id": "yml-suez-md1-ms2-2026-10-22",
+    "carrierIds": ["yml"],
+    "title": "YML: חזרה לניתוב דרך הים האדום ותעלת סואץ בשירותי MD1 ו־MS2",
+    "banner": "YML: חזרה לניתוב דרך הים האדום ותעלת סואץ בשירותי MD1 ו־MS2 (הודעה מ־22.10.26)",
+    "publishedDate": "2026-10-22",
+    "added": "2026-11-23",
+    "effectiveFromVessel": "YM TRUST V.106W (MD1) / ONE SYNERGY V.003W (MS2)",
+    "validTo": null,
+    "appliesWhen": "always",
+    "service": "MD1",
+    "originRegions": ["asia"],
+    "severity": "warning",
+    "quoteWarningTitle": "YML: חזרה לניתוב דרך הים האדום ותעלת סואץ בשירותי MD1 ו־MS2",
+    "quoteWarning": "YML הודיעה ב־22.10.2026 ששירותי MD1 ו־MS2 חוזרים לניתוב המסורתי דרך הים האדום ותעלת סואץ, לשיפור זמני המעבר והאמינות. השינוי חל מההפלגות YM TRUST 106W (נינגבו, 10.11.2026) ו־ONE SYNERGY 003W (צ׳ינגדאו, 16.11.2026). YML תמשיך לעקוב אחרי המצב הביטחוני בים האדום.",
+    "sections": [
+      { "kind": "meta", "text": "תאריך ההודעה: 22.10.2026. מצורפת כ־Customer Advisory למייל ההצעות מ־28.10.2026." },
+      { "kind": "p", "text": "כדי לשפר את יעילות שרשרת האספקה ולהציע זמני מעבר תחרותיים יותר בין אסיה לים התיכון, Yang Ming הודיעה ששירותי MD1 ו־MS2 ברשת Premier Alliance חוזרים לניתוב המסורתי דרך הים האדום ותעלת סואץ. ההחלטה התקבלה לאחר הערכת המצב הביטחוני והתפעולי באזור." },
+      { "kind": "p", "text": "השינוי חל מההפלגות הבאות:" },
+      { "kind": "list", "lead": "הפלגות תחילת הניתוב החדש", "items": [
+        "MD1: YM Trust 106W, נינגבו 10.11.2026",
+        "MD1: YM Trust 106E, דמייטה 07.12.2026",
+        "MS2: ONE Synergy 003W, צ׳ינגדאו 16.11.2026",
+        "MS2: ONE Synergy 003E, פיראוס 28.12.2026"
+      ] },
+      { "kind": "p", "text": "סיבוב MD1: Ningbo – Shanghai – Shekou – Singapore – Sokhna – (Suez) – Damietta – Istanbul – Izmit – Mersin – Damietta – (Suez) – Singapore – Kaohsiung." },
+      { "kind": "p", "text": "סיבוב MS2: Qingdao – Pusan – Shanghai – Ningbo – Kaohsiung – Shekou – Singapore – (Suez) – Piraeus – Valencia – Barcelona – Genoa – La Spezia – Fos – (Suez) – Singapore – Laem Chabang – Cai Mep – Yantian – Pusan." },
+      { "kind": "p", "text": "YML תמשיך לעקוב אחרי ההתפתחויות בים האדום. עדכוני ניתוב עתידיים ייבחנו שירות־שירות. בטיחות הצוות, האוניות ומטען הלקוחות נשארת בעדיפות העליונה. לאחר החזרה לניתוב דרך סואץ, הלקוחות אמורים ליהנות מזמני מעבר קצרים יותר ומאמינות לוח משופרת." },
+      { "kind": "p", "text": "במייל שצורף להצעות 01.11.2026–15.11.2026 צוין גם שמשבוע 46 YML חוזרת לניתוב זה, ושמטען מדמייטה לאשדוד יועמס על פידרים ייעודיים ורגילים." },
+      { "kind": "original", "lead": "נוסח מקורי", "text": "Premier Alliance Update – Resumption of Red Sea and Suez Canal Routing for MD1 and MS2 Services\n22 October 2026\n\nDear Valued Customers,\n\nTo enhance supply chain efficiency and offer more competitive transit times between Asia and the Mediterranean, Yang Ming Marine Transport Corp. (Yang Ming) announces that our MD1 and MS2 services, operating under the Premier Alliance network, will return to their traditional routing via the Red Sea and the Suez Canal. This strategic decision has been made following a comprehensive assessment of the regional security environment and operational conditions, with the objective of enhancing service reliability and transit time competitiveness.\nThis routing adjustment will take effect starting from the following voyages:\n\nMD1  YM Trust  106W  Ningbo  10 November 2026\nMD1  YM Trust  106E  Damietta  7 December 2026\nMS2  ONE Synergy  003W  Qingdao  16 November 2026\nMS2  ONE Synergy  003E  Piraeus  28 December 2026\n\nMD1 Service Details\nRotation: Ningbo – Shanghai – Shekou – Singapore – Sokhna – (Suez) – Damietta – Istanbul – Izmit – Mersin – Damietta – (Suez) – Singapore – Kaohsiung\n\nMS2 Service Details\nRotation: Qingdao – Pusan – Shanghai – Ningbo – Kaohsiung – Shekou – Singapore – (Suez) – Piraeus – Valencia – Barcelona – Genoa – La Spezia – Fos – (Suez) – Singapore – Laem Chabang – Cai Mep – Yantian – Pusan\n\nSafety and Monitoring:\nYang Ming will continue to closely monitor developments in the Red Sea and conduct ongoing assessments of the regional security environment. Any future routing updates will be evaluated on a service-by-service basis to ensure a controlled and gradual transition when conditions permit.\n\nThe safety and security of our crew, vessels, and customers' cargo remain our highest priority.\n\nCustomers will benefit from shorter transit times and improved schedule reliability following the reinstatement of traditional Suez Canal routing." }
+    ]
+  },
+  {
     "id": "zim-black-sea-wr-2026-11-19",
     "carrierIds": ["zim"],
     "title": "ZIM: תוספת סיכון מלחמה בים השחור (WR)",

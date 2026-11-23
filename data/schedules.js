@@ -20,9 +20,35 @@ window.CARRIER_SCHEDULES = [
       { "code": "SGSIN", "key": "SINGAPORE", "name": "Singapore", "col": "SIN" },
       { "code": "EGSOK", "key": "SOKHNA", "name": "Sokhna", "col": "SOK" },
       { "code": "EGSUZ", "key": "SUEZ", "name": "Suez", "col": "SUZ" },
-      { "code": "EGDAM", "key": "DAMIETTA", "name": "Damietta", "col": "DAM" }
+      { "code": "EGDAM", "key": "DAMIETTA", "name": "Damietta", "col": "DAM" },
+      { "code": "ILASH", "key": "ASHDOD", "name": "Ashdod", "col": "ASH" }
     ],
     "voyages": [
+      {
+        "newVoy": "MD12645W",
+        "vessel": "YM WREATH",
+        "alliance": "WRH",
+        "imo": "9708473",
+        "ymAbbr": "YWRH",
+        "comnVoy": "036W",
+        "sourceReceived": "2026-10-28",
+        "calls": {
+          "CNNGB": { "etb": "2026-11-03", "etd": "2026-11-05" },
+          "CNSHA": { "etb": "2026-11-05", "etd": "2026-11-07" },
+          "CNSHK": { "etb": "2026-11-09", "etd": "2026-11-10" },
+          "SGSIN": { "etb": "2026-11-14", "etd": "2026-11-15" },
+          "EGDAM": { "etb": "2026-12-16", "etd": "2026-12-18" },
+          "ILASH": { "etb": "2026-12-19" }
+        },
+        "starCalls": {
+          "CNNGB": { "etb": "2026-11-08", "etd": "2026-11-10" },
+          "CNSHA": { "etb": "2026-11-13", "etd": "2026-11-15" },
+          "CNSHK": { "etb": "2026-11-17", "etd": "2026-11-18" },
+          "SGSIN": { "etb": "2026-11-22", "etd": "2026-11-23" },
+          "EGDAM": { "etb": "2026-12-29", "etd": "2026-12-31" },
+          "ILASH": { "etb": "2027-01-01" }
+        }
+      },
       {
         "newVoy": "MD12646W",
         "vessel": "YM TRUST",
