@@ -876,10 +876,10 @@
     <footer class="note">כלי פנימי להצעת מחיר ממחירון. התעריפים כפופים לתוקף, למקום פנוי ולתנאי החברה.</footer>
   </div>
   <noscript><p class="wrap">יש להפעיל JavaScript כדי להשתמש במחשבון.</p></noscript>
-  <script src="data/index.js?v=contracts-20261123"></script>
-  <script src="data/notices.js?v=contracts-20261123"></script>
-  <script src="data/spots.js?v=contracts-20261123"></script>
-  <script src="data/schedules.js?v=contracts-20261123"></script>
+  <script src="data/index.js?v=yml-md1-20261123"></script>
+  <script src="data/notices.js?v=yml-md1-20261123"></script>
+  <script src="data/spots.js?v=yml-md1-20261123"></script>
+  <script src="data/schedules.js?v=yml-md1-20261123"></script>
   <script>
 (function () {
   const DATA = window.QUOTE_INDEX;
@@ -1764,7 +1764,7 @@
     }
     return new Promise(function (resolve, reject) {
       const s = document.createElement("script");
-      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=contracts-20261123";
+      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=yml-md1-20261123";
       s.async = true;
       s.onload = function () {
         const pack = window.QUOTE_PACK && window.QUOTE_PACK[meta.id];
@@ -2265,6 +2265,41 @@
     if (n.validTo && iso > n.validTo) return false;
     return true;
   }
+  const ASIA_ORIGIN_COUNTRIES = {
+    CN: 1, HK: 1, MO: 1, TW: 1, JP: 1, KR: 1, KP: 1, MN: 1,
+    TH: 1, VN: 1, ID: 1, MY: 1, SG: 1, PH: 1, BN: 1, KH: 1, LA: 1, MM: 1, TL: 1,
+    IN: 1, LK: 1, BD: 1, NP: 1, BT: 1, PK: 1, MV: 1, AF: 1
+  };
+  function noticeOriginCountry(rate, origin) {
+    const name = (origin && (origin.pol || origin.name)) || (rate && (rate.origin || rate.pol)) || "";
+    const fromName = portCountry(name);
+    if (fromName) return fromName;
+    const unlo = lookupUnlo(name);
+    if (unlo && unlo.code && /^[A-Za-z]{2}/.test(unlo.code)) return unlo.code.slice(0, 2).toUpperCase();
+    return "";
+  }
+  function noticeOriginApplies(n, rate, origin) {
+    const regions = n.originRegions || [];
+    const countries = n.originCountries || [];
+    if (!regions.length && !countries.length) return true;
+    if (!rate && !origin) return true;
+    const cc = noticeOriginCountry(rate, origin);
+    if (!cc) return true;
+    if (countries.length && countries.indexOf(cc) >= 0) return true;
+    if (regions.indexOf("asia") >= 0 && ASIA_ORIGIN_COUNTRIES[cc]) return true;
+    if (countries.length || regions.length) return false;
+    return true;
+  }
+  function noticeServiceApplies(n, rate) {
+    if (!n.service) return true;
+    if (!rate) return true;
+    const code = rate.service || rate.svc || "";
+    if (!code) return true;
+    return String(code).toUpperCase().indexOf(String(n.service).toUpperCase()) >= 0;
+  }
+  function noticeAppliesToLane(n, rate, origin) {
+    return noticeOriginApplies(n, rate, origin) && noticeServiceApplies(n, rate);
+  }
   function activeNoticesFor(carrierId, iso) {
     return noticesFor(carrierId).filter(function (n) { return noticeIsActive(n, iso); });
   }
@@ -2275,8 +2310,9 @@
     if (iso && noticeIsActive(n, iso)) return "valid";
     return "expired";
   }
-  function quoteNoticesFor(carrierId, iso, rate) {
+  function quoteNoticesFor(carrierId, iso, rate, origin) {
     return activeNoticesFor(carrierId, iso).filter(function (n) {
+      if (!noticeAppliesToLane(n, rate, origin)) return false;
       const when = n.appliesWhen || "always";
       if (when === "haz") return !!state.haz;
       if (when === "surcharge") {
@@ -2313,8 +2349,10 @@
     state.noticeOpen = false;
     render();
   }
-  function noticeBannerHtml(carrier, iso) {
-    const list = activeNoticesFor(carrier.id, iso);
+  function noticeBannerHtml(carrier, iso, origin, rate) {
+    const list = activeNoticesFor(carrier.id, iso).filter(function (n) {
+      return noticeAppliesToLane(n, rate, origin);
+    });
     if (!list.length) return "";
     return list.map(function (n, i) {
       const idAttr = i === 0 ? ' id="notice-banner"' : "";
@@ -2373,9 +2411,9 @@
     }
     return esc(text);
   }
-  function quoteNoticeHtml(carrier, iso, rate) {
+  function quoteNoticeHtml(carrier, iso, rate, origin) {
     if (!carrier) return "";
-    const list = quoteNoticesFor(carrier.id, iso, rate);
+    const list = quoteNoticesFor(carrier.id, iso, rate, origin);
     if (!list.length) return "";
     return list.map(function (n, i) {
       const idAttr = i === 0 ? ' id="quote-notice"' : "";
@@ -3134,7 +3172,7 @@
       '<div class="search-top">' +
         '<div class="carrier-field"><label class="fld" for="carrier">חברת ספנות</label><select id="carrier">' + carrierOptions + "</select>" +
         (!isCompare ? historyLinkHtml(carrier) : "") +
-        (!isCompare ? noticeBannerHtml(carrier, shipIso) : "") + "</div>" +
+        (!isCompare ? noticeBannerHtml(carrier, shipIso, selectedOrigin, typeof quoteRate !== "undefined" ? quoteRate : null) : "") + "</div>" +
         '<div class="origin-combo" id="origin-combo">' +
           '<label class="fld" for="origin-input" id="origin-field-label">נמל מוצא (' + origins.length + " במחירון)</label>" +
           '<input type="text" id="origin-input" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="origin-list" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" placeholder="הקלידו אות לחיפוש או בחרו מהרשימה" value="' + esc(selectedOrigin ? originChoiceLabel(selectedOrigin) : "") + '">' +
@@ -3159,7 +3197,7 @@
       '<details class="extras-panel" id="extras-panel"' + (state.extrasOpen ? " open" : "") + "><summary>אפשרויות נוספות</summary>" + extrasInner + "</details>" +
       "</section>" +
       (state.originId && state.dest && effectiveTyp
-        ? '<section class="card" id="quote-card"><div class="card-head"><h2>הצעת מחיר</h2>' + copyBtn + "</div>" + quoteMeta + quoteNoticeHtml(displayCarrier, shipIso, quoteRate) + (badgeVersion ? versionBadgeHtml(badgeVersion, shipIso, badgeAlts) : "") + quoteHtml + "</section>"
+        ? '<section class="card" id="quote-card"><div class="card-head"><h2>הצעת מחיר</h2>' + copyBtn + "</div>" + quoteMeta + quoteNoticeHtml(displayCarrier, shipIso, quoteRate, selectedOrigin) + (badgeVersion ? versionBadgeHtml(badgeVersion, shipIso, badgeAlts) : "") + quoteHtml + "</section>"
         : "") +
       '<details class="terms"><summary>תנאים שחשוב לציין</summary><div class="card">' + termsHtml(displayCarrier, shipIso) + "</div></details>" +
       (!isCompare ? historySheetHtml(carrier, shipIso) : "") +
