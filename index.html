@@ -579,6 +579,13 @@
     .callout.warn { background: var(--warn-bg); border-color: var(--warn-bd); color: var(--warn-ink); }
     .callout.info { background: var(--info-bg); border-color: var(--info-bd); color: var(--info-ink); }
     .callout.expired { background: #fdecec; border-color: #e8b4b4; color: #7a1f1f; }
+    .callout.fallback-banner {
+      background: var(--warn-bg);
+      border-color: #e8a317;
+      color: var(--warn-ink);
+      font-size: 1.05rem;
+    }
+    .callout.fallback-banner strong { margin-bottom: 0; font-size: 1.08rem; line-height: 1.45; }
     .sailings {
       margin: 14px 0 0;
       padding: 12px 14px;
@@ -869,10 +876,10 @@
     <footer class="note">כלי פנימי להצעת מחיר ממחירון. התעריפים כפופים לתוקף, למקום פנוי ולתנאי החברה.</footer>
   </div>
   <noscript><p class="wrap">יש להפעיל JavaScript כדי להשתמש במחשבון.</p></noscript>
-  <script src="data/index.js?v=no-contacts-20261123"></script>
-  <script src="data/notices.js?v=no-contacts-20261123"></script>
-  <script src="data/spots.js?v=no-contacts-20261123"></script>
-  <script src="data/schedules.js?v=no-contacts-20261123"></script>
+  <script src="data/index.js?v=fallback-20261123"></script>
+  <script src="data/notices.js?v=fallback-20261123"></script>
+  <script src="data/spots.js?v=fallback-20261123"></script>
+  <script src="data/schedules.js?v=fallback-20261123"></script>
   <script>
 (function () {
   const DATA = window.QUOTE_INDEX;
@@ -1376,7 +1383,11 @@
     rate = applyCarrierRules(rate, carrier && carrier.id, shipDate);
     const t = totalsOf(rate, qty);
     const lines = [];
-    if (expired) {
+    const fb = fallbackLabel(rate);
+    if (fb) {
+      lines.push("*** " + fb + " ***");
+      lines.push("");
+    } else if (expired) {
       lines.push("*** המחירון פג תוקף — לעיון בלבד, לא הצעת מחיר בתוקף ***");
       lines.push("תוקף המחירון: " + fmtDate(rate.vf) + "–" + fmtDate(rate.vt) + " · תאריך השילוח שנבחר: " + fmtDate(shipDate) + " (מחוץ לחלון התוקף).");
       lines.push("");
@@ -1728,7 +1739,7 @@
     }
     return new Promise(function (resolve, reject) {
       const s = document.createElement("script");
-      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=no-contacts-20261123";
+      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=fallback-20261123";
       s.async = true;
       s.onload = function () {
         const pack = window.QUOTE_PACK && window.QUOTE_PACK[meta.id];
@@ -1741,17 +1752,22 @@
     });
   }
   function neededVersions(isCompare, carrier, shipIso) {
-    if (isCompare) {
-      const out = [];
-      const seen = {};
-      carriers.forEach(function (c) {
-        versionsForDate(c.id, shipIso).forEach(function (v) {
-          if (!seen[v.id]) { seen[v.id] = true; out.push(v); }
-        });
+    const out = [];
+    const seen = {};
+    function addAll(carrierId) {
+      const pinned = state.versionOverride[carrierId];
+      if (pinned) {
+        const v = versionMeta(pinned);
+        if (v && !seen[v.id]) { seen[v.id] = true; out.push(v); }
+        return;
+      }
+      versionsFor(carrierId).forEach(function (v) {
+        if (!seen[v.id]) { seen[v.id] = true; out.push(v); }
       });
-      return out;
     }
-    return versionsForDate(carrier.id, shipIso);
+    if (isCompare) carriers.forEach(function (c) { addAll(c.id); });
+    else addAll(carrier.id);
+    return out;
   }
   function ratesOfLoaded(meta) {
     return meta && versionCache[meta.id] ? versionCache[meta.id].rates : [];
@@ -1808,17 +1824,18 @@
     partials.forEach(add);
     return out;
   }
-  function ratesForDate(carrierId, iso) {
+  function allLoadedRates(carrierId) {
+    const out = [];
     const pinned = state.versionOverride[carrierId];
-    if (pinned) {
-      const v = versionMeta(pinned);
-      return tagRates(ratesOfLoaded(v), v && v.id);
-    }
+    const list = pinned ? (versionMeta(pinned) ? [versionMeta(pinned)] : []) : versionsFor(carrierId);
+    list.forEach(function (v) {
+      tagRates(ratesOfLoaded(v), v.id).forEach(function (r) { out.push(r); });
+    });
+    return out;
+  }
+  function coveringMergeRates(carrierId, iso) {
     const cov = iso ? coveringVersions(carrierId, iso) : [];
-    if (!iso || !cov.length) {
-      const v = selectedVersionMeta(carrierId, iso);
-      return tagRates(ratesOfLoaded(v), v && v.id);
-    }
+    if (!iso || !cov.length) return [];
     const full = cov.filter(function (v) { return !v.partialCoverage; });
     const partials = cov.filter(function (v) { return v.partialCoverage; });
     const base = full[0] || cov[0];
@@ -1834,6 +1851,82 @@
         seen[k] = true;
         out.push(r);
       });
+    });
+    return out;
+  }
+  function pickFallbackRate(rates, iso) {
+    const past = rates.filter(function (r) { return r.vt < iso; }).slice().sort(function (a, b) {
+      if (b.vt !== a.vt) return b.vt.localeCompare(a.vt);
+      const va = versionMeta(a.versionId);
+      const vb = versionMeta(b.versionId);
+      if (va && vb) return compareVersionsNewest(va, vb);
+      return 0;
+    });
+    if (past[0]) return Object.assign({}, past[0], { fallbackKind: "past" });
+    const future = rates.filter(function (r) { return r.vf > iso; }).slice().sort(function (a, b) {
+      if (a.vf !== b.vf) return a.vf.localeCompare(b.vf);
+      const va = versionMeta(a.versionId);
+      const vb = versionMeta(b.versionId);
+      if (va && vb) return compareVersionsNewest(va, vb);
+      return 0;
+    });
+    if (future[0]) return Object.assign({}, future[0], { fallbackKind: "future" });
+    return null;
+  }
+  function fallbackLabel(rate) {
+    if (!rate || !rate.fallbackKind) return "";
+    if (rate.fallbackKind === "past") {
+      return "מחיר אחרון ידוע, תוקף עד " + fmtDate(rate.vt) + ", יש לוודא מול חברת הספנות";
+    }
+    if (rate.fallbackKind === "future") {
+      return "מחיר ממחירון שיתחיל ב־" + fmtDate(rate.vf);
+    }
+    return "";
+  }
+  function ratesForDate(carrierId, iso) {
+    const pinned = state.versionOverride[carrierId];
+    if (pinned) {
+      const v = versionMeta(pinned);
+      const rows = tagRates(ratesOfLoaded(v), v && v.id);
+      if (!iso) return rows;
+      const valid = [];
+      const rest = [];
+      rows.forEach(function (r) {
+        if (isValidOn(r, iso)) valid.push(r);
+        else rest.push(r);
+      });
+      const seen = {};
+      valid.forEach(function (r) { seen[laneKey(r)] = true; });
+      const byLane = {};
+      rest.forEach(function (r) {
+        const k = laneKey(r);
+        if (seen[k]) return;
+        (byLane[k] = byLane[k] || []).push(r);
+      });
+      const out = valid.slice();
+      Object.keys(byLane).forEach(function (k) {
+        const pick = pickFallbackRate(byLane[k], iso);
+        if (pick) out.push(pick);
+      });
+      return out;
+    }
+    if (!iso) {
+      const v = versionsFor(carrierId).slice().sort(compareVersionsNewest)[0];
+      return tagRates(ratesOfLoaded(v), v && v.id);
+    }
+    const inForce = coveringMergeRates(carrierId, iso).filter(function (r) { return isValidOn(r, iso); });
+    const seen = {};
+    inForce.forEach(function (r) { seen[laneKey(r)] = true; });
+    const out = inForce.slice();
+    const byLane = {};
+    allLoadedRates(carrierId).forEach(function (r) {
+      const k = laneKey(r);
+      if (seen[k]) return;
+      (byLane[k] = byLane[k] || []).push(r);
+    });
+    Object.keys(byLane).forEach(function (k) {
+      const pick = pickFallbackRate(byLane[k], iso);
+      if (pick) out.push(pick);
     });
     return out;
   }
@@ -1972,10 +2065,10 @@
     let nextRates = [];
     if (nextIsCompare) {
       carriers.forEach((c) => {
-        nextRates = nextRates.concat(ratesForDate(c.id, shipIso));
+        nextRates = nextRates.concat(allLoadedRates(c.id));
       });
     } else {
-      nextRates = ratesForDate(nextId, shipIso);
+      nextRates = allLoadedRates(nextId);
     }
     const nextOrigins = nextIsCompare
       ? buildOrigins(nextRates).map((o) => Object.assign({}, o, { id: "cmp::" + bareKey(o.name) }))
@@ -2588,14 +2681,17 @@
       });
       return;
     }
+    const catalogRates = isCompare
+      ? carriers.flatMap((c) => allLoadedRates(c.id))
+      : allLoadedRates(carrier.id);
     const rates = isCompare
       ? carriers.flatMap((c) => ratesForDate(c.id, shipIsoEarly))
       : ratesForDate(carrier.id, shipIsoEarly);
     let origins;
-    if (!isCompare) origins = buildOrigins(rates);
+    if (!isCompare) origins = buildOrigins(catalogRates);
     else {
       const map = new Map();
-      for (const o of buildOrigins(rates)) {
+      for (const o of buildOrigins(catalogRates)) {
         const id = "cmp::" + bareKey(o.name);
         if (!map.has(id)) map.set(id, Object.assign({}, o, { id }));
       }
@@ -2644,6 +2740,8 @@
     const quoteRate = validRate || (windowRates.length ? windowRates.slice().sort((a, b) => a.frt - b.frt)[0] : null);
     const isExpiredRef = !!(quoteRate && shipIso && !validRate && windowRates.every((r) => r.vt < shipIso));
     const isNotYetValid = !!(quoteRate && shipIso && !validRate && windowRates.every((r) => r.vf > shipIso));
+    const fallbackKind = (quoteRate && quoteRate.fallbackKind) || (isExpiredRef ? "past" : (isNotYetValid ? "future" : ""));
+    const fallbackNote = fallbackLabel(Object.assign({}, quoteRate || {}, { fallbackKind: fallbackKind || (quoteRate && quoteRate.fallbackKind) }));
     const altQuotes = validRates.filter((r) => r !== validRate);
     const otherWindows = windowRates.filter((r) => r !== quoteRate && !isValidOn(r, shipIso || ""));
 
@@ -2678,7 +2776,7 @@
             r.pod === state.dest &&
             r.typ === effectiveTyp &&
             r.haz === effectiveHaz &&
-            isValidOn(r, shipIso),
+            (isValidOn(r, shipIso) || r.fallbackKind),
           )
           .sort((a, b) => a.frt - b.frt);
         for (const rate of hits) peerQuotes.push({ c: x.c, rate: applyCarrierRules(rate, x.c.id, shipIso) });
@@ -2743,7 +2841,7 @@
     if (!shipIso) {
       formWarn += '<div class="callout warn"><strong>תאריך לא מזוהה</strong>כתבו את תאריך השילוח בפורמט 18.11.2026 (יום.חודש.שנה).</div>';
     }
-    if (!isCompare && shipIso && !activeVersion) {
+    if (!isCompare && shipIso && !activeVersion && !rates.length) {
       formWarn += dateJumpNoticeHtml(carrier, shipIso);
     }
 
@@ -2760,7 +2858,9 @@
         ? selectedOrigin.name + " → " + destHe(state.dest) + " (דרך " + selectedOrigin.pol + ")"
         : selectedOrigin.name + " → " + destHe(state.dest);
       let expiredBanner = "";
-      if (!validRate && isExpiredRef) {
+      if (fallbackNote) {
+        expiredBanner = '<div class="callout warn fallback-banner" role="status"><strong>' + esc(fallbackNote) + "</strong></div>";
+      } else if (!validRate && isExpiredRef) {
         expiredBanner = '<div class="callout expired"><strong>המחירון פג תוקף</strong>תוקף המחירון: ' +
           esc(fmtDate(quoteRate.vf) + "–" + fmtDate(quoteRate.vt)) +
           ". למסלול " + esc((selectedOrigin && selectedOrigin.name) || "") + " → " + esc(destHe(state.dest)) +
@@ -2793,10 +2893,10 @@
       let metrics = '<div class="metrics">';
       for (const c of t.currencies) {
         metrics += '<div class="metric"><div class="val">' + moneyHtml(t.perCtr[c] || 0, c) + '</div><div class="lab">' +
-          esc(!validRate
+          esc(!validRate && !fallbackNote
             ? ("סה״כ למכולה לעיון בלבד" + (t.currencies.length > 1 ? " · " + c : "") + " — לא הצעת מחיר בתוקף")
             : (t.currencies.length > 1 ? "סה״כ למכולה · " + c : "סה״כ למכולה (All-in)")) +
-          '</div><div class="det">' + esc(!validRate ? "חישוב מהמחירון שפג תוקפו, לעיון בלבד" : "הובלה + תוספות למכולה, בלי חיוב לשטר מטען") +
+          '</div><div class="det">' + esc((!validRate && !fallbackNote) ? "חישוב מהמחירון שפג תוקפו, לעיון בלבד" : "הובלה + תוספות למכולה, בלי חיוב לשטר מטען") +
             (ruleNotes.length ? "<br>" + esc(ruleNotes.join(" · ")) : "") + "</div></div>";
       }
       const ttDet = quoteRate.ett
@@ -2806,8 +2906,8 @@
           : "זמן ההפלגה לא צוין במחירון";
       metrics += '<div class="metric"><div class="val">' + esc(ttLabel(quoteRate)) + '</div><div class="lab">זמן הפלגה משוער</div><div class="det">' + esc(ttDet) + "</div></div>";
       metrics += '<div class="metric"><div class="val">' + esc(fmtDate(quoteRate.vf) + "–" + fmtDate(quoteRate.vt)) + '</div><div class="lab">' +
-        esc(!validRate ? (isExpiredRef ? "תוקף התעריף (פג)" : "תוקף התעריף (לא חל בתאריך שנבחר)") : "תוקף התעריף") +
-        '</div><div class="det">' + esc(!validRate ? "התאריך שנבחר מחוץ לחלון — לעיון בלבד" : "לפי תאריך השילוח שנבחר") + "</div></div>";
+        esc(fallbackNote ? "תוקף התעריף במחירון" : (!validRate ? (isExpiredRef ? "תוקף התעריף (פג)" : "תוקף התעריף (לא חל בתאריך שנבחר)") : "תוקף התעריף")) +
+        '</div><div class="det">' + esc(fallbackNote ? "חלון התוקף של המחירון שמוצג" : (!validRate ? "התאריך שנבחר מחוץ לחלון — לעיון בלבד" : "לפי תאריך השילוח שנבחר")) + "</div></div>";
       metrics += "</div>";
 
       let table = '<div class="table-wrap"><table><thead><tr><th>חיוב</th><th>סכום</th><th>בסיס</th><th>תשלום</th><th>סוג מחיר</th></tr></thead><tbody>';
@@ -2851,7 +2951,7 @@
         if (markup > 0) {
           shipBlock += '<div class="metric"><div class="val">' + moneyHtml(markup, "USD") + '</div><div class="lab">רווח למכולה</div><div class="det">סה״כ רווח למשלוח ' + esc(money(markup * qty, "USD")) + "</div></div>";
           shipBlock += '<div class="metric"><div class="val">' + moneyHtml(saleUsd, "USD") + '</div><div class="lab">' +
-            esc(!validRate ? "חישוב לעיון בלבד (USD) — לא הצעת מחיר בתוקף" : "מחיר מכירה למשלוח (USD)") +
+            esc((!validRate && !fallbackNote) ? "חישוב לעיון בלבד (USD) — לא הצעת מחיר בתוקף" : "מחיר מכירה למשלוח (USD)") +
             '</div><div class="det">עלות החלק ב-USD ' + esc(money(t.shipment.USD || 0, "USD")) + " + רווח " + esc(money(markup * qty, "USD")) +
             (frtCcy(quoteRate) !== "USD" ? " (ההובלה ב-" + frtCcy(quoteRate) + " לא הומרה ולא נכללת במחיר מכירה זה)" : "") + "</div></div>";
         }
@@ -2958,10 +3058,10 @@
 
       const sailings = sailingsHtml(displayCarrier, selectedOrigin, shipIso);
       const inner = props + metrics + table + inclHtml + how + shipBlock + nis + notes + sailings + alts + peers + payNote + fallback;
-      quoteHtml = expiredBanner + (!validRate ? '<div class="expired-ref">' + inner + "</div>" : inner);
+      quoteHtml = expiredBanner + ((!validRate && !fallbackNote) ? '<div class="expired-ref">' + inner + "</div>" : inner);
     }
 
-    if (!isCompare && shipIso && !activeVersion) {
+    if (!isCompare && shipIso && !activeVersion && !quoteRate) {
       const near = nearestVersions(carrier.id, shipIso);
       quoteHtml = '<div class="callout warn" id="no-version-msg"><strong>אין מחירון בתוקף לתאריך זה</strong>לתאריך ההפלגה / BL ' +
         esc(fmtDate(shipIso)) + " אין מחירון של " + esc(carrier.nameHe) + " שחל באותו תאריך." +
@@ -2972,7 +3072,7 @@
 
     const copyBtn = quoteRate
       ? '<button type="button" class="btn' + (state.copied ? " ok" : "") + '" id="copy-btn">' +
-        (state.copied ? "הסיכום הועתק" : (validRate ? "העתק סיכום" : "העתק סיכום לעיון (פג תוקף)")) + "</button>"
+        (state.copied ? "הסיכום הועתק" : ((validRate || fallbackNote) ? "העתק סיכום" : "העתק סיכום לעיון (פג תוקף)")) + "</button>"
       : "";
 
     const badgeVersion = (!isCompare && quoteRate && quoteRate.versionId && versionMeta(quoteRate.versionId)) || activeVersion;
