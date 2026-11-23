@@ -160,6 +160,17 @@
       background: #fff6e5;
       border: 1px solid #f0d9a8;
     }
+    .notice-list-lead {
+      margin: 12px 0 4px;
+      font-weight: 700;
+    }
+    .notice-list {
+      margin: 0 0 8px;
+      padding: 0 0 0 1.4em;
+    }
+    .notice-list li {
+      margin: 0 0 4px;
+    }
     .notice-original {
       margin: 12px 0 0;
       padding: 0;
@@ -858,10 +869,10 @@
     <footer class="note">כלי פנימי להצעת מחיר ממחירון. התעריפים כפופים לתוקף, למקום פנוי ולתנאי החברה.</footer>
   </div>
   <noscript><p class="wrap">יש להפעיל JavaScript כדי להשתמש במחשבון.</p></noscript>
-  <script src="data/index.js?v=zim-v204-20261122"></script>
-  <script src="data/notices.js?v=zim-v204-20261122"></script>
-  <script src="data/spots.js?v=zim-v204-20261122"></script>
-  <script src="data/schedules.js?v=zim-v204-20261122"></script>
+  <script src="data/index.js?v=zim-nbf-dec-20261123"></script>
+  <script src="data/notices.js?v=zim-nbf-dec-20261123"></script>
+  <script src="data/spots.js?v=zim-nbf-dec-20261123"></script>
+  <script src="data/schedules.js?v=zim-nbf-dec-20261123"></script>
   <script>
 (function () {
   const DATA = window.QUOTE_INDEX;
@@ -1244,6 +1255,7 @@
     } else if (!(match.originCountries && match.originCountries.length)) {
       return false;
     }
+    if (match.dryOnly && rate.haz) return false;
     const excl = match.excludeDestCountries || rule.excludeDestCountries;
     if (excl && excl.length && excl.indexOf(portCountry(rate.pod)) >= 0) return false;
     if (rule.weightBands) return true;
@@ -1682,7 +1694,7 @@
     }
     return new Promise(function (resolve, reject) {
       const s = document.createElement("script");
-      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=zim-v204-20261122";
+      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=zim-nbf-dec-20261123";
       s.async = true;
       s.onload = function () {
         const pack = window.QUOTE_PACK && window.QUOTE_PACK[meta.id];
@@ -2161,6 +2173,15 @@
     (n.sections || []).forEach(function (s) {
       if (s.kind === "meta") {
         html += '<p class="notice-meta">' + esc(s.text) + "</p>";
+        return;
+      }
+      if (s.kind === "list") {
+        if (s.lead) html += '<p class="notice-list-lead">' + esc(s.lead) + "</p>";
+        html += '<ul class="notice-list">';
+        (s.items || []).forEach(function (item) {
+          html += "<li>" + esc(item) + "</li>";
+        });
+        html += "</ul>";
         return;
       }
       if (s.kind === "original") {

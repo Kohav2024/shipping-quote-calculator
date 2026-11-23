@@ -151,6 +151,58 @@ window.CARRIER_NOTICES = [
       { "kind": "p", "text": "התוספת לא חלה על סחר הודו. בשורות הודו, סרי לנקה וצ׳טגונג במחירון צוין KLG included, והסכום לא נוסף שם שוב." },
       { "kind": "original", "lead": "נוסח מקורי", "text": "All heavy 20' from China and the Far-East will be charged over wt charge as follow:\nKLG Overweight Surcharge – Tariff for DV20/OT20/FL20\nTon (Gross)\n20-24 $200 · 24-27 $400 · 27+ $600\nF.East → Israel W/B" }
     ]
+  },
+  {
+    "id": "zim-nbf-efs-2026-12",
+    "carrierIds": ["zim"],
+    "title": "ZIM: רמות NBF ו־EFS למטען יבש בדצמבר 2026",
+    "banner": "צים: רמות NBF ו־EFS למטען יבש בדצמבר 2026 נשארות כמו בנובמבר 2026",
+    "publishedDate": "2026-11-23",
+    "added": "2026-11-23",
+    "effectiveFromVessel": null,
+    "validTo": "2026-12-31",
+    "appliesWhen": "always",
+    "severity": "warning",
+    "quoteWarningTitle": "צים: רמות NBF ו־EFS למטען יבש בדצמבר 2026",
+    "quoteWarning": "רמות NBF ו־EFS למטען יבש בדצמבר 2026 נשארות כמו בנובמבר 2026. 20׳ = 1 TEU, 40׳/HC = 2 TEU. פירוט הסכומים בהודעה.",
+    "surcharge": {
+      "code": "EFS",
+      "label": "EFS",
+      "currency": "USD",
+      "perTeu": 125,
+      "teuByType": { "DV20": 1, "FL20": 1, "OT20": 1, "DV40": 2, "HC40": 2, "FL40": 2, "OT40": 2 },
+      "effectiveFrom": "2026-12-01",
+      "effectiveTo": "2026-12-31",
+      "match": {
+        "originCountries": ["CA", "MX", "GT", "BZ", "CR", "PA", "CO", "VE", "AW", "BB", "CW", "DO", "GY"],
+        "side": "origin",
+        "dryOnly": true
+      },
+      "note": "חל על מטען יבש בדצמבר 2026, לפי הודעת צים שרמות EFS נשארות כמו בנובמבר. 125$ ל־TEU ביבוא מצפון אמריקה, מרכז אמריקה והקריביים (20׳ = 125$, 40׳/HC = 250$)."
+    },
+    "sections": [
+      { "kind": "meta", "text": "התקבל: 23.11.2026. חל על מטען יבש בדצמבר 2026." },
+      { "kind": "p", "text": "צים הודיעה שרמות NBF ו־EFS למטען יבש בדצמבר 2026 נשארות כמו בנובמבר 2026. הסכומים בטבלאות הם ל־TEU: מכולת 20׳ = 1 TEU, מכולת 40׳ או HC = 2 TEU." },
+      { "kind": "list", "lead": "NBF", "items": [
+        "ישראל אל/מ צפון אמריקה, מרכז אמריקה והקריביים: 393$ ל־TEU",
+        "תת־היבשת ההודית לישראל: 447$ ל־TEU",
+        "ישראל לתת־היבשת ההודית: 393$ ל־TEU",
+        "המזרח הרחוק (לא כולל סין) לישראל: 793$ ל־TEU",
+        "סין לישראל: 850$ ל־TEU",
+        "ישראל למזרח הרחוק: 355$ ל־TEU",
+        "תוך־ים־תיכוני (מזרח ומערב) והים השחור: 246$ ל־TEU",
+        "צפון אירופה והבלטי/סקנדינביה לישראל: 320$ ל־TEU",
+        "ישראל לצפון אירופה והבלטי/סקנדינביה: 272$ ל־TEU",
+        "ישראל לדרום אמריקה: 236$ ל־TEU",
+        "דרום אמריקה לישראל: 272$ ל־TEU"
+      ]},
+      { "kind": "list", "lead": "EFS", "items": [
+        "ישראל אל/מ צפון אמריקה, מרכז אמריקה והקריביים: 125$ ל־TEU",
+        "תוך־ים־תיכוני (מזרח ומערב) והים השחור: 0",
+        "צפון אירופה והבלטי/סקנדינביה לישראל: 52$ ל־TEU",
+        "ישראל לצפון אירופה והבלטי/סקנדינביה: 52$ ל־TEU"
+      ]},
+      { "kind": "original", "lead": "נוסח מקורי", "text": "Pls note that NBF and EFS levels for dry cargo will remain the same in December 2026 as November 2026\n\nNBF\nIsrael to/from North America & Central America & Caribbean: $393/TEU\nIndia Sub Continent to Israel: $447/TEU\nIsrael to India Sub Continent: $393/TEU\nFar East (excluding China) to Israel: $793/TEU\nChina to Israel: $850/TEU\nIsrael to the Far East: $355/TEU\nIntra Mediterranean (East & West) & Black Sea: $246/TEU\nNorth Europe and Baltic/Scand. to Israel: $320/TEU\nIsrael to North Europe and Baltic/Scand.: $272/TEU\nIsrael to South America: $236/TEU\nSouth America to Israel: $272/TEU\n\nEFS\nIsrael to/from North America & Central America & Caribbean: $125/TEU\nIntra Mediterranean (East & West) & Black Sea: 0\nNorth Europe and Baltic/Scand. to Israel: $52/TEU\nIsrael to North Europe and Baltic/Scand.: $52/TEU" }
+    ]
   }
-
 ];
