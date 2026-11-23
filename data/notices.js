@@ -409,5 +409,80 @@ window.CARRIER_NOTICES = [
       ]},
       { "kind": "original", "lead": "נוסח מקורי (עמוד 4)", "text": "IMPORT FOB RATES · DRY · NON IMO\nDecember 2026\nValid till 31.12.2026\n\nPlease see below our IMPORT FOB rates for dry containers, NON IMO for December 2026.\nVALID TILL 31.12.2026\n\nMAX INTAKE 24 T/20' (24-26 T - Additional $70) , 24 T/40' (24-26 T – Additional $140)\nIMCO Cargo – subject to separate Acceptance by the Carrier\nNo Waste cargo allowed, No Weapons, No Ammunition or Military Equipment Allowed.\nSubject to both space & Equipment Availability\n\n• To the above you should add all surcharges and relevant taxes.\n• All rates subject to change.\n• The carrier has the right to modify or suspend the service and or offer, or apply surcharges upon the implementation of (or in advance of,) any Emissions Trading Scheme and/or Emissions regulations (including EEXI/CII) introduced by the EU or other national, international or regional authorities\nSHOULD BE ANY SURCHARGES COMING INTO FORCE AT TIME OF SHIPMENT (I.E. WAR RISK, BAF, CAF, CONGESTION, THC OR OTHERS), THESE WILL BE ADDED ON TOP OF THE ABOVE MENTIONED RATE. RATES CAN CHANGE WITHOUT PRIOR NOTICE.\n** התשלום בש\"ח עפ\"י שער ספנות ביום התשלום.\nSTANDARD BORCHARD BILL OF LADING TERMS/CONDITIONS PUBLISHED AT: WWW.BORLINES.COM\nDemurrage free days /Demurrage charges available at our offices as per carrier's terms and conditions.\n\nLucy Borchard Shipping LTD. · As Agents Only of Borchard Lines\nAll shipments are subject to Borchard Lines Ltd Conditions of Carriage which are available at www.borlines.com/info/legal-terms. Lucy Borchard Shipping LTD are acting as agents for and on behalf of Borchard Lines Ltd." }
     ]
+  },
+  {
+    "id": "msc-nwc-uk-2026-12",
+    "carrierIds": ["msc"],
+    "title": "MSC: מחירון FAK ליבוא מ-UK ומ-NWC לדצמבר 2026, ועדכון מספרי חוזה",
+    "banner": "⚠️ MSC: מחירון FAK מ-UK (לונדון גייטוויי) ומ-NWC (אנטוורפן, רוטרדם, לה האבר, המבורג) בתוקף 01.12.2026–31.12.2026. מספר חוזה מעודכן: Q73WC4P6G — מספרי החוזה הקודמים אינם בתוקף.",
+    "publishedDate": "2026-11-12",
+    "added": "2026-11-23",
+    "effectiveFromVessel": null,
+    "validTo": "2026-12-31",
+    "appliesWhen": "always",
+    "severity": "info",
+    "originCountries": ["GB", "BE", "NL", "FR", "DE"],
+    "quoteWarningTitle": "MSC: מחירון UK / NWC לדצמבר 2026",
+    "quoteWarning": "תוקף 01.12.2026–31.12.2026. יש להשתמש במספר החוזה המעודכן Q73WC4P6G; מספרי החוזה הקודמים אינם בתוקף. הימים החופשיים (21) תקפים רק למשלוחי Collect. למטען מסוכן נדרש אישור מוקדם של MSC ישראל.",
+    "sections": [
+      { "kind": "meta", "text": "התקבל במייל מ-12.11.2026. תוקף התעריפים: 01.12.2026–31.12.2026. הצד: MEDITERRANEAN SHIPPING CO. (Israel) Ltd., as agent only for MSC Mediterranean Shipping Company S.A., Geneva." },
+      { "kind": "p", "lead": "עדכון מספרי חוזה:", "text": "במסגרת המעבר למערכת תמחור חדשה עודכנו מספרי החוזים בחלק מההסכמים. יש להקפיד להשתמש במספרי החוזה המעודכנים עבור כל משלוח עתידי, שכן מספרי החוזה הקודמים אינם בתוקף עוד. בהמשך, כלל ההסכמים ינוהלו במערכת החדשה. במחירון הזה מספר החוזה הוא Q73WC4P6G." },
+      { "kind": "p", "text": "התעריפים הם FAK ליבוא לישראל. במייל לא צוין במפורש נמל היעד; אותו מחיר הוחל על אשדוד ועל חיפה, כמקובל בהצעות יבוא של MSC לישראל. 40׳ HC לא צוין במחירון, ולא הומצא לו תעריף." },
+      { "kind": "list", "lead": "הובלה (דולר)", "items": [
+        "UK — London Gateway (LGW): 200$ ל-20׳, 300$ ל-40׳.",
+        "NWC — Antwerp / Rotterdam / Le Havre / Hamburg: 375$ ל-20׳, 600$ ל-40׳."
+      ]},
+      { "kind": "list", "lead": "תוספות שנוספו לסה״כ (דולר, דצמבר)", "items": [
+        "BRC 367$/TEU (367$ ל-20׳, 734$ ל-40׳).",
+        "PSS 200$/TEU (200$ / 400$).",
+        "IEI (Import Emergency Imbalance) 100$ למכולה.",
+        "ECA 160$/TEU (160$ / 320$).",
+        "ETS 66$/TEU (66$ / 132$).",
+        "EFS 81$/TEU (81$ / 162$).",
+        "FEU 12$/TEU (12$ / 24$) — כך במחירון, כולל הסימון /TEU.",
+        "THC יעד VATOS: 275$ ל-20׳, 400$ ל-40׳.",
+        "EBS: NO EBS — לא נוסף."
+      ]},
+      { "kind": "p", "lead": "ימי חופש:", "text": "21 ימים מופיעים בהסכם הדמורג'. לפי המחירון, הימים החופשיים בהצעה תקפים רק למשלוחים על בסיס Collect." },
+      { "kind": "list", "lead": "לא נוסף אוטומטית", "items": [
+        "HAZ (Med & Low Risk): 50$/TEU בשורות NWC בלבד (בתא UK התא היה ריק).",
+        "תעריף מטען מסוכן לפי רמת סיכון (מ-01.01.2023): Low 300$/מכולה, Med 400$, High 800$. סוללות ליתיום נחשבות High Risk.",
+        "למטען מסוכן נדרש אישור מוקדם של MSC ישראל לפי Packing Group ו-Class, לפני הטענה.",
+        "THC ל-IMO ולציוד מיוחד: 320$ ל-20׳, 460$ ל-40׳.",
+        "EIS 50$/מכולה למטען self-heating, לפי קודי HS שפורטו במחירון (ייתכנו קודים נוספים בלי הודעה מוקדמת).",
+        "Foodgraded units — תוספת בלי סכום במחירון.",
+        "Flexitank — התעריפים אינם תקפים; יש לבדוק מול המשרד.",
+        "מטען בשווי מעל 500,000$ למכולה, או תרופות יקרות — התעריפים אינם תקפים.",
+        "ISPS בנמל המוצא (כפוף, בלי סכום), LWS אם/מתי/היכן שחל, ו-GRI."
+      ]},
+      { "kind": "p", "text": "הדירוג לפי תאריך הפלגת הפרופורמה בלוח MSC. כפוף לתוספות חירום V.A.T.O.S, לזמינות ציוד במוצא, לביקורת בנמלי שטעון, לדמי D/O ולהוצאות מקומיות. לא כולל שחרור מכס, שירותי פורוורדינג, הטענה/קשירה/אבטחת מטען, אחסנה, demurrage מעבר לימי הפטור, זמן המתנה, ביטוח ומסי יבוא מקומיים. תנאי ההובלה: https://www.msc.com/che/contract-of-carriage." },
+      { "kind": "original", "lead": "נוסח מקורי", "text": "Good day\nPls find below rates val 1.12.26-31.12.26\n\nFAK  UK  LGW  20' $200  40' $300  BRC DEC $367/TEU  NO EBS  PSS $200/TEU  IEI $100/CNTR  HAZ (MED & LOW RISK) (blank)  ECA DEC $160/TEU  ETS DEC $66/TEU  EFS $81/TEU  FEU $12/TEU  THC VATOS BELOW  DEMURRAGE AGREEMENTS 21  CONTRACT NO Q73WC4P6G\n\nFAK  NWC  ANT / RTM / LHV / HAM  20' $375  40' $600  BRC DEC $367/TEU  NO EBS  PSS $200/TEU  IEI $100/CNTR  HAZ (MED & LOW RISK) $50/TEU  ECA DEC $160/TEU  ETS DEC $66/TEU  EFS $81/TEU  FEU $12/TEU  THC VATOS BELOW  DEMURRAGE AGREEMENTS 21  CONTRACT NO Q73WC4P6G\n\nTHC VATOS\nTHC  20' $275  40' $400\nTHC FOR IMO CARGO AND SPECIAL EQUIP  20' $320  40' $460\n\nRATES ARE SUBJECT TO FOODGRADED UNITS ADDITIONAL\nRATES ARE NOT VALID FOR HIGH VALUE CARGO OVER $500,000 PER CNTR OR HIGH VALUE PHARMACEUTICAL GOODS.\nEIS SURCHARGE AT USD 50 PER CNTR FOR ALL SELF-HEATING CARGOES WILL BE ADDED ON TOP ANY FREIGHT TERMS AGREED\n\"ALL SHIPMENTS ARE SUBJECT TO ISPS COSTS AT POL\"\nRATES ARE NOT VALID FOR FLEXITANK – PLS CHECK WITH OUR OFFICE\nFOR HAZ COMMODITY YOU MUST GET MSC ISRAEL PREAPPROVAL BEFORE LOADING BASED ON THE PACKING GROUP (PG) AND CLASS.\nHAZARDOUS CARGO TARIFF LEVEL WILL BE BASED ON LEVEL OF RISK IMPLEMENTED AS FROM JAN 1ST 2023 ON ALL TRADES, AS FOLLOWS:\nHAZ LOW RISK $300/CNTR\nHAZ MED RISK $400/CNTR\nHAZ HIGH RISK $800/CNTR\n*LITHIUM BATTERIES ARE CONSIDERED AS HIGH RISK HAZ\nEIS (SELF IGNITING COMM) 50$ PER CNTR - ONLY FOR SPECIFIC H.S CODE SHOWN BELOW (OTHER HS CODE MIGHT BE ADDED TO THE LIST WITHOUT PRIOR NOTIFICATION):\n  0305 / 1214 / 1404 / 1802 / 2301 / 2304 / 2305 / 2306 / 2308 / 2309 / 2803 / 3802 / 3804 / 4004 / 4400 / 4401 / 4402 / 5200 / 5201 / 5300 / 5301 / 5302 / 5303 / 5305 / 7204 / 7602\nRATES ARE SUBJECT TO GRI\nRATES EXCLUDE CUSTOM CLEARANCE AND /OR ANY FORWARDING SERVICES.\nRATES ARE SUBJECT TO APPLICATION OF ANY EMERGENCY SURCHARGES *V.A.T.O.S\nRATES ARE SUBJECT TO LWS (LOW WATTER SURCHARGES) IF, WHEN AND WHERE APPLICABLE.\nRATES DO NOT INCLUDE LOADING, LASHING, SECURING, BLOCKING AND BRACING OF CARGO.\nRATES ARE CHARGED ACC. TO PROFORMA SAILING DATE OF MSC SCHEDULE\nFREE DAYS INDICATED IN THIS OFFER ARE VALID ONLY FOR SHIPMENTS ON COLLECT BASIS\nRATES ARE SUBJECT TO AVAILABILITY OF EQUIPMENT AT PORT OF LOADING AT TIME OF SHIPMENT.\nRATES ARE SUBJECT TO INSPECTION COSTS, AT TRANSHIPMENT PORTS.\nRATES DO NOT INCLUDE STORAGE, DEMURRAGE, WAITING TIME, INSURANCE AND LOCAL IMPORT DUTIES AT PORT OF LOADING.\nRATES DO NOT INCLUDE STORAGE, DEMURRAGE, WAITING TIME, INSURANCE AND LOCAL IMPORT DUTIES AT PORT OF DISCHARGE.\nRATES ARE SUBJECT TO DELIVERY ORDER FEES AND LOCAL EXPENSES." }
+    ]
+  },
+  {
+    "id": "msc-nwc-uk-haz-2026-12",
+    "carrierIds": ["msc"],
+    "title": "MSC: מטען מסוכן במחירון UK / NWC לדצמבר 2026",
+    "banner": "⚠️ MSC: למטען מסוכן מ-UK/NWC נדרש אישור מוקדם של MSC ישראל לפני הטענה. תעריפי HAZ לא נוספו אוטומטית לסה״כ.",
+    "publishedDate": "2026-11-12",
+    "added": "2026-11-23",
+    "effectiveFromVessel": null,
+    "validTo": "2026-12-31",
+    "appliesWhen": "haz",
+    "severity": "warning",
+    "originCountries": ["GB", "BE", "NL", "FR", "DE"],
+    "quoteWarningTitle": "⚠️ MSC: מטען מסוכן — נדרש אישור מוקדם",
+    "quoteWarning": "למטען מסוכן נדרש אישור מוקדם של MSC ישראל לפי Packing Group ו-Class, לפני הטענה. תעריפי HAZ לא נוספו לסה״כ: ב-NWC יש גם 50$/TEU ל-Med & Low Risk; לפי רמת סיכון Low 300$/מכולה, Med 400$, High 800$ (סוללות ליתיום = High Risk). THC ל-IMO 320$/20׳ ו-460$/40׳.",
+    "sections": [
+      { "kind": "meta", "text": "מתוך מחירון FAK UK / NWC לדצמבר 2026 (התקבל 12.11.2026). חל כשהמטען מסומן כמסוכן." },
+      { "kind": "p", "text": "למטען מסוכן חובה לקבל אישור מוקדם של MSC ישראל לפני הטענה, לפי Packing Group (PG) ו-Class. סוללות ליתיום נחשבות High Risk." },
+      { "kind": "list", "lead": "סכומים שלא נוספו אוטומטית", "items": [
+        "HAZ (Med & Low Risk) 50$/TEU — מופיע בשורות NWC בלבד; בתא UK התא היה ריק.",
+        "תעריף לפי רמת סיכון (מ-01.01.2023, כל הסחרים): Low 300$/מכולה, Med 400$/מכולה, High 800$/מכולה.",
+        "THC ל-IMO ולציוד מיוחד: 320$ ל-20׳, 460$ ל-40׳ (במקום 275$/400$ ליבש).",
+        "EIS 50$/מכולה למטען self-heating, לפי קודי HS שפורטו במחירון."
+      ]},
+      { "kind": "original", "lead": "נוסח מקורי", "text": "FOR HAZ COMMODITY YOU MUST GET MSC ISRAEL PREAPPROVAL BEFORE LOADING BASED ON THE PACKING GROUP (PG) AND CLASS.\nHAZARDOUS CARGO TARIFF LEVEL WILL BE BASED ON LEVEL OF RISK IMPLEMENTED AS FROM JAN 1ST 2023 ON ALL TRADES, AS FOLLOWS:\nHAZ LOW RISK $300/CNTR\nHAZ MED RISK $400/CNTR\nHAZ HIGH RISK $800/CNTR\n*LITHIUM BATTERIES ARE CONSIDERED AS HIGH RISK HAZ\nHAZ (MED & LOW RISK): NWC $50/TEU (UK cell blank)\nTHC FOR IMO CARGO AND SPECIAL EQUIP  $320 / $460\nEIS SURCHARGE AT USD 50 PER CNTR FOR ALL SELF-HEATING CARGOES WILL BE ADDED ON TOP ANY FREIGHT TERMS AGREED" }
+    ]
   }
 ];

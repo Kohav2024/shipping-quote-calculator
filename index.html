@@ -941,10 +941,10 @@
     <footer class="note">כלי פנימי להצעת מחיר ממחירון. התעריפים כפופים לתוקף, למקום פנוי ולתנאי החברה.</footer>
   </div>
   <noscript><p class="wrap">יש להפעיל JavaScript כדי להשתמש במחשבון.</p></noscript>
-  <script src="data/index.js?v=simple-compare-20261123"></script>
-  <script src="data/notices.js?v=simple-compare-20261123"></script>
-  <script src="data/spots.js?v=simple-compare-20261123"></script>
-  <script src="data/schedules.js?v=simple-compare-20261123"></script>
+  <script src="data/index.js?v=msg-upd-20261123"></script>
+  <script src="data/notices.js?v=msg-upd-20261123"></script>
+  <script src="data/spots.js?v=msg-upd-20261123"></script>
+  <script src="data/schedules.js?v=msg-upd-20261123"></script>
   <script>
 (function () {
   const DATA = window.QUOTE_INDEX;
@@ -1961,7 +1961,7 @@
     }
     return new Promise(function (resolve, reject) {
       const s = document.createElement("script");
-      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=simple-compare-20261123";
+      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=msg-upd-20261123";
       s.async = true;
       s.onload = function () {
         const pack = window.QUOTE_PACK && window.QUOTE_PACK[meta.id];
@@ -2378,6 +2378,18 @@
       } else {
         head = "<p>";
       }
+      if (vid === "msc-nwc-uk-2026-12-01") {
+        return head + "הכותרת במייל: FAK rates val 1.12.26–31.12.26, ל-UK (London Gateway) ול-NWC (Antwerp / Rotterdam / Le Havre / Hamburg). הצד: MEDITERRANEAN SHIPPING CO. (Israel) Ltd., as agent only for MSC Mediterranean Shipping Company S.A., Geneva. "
+          + "מספר החוזה בהצעה: <span class=\"ltr\">Q73WC4P6G</span>. במסגרת המעבר למערכת תמחור חדשה עודכנו מספרי חוזה בחלק מההסכמים; יש להשתמש במספר המעודכן, ומספרי החוזה הקודמים אינם בתוקף.</p>"
+          + "<p>התעריפים הם F.A.K. ליבוא לישראל. במייל לא צוין נמל יעד במפורש; אותו מחיר הוחל על אשדוד ועל חיפה. 40׳ HC לא צוין במחירון ולא הומצא תעריף. "
+          + "הובלה: מלונדון גייטוויי 200$/20׳ ו-300$/40׳; מאנטוורפן, רוטרדם, לה האבר והמבורג 375$/20׳ ו-600$/40׳. "
+          + "לסה״כ נוספו בדולר: BRC 367$/TEU, PSS 200$/TEU, IEI (Import Emergency Imbalance) 100$/מכולה, ECA 160$/TEU, ETS 66$/TEU, EFS 81$/TEU, FEU 12$/TEU, ו-THC יעד (VATOS) 275$/20׳ ו-400$/40׳. EBS לא חל (NO EBS). "
+          + "21 ימי demurrage בהסכם; הימים החופשיים בהצעה תקפים רק למשלוחי Collect. הדירוג לפי תאריך הפלגת הפרופורמה בלוח MSC. "
+          + "כפוף לתוספות חירום V.A.T.O.S, לזמינות ציוד במוצא, לביקורת בנמלי שטעון, לדמי D/O ולהוצאות מקומיות (סכומים לא צוינו — לא הומצאו). תנאי ההובלה: "
+          + "<span class=\"ltr\">https://www.msc.com/che/contract-of-carriage</span>.</p>"
+          + "<p>לא נוספו אוטומטית: HAZ (Med &amp; Low Risk) 50$/TEU בשורות NWC בלבד (בתא UK התא היה ריק); תעריף HAZ לפי רמת סיכון מ-01.01.2023 — Low 300$/מכולה, Med 400$, High 800$ (סוללות ליתיום = High Risk); למטען מסוכן נדרש אישור מוקדם של MSC ישראל לפי Packing Group ו-Class; THC ל-IMO ולציוד מיוחד 320$/20׳ ו-460$/40׳; EIS 50$/מכולה למטען self-heating לפי קודי HS שצוינו; Foodgraded units (בלי סכום); Flexitank — התעריפים אינם תקפים; מטען בשווי מעל 500,000$ למכולה או תרופות יקרות — אינו תקף; ISPS במוצא (בלי סכום); LWS אם/מתי/היכן שחל; GRI. "
+          + "לא כולל שחרור מכס, שירותי פורוורדינג, הטענה/קשירה/אבטחת מטען, אחסנה, demurrage מעבר לימי הפטור, זמן המתנה, ביטוח ומסי יבוא מקומיים במוצא וביעד.</p>";
+      }
       if (vid === "msc-fak-asia-2026-12-01") {
         return head + "הכותרת במחירון: FAK rate offer to Ashdod (HCT) and Haifa ports — Effective as of 1.12.2026 until further notice but not beyond 14.12.2026 (HARMLESS). הצד: MEDITERRANEAN SHIPPING CO. (Israel) Ltd. "
           + "לא צוין במחירון מספר SCT, הסכם או filing, ולא הועתק ה-placeholder שהופיע במייל. אחרי שחרור הזמנה לא ניתן לשנות את קוד ה-SCT; שינוי/קוד שגוי — קנס 3,500$ למכולה, ואם אין תעריף בגלל קוד שגוי יחולו תעריפי FAK. יש לאמת את הקוד מול משרד MSC לפני הזמנה.</p>"
@@ -2396,7 +2408,7 @@
           "<p>התעריפים הם F.A.K. harmless ליעדי חיפה ואשדוד (אותו מחיר לשני היעדים). 40DV ו-40HC באותו מחיר. DTHC: 275$/20׳ ו-400$/40׳. EFS IN USD - SEP: 156$ × TEU (156$/20׳, 312$/40׳) — נוסף לסה״כ לפי הטבלה, בלי להמציא סכום אחר. OVW כלול בתעריף ל-20׳. 14 ימי demurrage חינם ביעד, אלא אם צוין אחרת. Origin THC משולם על ידי השולח. כפוף לדמי D/O ולהוצאות מקומיות (סכומים לא צוינו — לא הומצאו). כפוף לתוספות במועד השילוח. תנאי ההובלה: <span class=\"ltr\">https://www.msc.com/che/contract-of-carriage</span>.</p>" +
           "<p>לא נוספו אוטומטית (מותנים / ציוד מיוחד / מסוכן, והמחירון הוא FAK harmless): EIS 50$/מכולה ל-Coir pith/Flammable (הסכם נפרד) ולמטען עם סכנת בעירה ספונטנית; FTS 14$/TEU ל-FlexiTank/FlexiBag; SWB FEE 35$ לסוכן/שולח ב-POL שאינו אשראי; דמי HAZ ב-POL (בלי VIZAK ו-GOA): 500/150/250$ ל-TEU לפי PG 1/3/2; OTS 500$ ל-20׳ Open Top ו-1000$ ל-40׳ Open Top/High; Israel THC למסוכן/ציוד מיוחד 320$/20׳ ו-460$/40׳; SOC FEE 500$ × TEU. ביטול הזמנה: 200$/מכולה. לא מקבלים Granite Blocks. הובלה יבשתית עד מחסן הלקוח הוצעה במייל בנפרד ולא תומחרה במחירון. לא צוין במחירון דוא״ל להזמנה.</p>";
       }
-      return head + "ל-MSC יש במחשבון יותר ממחירון אחד. לתאריך שנבחר אין מחירון בתוקף, או שלא נבחרה גרסה. גרסאות זמינות בהיסטוריית המחירונים: Ex India + Sri Lanka (תוקף 16.08.2026–31.10.2026) ו-FAK Far East / SE Asia (תוקף 01.12.2026–14.12.2026). תנאי ההובלה: <span class=\"ltr\">https://www.msc.com/che/contract-of-carriage</span>.</p>";
+      return head + "ל-MSC יש במחשבון יותר ממחירון אחד. לתאריך שנבחר אין מחירון בתוקף, או שלא נבחרה גרסה. גרסאות זמינות בהיסטוריית המחירונים: Ex India + Sri Lanka (תוקף 16.08.2026–31.10.2026), FAK Far East / SE Asia (תוקף 01.12.2026–14.12.2026), ו-FAK UK / NWC (תוקף 01.12.2026–31.12.2026, חוזה Q73WC4P6G). תנאי ההובלה: <span class=\"ltr\">https://www.msc.com/che/contract-of-carriage</span>.</p>";
     }
     if (displayCarrier.id === "yml") {
       const ymlVid = displayCarrier.versionId || "";

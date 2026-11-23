@@ -340,6 +340,25 @@ window.QUOTE_INDEX =
       }
     },
     {
+      "id": "msc-nwc-uk-2026-12-01",
+      "carrierId": "msc",
+      "file": "data/msc/2026-12-01_nwc-uk.js",
+      "ref": "Q73WC4P6G",
+      "version": "",
+      "party": "MEDITERRANEAN SHIPPING CO. (Israel) Ltd.",
+      "vf": 20,
+      "vt": 50,
+      "issued": "2026-11-12",
+      "added": "2026-11-23",
+      "sourceFile": "MSC email RE: MAYAN/ NWC RATES /DEC 26 (12.11.2026)",
+      "sourceNote": "מייל מ-12.11.2026. תוקף 01.12.2026–31.12.2026. FAK ליבוא מ-UK (London Gateway) ומ-NWC (Antwerp, Rotterdam, Le Havre, Hamburg). מספר חוזה Q73WC4P6G. מחירון חלקי. 40׳ HC לא צוין ולא הומצא. במייל לא צוין נמל יעד במפורש; התעריף הוחל על אשדוד וחיפה באותו מחיר, כמקובל בהצעות יבוא של MSC לישראל.",
+      "label": "FAK UK / NWC (Dec 2026)",
+      "offerTitle": "FAK rates UK / NWC val 1.12.26–31.12.26",
+      "partialCoverage": true,
+      "website": "https://www.msc.com",
+      "termsUrl": "https://www.msc.com/che/contract-of-carriage"
+    },
+    {
       "id": "one-neu-2026-11-01",
       "carrierId": "one",
       "file": "data/one/2026-11-01_neu.js",
@@ -759,7 +778,9 @@ window.QUOTE_INDEX =
     "LIVERPOOL, GB",
     "BELFAST, GB",
     "MARSEILLE, FR",
-    "VISAKHAPATNAM, IN"
+    "VISAKHAPATNAM, IN",
+    "LONDON GATEWAY, GB",
+    "HAMBURG, DE"
   ],
   "types": [
     "DV20",
@@ -799,7 +820,8 @@ window.QUOTE_INDEX =
     "DETENTION: ASH - $ 21 ; HFA - $ 17",
     "DETENTION: ASH - $ 42 ; HFA - $ 34",
     "Dry FAK only, not Ceramics. DETENTION: ASH - $ 21 ; HFA - $ 17",
-    "Dry FAK only, not Ceramics. DETENTION: ASH - $ 42 ; HFA - $ 34"
+    "Dry FAK only, not Ceramics. DETENTION: ASH - $ 42 ; HFA - $ 34",
+    "F.A.K. ליעדי אשדוד וחיפה (אותו מחיר; במייל לא צוין נמל יעד, וההצעה היא ליבוא לישראל). תוקף 01.12.2026–31.12.2026. מספר חוזה/הסכם: Q73WC4P6G (יש להשתמש במספר המעודכן; מספרי החוזה הקודמים אינם בתוקף עוד). תעריפי הובלה: מלונדון גייטוויי (UK) 200$/20׳ ו-300$/40׳; מאנטוורפן, רוטרדם, לה האבר והמבורג (NWC) 375$/20׳ ו-600$/40׳. 40׳ HC לא צוין במחירון ולא הומצא תעריף. התוספות הבאות נוספו לסה״כ בדולר, לפי /TEU כפול 2 ל-40׳ ולפי /CNTR כסכום למכולה: BRC 367$/TEU, PSS 200$/TEU, IEI (Import Emergency Imbalance) 100$/מכולה, ECA 160$/TEU, ETS 66$/TEU, EFS 81$/TEU, FEU 12$/TEU. EBS: NO EBS — לא נוסף. THC יעד (VATOS) 275$/20׳ ו-400$/40׳ נוסף כ-DTHC (Collect). אין EBS. 21 ימי demurrage בהסכם — הימים החופשיים בהצעה תקפים רק למשלוחי Collect. דירוג לפי תאריך הפלגת הפרופורמה בלוח MSC. כפוף לתוספות חירום V.A.T.O.S, לזמינות ציוד במוצא, לביקורת בנמלי שטעון, לדמי D/O ולהוצאות מקומיות (סכומים לא צוינו — לא הומצאו). לא כולל שחרור מכס, שירותי פורוורדינג, הטענה/קשירה/אבטחת מטען, אחסנה, demurrage מעבר לימי הפטור, זמן המתנה, ביטוח ומסי יבוא מקומיים במוצא וביעד. לא נוספו אוטומטית: HAZ (Med & Low Risk) 50$/TEU בשורות NWC בלבד (בתא UK התא היה ריק); תעריף HAZ לפי רמת סיכון מ-01.01.2023: Low 300$/מכולה, Med 400$, High 800$ (סוללות ליתיום = High Risk); למטען מסוכן נדרש אישור מוקדם של MSC ישראל לפי Packing Group ו-Class; THC ל-IMO ולציוד מיוחד 320$/20׳ ו-460$/40׳; EIS 50$/מכולה למטען self-heating לפי קודי HS שצוינו (0305 / 1214 / 1404 / 1802 / 2301 / 2304 / 2305 / 2306 / 2308 / 2309 / 2803 / 3802 / 3804 / 4004 / 4400 / 4401 / 4402 / 5200 / 5201 / 5300 / 5301 / 5302 / 5303 / 5305 / 7204 / 7602; ייתכנו קודים נוספים בלי הודעה מוקדמת); Foodgraded units additional (בלי סכום); Flexitank — התעריפים אינם תקפים, יש לבדוק מול המשרד; מטען בשווי מעל 500,000$ למכולה או תרופות יקרות — התעריפים אינם תקפים; ISPS במוצא (כפוף, בלי סכום); LWS אם/מתי/היכן שחל; GRI. תנאי ההובלה: https://www.msc.com/che/contract-of-carriage."
   ],
   "incl": [
     "CNS/AGC/SSD/WR/THC",
@@ -899,7 +921,11 @@ window.QUOTE_INDEX =
     "EIS",
     "ENV",
     "EWR",
-    "FEEDER"
+    "FEEDER",
+    "BRC",
+    "IEI",
+    "ECA",
+    "FEU"
   ],
   "curs": [
     "USD",
@@ -1854,6 +1880,14 @@ window.QUOTE_INDEX =
     "MARSEILLE": [
       "FRMRS",
       "France"
+    ],
+    "LONDON GATEWAY": [
+      "GBLGP",
+      "United Kingdom"
+    ],
+    "HAMBURG": [
+      "DEHAM",
+      "Germany"
     ]
   },
   "countryHe": {
@@ -2046,7 +2080,10 @@ window.QUOTE_INDEX =
     "EIS": "EIS",
     "ENV": "תוספת סביבתית (Environmental)",
     "EWR": "EWR",
-    "FEEDER": "הובלת פידר (Feeder Freight)"
+    "FEEDER": "הובלת פידר (Feeder Freight)",
+    "BRC": "תוספת דלק (Bunker Recovery Charge)",
+    "IEI": "תוספת חוסר איזון בציוד ביבוא (Import Emergency Imbalance)",
+    "ECA": "אזור בקרת פליטות (Emission Control Area)"
   },
   "payHe": {
     "prepaid": "במוצא (Prepaid)",
