@@ -869,10 +869,10 @@
     <footer class="note">כלי פנימי להצעת מחיר ממחירון. התעריפים כפופים לתוקף, למקום פנוי ולתנאי החברה.</footer>
   </div>
   <noscript><p class="wrap">יש להפעיל JavaScript כדי להשתמש במחשבון.</p></noscript>
-  <script src="data/index.js?v=bouchard-20261123"></script>
-  <script src="data/notices.js?v=bouchard-20261123"></script>
-  <script src="data/spots.js?v=bouchard-20261123"></script>
-  <script src="data/schedules.js?v=bouchard-20261123"></script>
+  <script src="data/index.js?v=no-contacts-20261123"></script>
+  <script src="data/notices.js?v=no-contacts-20261123"></script>
+  <script src="data/spots.js?v=no-contacts-20261123"></script>
+  <script src="data/schedules.js?v=no-contacts-20261123"></script>
   <script>
 (function () {
   const DATA = window.QUOTE_INDEX;
@@ -1099,7 +1099,6 @@
     return versionTitle(carrier);
   }
   function bookingLine(carrier) {
-    if (carrier.email) return carrier.email;
     if (carrier.agent) return carrier.agent;
     return "";
   }
@@ -1729,7 +1728,7 @@
     }
     return new Promise(function (resolve, reject) {
       const s = document.createElement("script");
-      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=bouchard-20261123";
+      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=no-contacts-20261123";
       s.async = true;
       s.onload = function () {
         const pack = window.QUOTE_PACK && window.QUOTE_PACK[meta.id];
@@ -2022,7 +2021,7 @@
     }
     if (displayCarrier.id === "oocl") {
       return "<p>תיקון מספר חוזה / filing שגוי עולה 100$. ההובלה מתומחרת לפי תאריך הטעינה בשטר המטען (BL loading date) בלי חריגים. מטען כללי / non-IMCO, Freight Collect. תוקף 15.11.2026–30.11.2026. ההצעה תקפה לתשלום במזומן ולמטען בשווי נמוך מ-500,000$ למכולה, וכפופה למקום פנוי.</p>" +
-        "<p>הסוכן: Israel Scandinavian Maritime Agency Ltd (סוכן בלבד ל-OOCL). פניות: isma-sales@israscan.co.il, www.Israscan.co.il, טל׳ (972) 4-8680777. חיפה: 2 Khayat Sq., POB 33557. אשדוד: Haorgim 35, room 602, P.O.B 4060. תנאי התעריף וה-B/L ב-www.OOCL.com. התעריפים כפופים לשינוי (V.A.T.O.S). אינם כוללים ביטוח, שחרור מכס, אגרות ומיסים. המוביל רשאי לנתב דרך סואץ או כף התקווה הטובה (COGH) בלי הודעה. זמני ההפלגה משוערים.</p>" +
+        "<p>הסוכן: Israel Scandinavian Maritime Agency Ltd (סוכן בלבד ל-OOCL). אתר הסוכן: www.Israscan.co.il. חיפה: 2 Khayat Sq., POB 33557. אשדוד: Haorgim 35, room 602, P.O.B 4060. תנאי התעריף וה-B/L ב-www.OOCL.com. התעריפים כפופים לשינוי (V.A.T.O.S). אינם כוללים ביטוח, שחרור מכס, אגרות ומיסים. המוביל רשאי לנתב דרך סואץ או כף התקווה הטובה (COGH) בלי הודעה. זמני ההפלגה משוערים.</p>" +
         "<p>לפי האקסל: התעריף מבוסס על הניתוב שצוין (Rates from NON BASE PORTS); ניתוב אחר עלול לשנות את המחיר. B/L שימוזגו עם B/L אחר יהיו כפופים ל-roll over. לפי הטקסט הנלווה (לא בתאי האקסל): Foshan, Jiangmen ו-Huangpu דרך טרמינלים מסוימים בלבד — לפנות לסוכן; וכן אם נדרש תעריף מ-POL אחר.</p>";
     }
     if (displayCarrier.id === "msc") {
@@ -2051,7 +2050,7 @@
           + "<p>חיובים מקומיים ליבוא (Dry / Harmless) מוצגים בנפרד ולא נכללים בסה״כ ההובלה: Handling Fee 76$ לשטר מטען, Container Fee 15$ למכולה יבשה, Fuel Energy Transition 70$/20׳ ו-140$/40׳. כפוף גם לדמי D/O ולהוצאות מקומיות נוספות. "
           + "לא נוספו אוטומטית (מותנים): Flexi/Flexibag 14$ למכולה; מטען עם בעירה ספונטנית / חימום עצמי 50$/מכולה (גיליון SCF — כותרת בלבד, רשימת הסחורות לא הייתה בטקסט מחלץ); "
           + "דמי מועמדות למכולה כבדה בהונג קונג ודרום סין (Nansha RMB 100, Shekou RMB 200, Yantian RMB 400, Hong Kong HKD 700, Shantou RMB 100 ל-20DV בלבד, Qinzhou Nil — לא הומרו ולא נוספו). "
-          + "גיליונות South East Asia pre carriage (TAO/PRE מעל תעריף נמל האם, ובנוסף CRS) ו-China Pre Carriage (inland) לא נכללו בסה״כ ההובלה. הובלה פנים-ארצית ביעד: ISR-intermodal@msc.com. לא צוין במחירון דוא״ל הזמנות כללי.</p>";
+          + "גיליונות South East Asia pre carriage (TAO/PRE מעל תעריף נמל האם, ובנוסף CRS) ו-China Pre Carriage (inland) לא נכללו בסה״כ ההובלה. הובלה פנים-ארצית ביעד לא נכללה בסה״כ. לא צוין במחירון דוא״ל הזמנות כללי.</p>";
       }
       if (vid === "msc-india-sl-2026-08-16") {
         return head + "הכותרת במחירון: Updated rate offer Ex India + Sri Lanka as from 16.08.2026 till 31.10.2026* (F.A.K HARMLESS) To Haifa/Ashdod — Updated 15.09.26. הערת הכוכבית: Effective last container Received for export at train depots, terminals or POL'S. הצד במכתב: MEDITERRANEAN SHIPPING CO. (Israel) Ltd. לא נמצא במחירון מספר הסכם, filing או חוזה. במייל צוין שההסכם כבר הוגש לפי שורת הנושא, אבל המספר אינו מופיע בקובץ ולא הומצא.</p>" +
@@ -2074,7 +2073,7 @@
     }
     if (displayCarrier.id === "one") {
       return "<p>חברת הספנות: Ocean Network Express (ONE). הסוכן הכללי בישראל לפי המייל: Crown Shipping, as general agent for ONE. "
-        + "פניות: " + ltrHtml("sales@crown-shipping.co.il") + " · " + ltrHtml("https://www.one-line.com") + ". "
+        + "אתר: " + ltrHtml("https://www.one-line.com") + ". "
         + "לא צוין במחירון או במייל מספר הסכם / filing, ולא הומצא. בעת הזמנה יש לבקש מהסוכן להגיש (file) את התעריף לפני ההזמנה.</p>"
         + "<p>מחירון יבוא מצפון אירופה, הבלטיק וסקנדינביה לחיפה/אשדוד. תוקף 01.11.2026–30.11.2026. הונפק / נשלח ב-25.10.2026. "
         + "ההובלה הימית נקובה ב<strong>אירו</strong>; התוספות OBS, EES, DTHC ו-CMD נקובות בדולר. הסכומים לא הומרו ולא חוברו למטבע אחד. "
@@ -2095,8 +2094,7 @@
         + "דמי הובלה יבשתית (6%, מינימום 58 ₪) לא נוספו כי אין במחירון תעריף inland.</p>";
     }
     let html = "<p>";
-    if (displayCarrier.email) html += "פניות להזמנה: " + esc(displayCarrier.email) + ".";
-    if (displayCarrier.scheduleUrl) html += (displayCarrier.email ? " " : "") + 'לוח הפלגות: <span class="ltr">' + esc(displayCarrier.scheduleUrl) + "</span>.";
+    if (displayCarrier.scheduleUrl) html += 'לוח הפלגות: <span class="ltr">' + esc(displayCarrier.scheduleUrl) + "</span>.";
     html += "</p>";
     html += "<p>התעריפים כפופים לתוספות התקפות במועד השילוח, ועשויים להשתנות עד לקבלת הזמנה סופית. החברה שומרת לעצמה את הזכות להוסיף תוספות כגון Peak Season ו־War Risk Premium.</p>";
     html += "<p>ההצעה כפופה לזמינות מקום וציוד, לתיאור המטען ולנפח שנמסר, ולתנאי שטר המטען והתעריפים הרשמיים. אם לא צוין אחרת, השילוח הוא ב־liner terms. דמי סוכן בנמל הטעינה או הפריקה אינם כלולים. אגרות מקומיות של רשויות המכס יש לשלם בנפרד.</p>";
@@ -2786,7 +2784,7 @@
         "<dt>סוג</dt><dd>" + esc((TYPE_HE[quoteRate.typ] || quoteRate.typ) + (quoteRate.haz ? " · מטען מסוכן" : "")) + "</dd>" +
         "<dt>קבלת מטען</dt><dd>" + esc(recv) + "</dd>";
       if (routingOf(quoteRate)) props += "<dt>ניתוב</dt><dd>" + esc(routingOf(quoteRate)) + "</dd>";
-      props += "<dt>" + (displayCarrier.email ? "דוא״ל הזמנות" : "גורם מטפל") + "</dt><dd>" +
+      props += "<dt>גורם מטפל</dt><dd>" +
         (bookingLine(displayCarrier) ? ltrHtml(bookingLine(displayCarrier)) : "לא צוין במחירון") + "</dd>";
       if (displayCarrier.paymentTerms) props += "<dt>תנאי תשלום</dt><dd>" + esc(displayCarrier.paymentTerms) + "</dd>";
       props += "</dl>";
