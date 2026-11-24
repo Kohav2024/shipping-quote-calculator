@@ -549,5 +549,49 @@ window.CARRIER_NOTICES = [
       { "kind": "p", "text": "OOCL אינה מקבלת מטען ביטחוני או צבאי, ולא סחורות הקשורות לו." },
       { "kind": "original", "lead": "נוסח מקורי", "text": "Not accepting security  / military cargo or related commodities." }
     ]
+  },
+  {
+    "id": "msc-india-sl-2026-11-19",
+    "carrierIds": [
+      "msc"
+    ],
+    "title": "MSC: מחירון FAK ליבוא מהודו ומסרי לנקה, 19.11.2026–15.12.2026, ואיסור Granite Blocks",
+    "banner": "MSC יבוא מהודו/סרי לנקה: מחירון FAK בתוקף 19.11.2026–15.12.2026, חוזה R26824020000093. לא מקבלים Granite Blocks.",
+    "publishedDate": "2026-11-19",
+    "added": "2026-11-24",
+    "effectiveFromVessel": null,
+    "validTo": "2026-12-15",
+    "appliesWhen": "always",
+    "severity": "warning",
+    "originCountries": [
+      "IN",
+      "LK"
+    ],
+    "quoteWarningTitle": "MSC: יבוא מהודו / סרי לנקה — לא מקבלים Granite Blocks",
+    "quoteWarning": "מחירון FAK HARMLESS בתוקף 19.11.2026–15.12.2026, חוזה R26824020000093. במחירון נכתב במפורש: לא מקבלים מטען Granite Blocks. תעריפי Coir pith דורשים הסכם נפרד ולא נכללו.",
+    "sections": [
+      {
+        "kind": "meta",
+        "text": "התקבל במייל מ-24.11.2026 כהארכת תוקף עד 15.12.2026. כותרת המחירון עודכנה ב-23.11.26. תוקף: 19.11.2026–15.12.2026 (*Effective last container Received for export at train depots, terminals or POL'S). מספר חוזה: R26824020000093 (FAK). הצד: MSC Mediterranean Shipping Agency AG, as agent only for MSC Mediterranean Shipping Company S.A., Geneva."
+      },
+      {
+        "kind": "p",
+        "lead": "איסור מטען:",
+        "text": "PAY ATTENTION: We Don’t Accept Granite Blocks commodity. לא מקבלים מטען Granite Blocks."
+      },
+      {
+        "kind": "p",
+        "text": "התעריפים הם F.A.K. harmless ליעדי אשדוד וחיפה (אותו מחיר). 14 ימי demurrage חינם ביעד, אלא אם צוין אחרת. EFS לפי העמודה EFS IN USD - NOV/DEC: 167$ ל-TEU בנובמבר ו-168$ ל-TEU בדצמבר. DTHC 275$/20׳ ו-400$/40׳. OVW כלול בתעריף ל-20׳."
+      },
+      {
+        "kind": "p",
+        "text": "אין במחירון תעריף COIR. ל-Coir pith/Flammable material נדרש הסכם נפרד (EIS 50$ למכולה) — לא הומצא תעריף."
+      },
+      {
+        "kind": "original",
+        "lead": "נוסח מקורי",
+        "text": "Updated rate offer Ex India + Sri Lanka as from 19.11.2026 till 15.12.2026* (F.A.K HARMLESS) To Haifa/Ashdod — Updated 23.11.26\n\nPAY ATTENTION: We Don’t Accept Granite Blocks commodity\n\nEIS $50/container applicable for Commodity Coir pith/ Flammable material-  A separate agreement is required for this cargo upon request\n\nRates are subject to EFS.\nEFS IN USD - NOV/DEC: 167/168 X TEU\n14 DAYS FREE OF DEMURRAGE IS APPLICABLE AT POD - UNLESS STATED DIFFERENTLY BY YOUR SALES PERSON.\nORIGIN THC SHOULD BE PAID BY SHIPPER\n\nPlease find our attached extended rate offer with validity of 15.12.2026.\nThe rate agreement mentioned in the subject line has been filed accordingly in our system."
+      }
+    ]
   }
 ];
