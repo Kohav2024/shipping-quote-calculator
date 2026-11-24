@@ -941,10 +941,10 @@
     <footer class="note">כלי פנימי להצעת מחיר ממחירון. התעריפים כפופים לתוקף, למקום פנוי ולתנאי החברה.</footer>
   </div>
   <noscript><p class="wrap">יש להפעיל JavaScript כדי להשתמש במחשבון.</p></noscript>
-  <script src="data/index.js?v=msc-india-sl-20261124b"></script>
-  <script src="data/notices.js?v=msc-india-sl-20261124b"></script>
-  <script src="data/spots.js?v=msc-india-sl-20261124b"></script>
-  <script src="data/schedules.js?v=msc-india-sl-20261124b"></script>
+  <script src="data/index.js?v=one-pss-jp-20261124"></script>
+  <script src="data/notices.js?v=one-pss-jp-20261124"></script>
+  <script src="data/spots.js?v=one-pss-jp-20261124"></script>
+  <script src="data/schedules.js?v=one-pss-jp-20261124"></script>
   <script>
 (function () {
   const DATA = window.QUOTE_INDEX;
@@ -1967,7 +1967,7 @@
     }
     return new Promise(function (resolve, reject) {
       const s = document.createElement("script");
-      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=msc-india-sl-20261124b";
+      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=one-pss-jp-20261124";
       s.async = true;
       s.onload = function () {
         const pack = window.QUOTE_PACK && window.QUOTE_PACK[meta.id];
@@ -2695,9 +2695,30 @@
     state.noticeOpen = false;
     render();
   }
+  function carrierOriginCountries(carrierId) {
+    const have = {};
+    allLoadedRates(carrierId).forEach(function (r) {
+      const cc = portCountry(r.origin) || portCountry(r.pol);
+      if (cc) have[cc] = true;
+    });
+    return have;
+  }
+  function noticeHasUnquotedOriginScope(n, carrierId) {
+    const countries = n.originCountries || [];
+    if (!countries.length) return false;
+    const have = carrierOriginCountries(carrierId);
+    for (let i = 0; i < countries.length; i++) {
+      if (have[countries[i]]) return false;
+    }
+    return true;
+  }
   function noticeBannerHtml(carrier, iso, origin, rate) {
+    // Banners were removed from the search card to keep the form simple.
+    // Re-show only notices scoped to origin countries that this carrier has
+    // no rates for (the origin cannot be selected, so the quote card would
+    // never surface the notice). Example: ONE PSS ex-Japan.
     const list = activeNoticesFor(carrier.id, iso).filter(function (n) {
-      return noticeAppliesToLane(n, rate, origin);
+      return noticeHasUnquotedOriginScope(n, carrier.id);
     });
     if (!list.length) return "";
     return list.map(function (n, i) {
@@ -3659,7 +3680,8 @@
       '<section class="card search-card">' +
       '<div class="search-top">' +
         '<div class="carrier-field"><label class="fld" for="carrier">חברת ספנות</label><select id="carrier">' + carrierOptions + "</select>" +
-        (!isCompare ? historyLinkHtml(carrier) : "") + "</div>" +
+        (!isCompare ? historyLinkHtml(carrier) : "") +
+        (!isCompare ? noticeBannerHtml(carrier, shipIso, selectedOrigin, null) : "") + "</div>" +
         '<div class="origin-combo" id="origin-combo">' +
           '<label class="fld" for="origin-input" id="origin-field-label">נמל מוצא (' + origins.length + " במחירון)</label>" +
           '<input type="text" id="origin-input" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="origin-list" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" placeholder="הקלידו אות לחיפוש או בחרו מהרשימה" value="' + esc(selectedOrigin ? originChoiceLabel(selectedOrigin) : "") + '">' +

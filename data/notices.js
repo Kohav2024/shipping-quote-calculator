@@ -593,5 +593,75 @@ window.CARRIER_NOTICES = [
         "text": "Updated rate offer Ex India + Sri Lanka as from 19.11.2026 till 15.12.2026* (F.A.K HARMLESS) To Haifa/Ashdod — Updated 23.11.26\n\nPAY ATTENTION: We Don’t Accept Granite Blocks commodity\n\nEIS $50/container applicable for Commodity Coir pith/ Flammable material-  A separate agreement is required for this cargo upon request\n\nRates are subject to EFS.\nEFS IN USD - NOV/DEC: 167/168 X TEU\n14 DAYS FREE OF DEMURRAGE IS APPLICABLE AT POD - UNLESS STATED DIFFERENTLY BY YOUR SALES PERSON.\nORIGIN THC SHOULD BE PAID BY SHIPPER\n\nPlease find our attached extended rate offer with validity of 15.12.2026.\nThe rate agreement mentioned in the subject line has been filed accordingly in our system.\n\nFrom the 22.11.2026 email in the same thread:\nSubject: RE: RATE OFFER EX INDIA VALID as from 19.11.2026-30.11.2026 CONTRACT R26824020000093(FAK)+ R26825020000029 (COIR) MAYAN OVERSEAS LTD\n\nPls find below the updated Transit Time ex the main ports of loading:\nNorth India POL Mundra to POD ASH / HFA : 48-49\nPOL Nhava Sheva to POD ASH / HFA : 47-48\nSouth and West India POL Tuticorin to POD ASH / HFA : 44-45\nPOL Kolkata to POD ASH / HFA : 53-54\nColombo POL SRI LANKA to POD ASH / HFA : 37-38"
       }
     ]
+  },
+  {
+    "id": "one-pss-japan-2026-12-01",
+    "carrierIds": [
+      "one"
+    ],
+    "title": "ONE: תוספת עונת שיא (PSS) ביבוא מיפן לישראל מ־01.12.2026",
+    "banner": "ONE: מ־01.12.2026 תוספת PSS ביבוא מיפן לישראל — 750$ ל־20׳, 1,500$ ל־40׳, עד להודעה חדשה",
+    "publishedDate": "2026-11-24",
+    "added": "2026-11-24",
+    "effectiveFromVessel": null,
+    "validTo": null,
+    "appliesWhen": "always",
+    "severity": "warning",
+    "originCountries": [
+      "JP"
+    ],
+    "quoteWarningTitle": "ONE: תוספת PSS ביבוא מיפן לישראל מ־01.12.2026",
+    "quoteWarning": "מ־01.12.2026 ועד להודעה חדשה חלה תוספת עונת שיא (PSS) על יבוא מיפן לישראל: 750$ למכולת 20׳ ו־1,500$ למכולת 40׳. אין במחשבון מחירון ONE ליפן כרגע; אם ייתוסף, התוספת תחושב אוטומטית לסה״כ מתאריך BL 01.12.2026.",
+    "surcharge": {
+      "code": "PSS",
+      "label": "PSS — Peak Season Surcharge (יפן)",
+      "currency": "USD",
+      "basis": "Container",
+      "perTeu": 750,
+      "teuByType": {
+        "DV20": 1,
+        "FL20": 1,
+        "OT20": 1,
+        "DV40": 2,
+        "HC40": 2,
+        "FL40": 2,
+        "OT40": 2
+      },
+      "effectiveFrom": "2026-12-01",
+      "effectiveTo": null,
+      "match": {
+        "originCountries": [
+          "JP"
+        ],
+        "side": "origin"
+      },
+      "note": "מ־01.12.2026 ועד להודעה חדשה: PSS ביבוא מיפן לישראל, 750$ למכולת 20׳ ו־1,500$ למכולת 40׳. 40HC מחויב בסכום ה־40׳, לפי מוסכמת האתר לתוספות שמצוינות ל־40׳."
+    },
+    "sections": [
+      {
+        "kind": "meta",
+        "text": "התקבל בהודעה ב־24.11.2026 (לא צוין תאריך במייל המקורי). בתוקף מ־01.12.2026 ועד להודעה חדשה. חל על יבוא מיפן לישראל בחברת ONE."
+      },
+      {
+        "kind": "p",
+        "text": "מ־01.12.2026 תחול תוספת עונת שיא (Peak Season Surcharge, PSS) על משלוחי יבוא מיפן לישראל, בסכומים הבאים:"
+      },
+      {
+        "kind": "list",
+        "items": [
+          "750$ למכולת 20׳",
+          "1,500$ למכולת 40׳"
+        ]
+      },
+      {
+        "kind": "p",
+        "text": "התוספת תישאר בתוקף עד להודעה חדשה. אין במחשבון מחירון ONE ליפן כרגע, ולכן אין ציטוט מחיר לנמלי יפן. אם ייתוסף מחירון כזה, התוספת תתווסף אוטומטית לסה״כ כאשר תאריך ה-BL הוא 01.12.2026 או מאוחר יותר."
+      },
+      {
+        "kind": "original",
+        "lead": "נוסח מקורי",
+        "text": "Dear Valued Customers,\nPlease be advised that effective December 1st, 2026, a Peak Season Surcharge (PSS) will apply to import shipments from Japan to Israel as follows:\n•\tUSD 750 per 20’ container\n•\tUSD 1,500 per 40’ container\nThe surcharge will remain in effect until further notice.\nThank you for your understanding and continued support.\nBest regards,\nCrown Shipping"
+      }
+    ]
   }
 ];
