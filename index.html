@@ -947,10 +947,10 @@
     <footer class="note">כלי פנימי להצעת מחיר ממחירון. התעריפים כפופים לתוקף, למקום פנוי ולתנאי החברה.</footer>
   </div>
   <noscript><p class="wrap">יש להפעיל JavaScript כדי להשתמש במחשבון.</p></noscript>
-  <script src="data/index.js?v=empty-start-20261124"></script>
-  <script src="data/notices.js?v=empty-start-20261124"></script>
-  <script src="data/spots.js?v=empty-start-20261124"></script>
-  <script src="data/schedules.js?v=empty-start-20261124"></script>
+  <script src="data/index.js?v=close-combo-20261124"></script>
+  <script src="data/notices.js?v=close-combo-20261124"></script>
+  <script src="data/spots.js?v=close-combo-20261124"></script>
+  <script src="data/schedules.js?v=close-combo-20261124"></script>
   <script>
 (function () {
   const DATA = window.QUOTE_INDEX;
@@ -1910,9 +1910,11 @@
     );
   }
   function clearSearch() {
+    suppressOriginReopen(400);
     comboOpen = false;
     comboTyped = null;
     comboHighlight = -1;
+    comboPointer = null;
     resetSearchState();
     render();
     window.scrollTo(0, 0);
@@ -2025,7 +2027,7 @@
     }
     return new Promise(function (resolve, reject) {
       const s = document.createElement("script");
-      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=empty-start-20261124";
+      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=close-combo-20261124";
       s.async = true;
       s.onload = function () {
         const pack = window.QUOTE_PACK && window.QUOTE_PACK[meta.id];
@@ -2234,6 +2236,53 @@
   let comboOpen = false;
   let comboTyped = null;
   let comboHighlight = -1;
+  let comboSuppressOpen = false;
+  let comboSuppressTimer = null;
+  let comboPointer = null;
+
+  function suppressOriginReopen(ms) {
+    comboSuppressOpen = true;
+    if (comboSuppressTimer) clearTimeout(comboSuppressTimer);
+    comboSuppressTimer = setTimeout(function () {
+      comboSuppressOpen = false;
+      comboSuppressTimer = null;
+    }, ms || 700);
+  }
+
+  function swallowResidualClick() {
+    function block(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      document.removeEventListener("click", block, true);
+    }
+    document.addEventListener("click", block, true);
+    setTimeout(function () { document.removeEventListener("click", block, true); }, 450);
+  }
+
+  function scrollFocus(el) {
+    if (!el) return;
+    try { el.focus({ preventScroll: true }); } catch (err) {
+      try { el.focus(); } catch (err2) {}
+    }
+    if (el.scrollIntoView) el.scrollIntoView({ block: "center", behavior: "smooth" });
+  }
+
+  function focusNextQuoteField(after) {
+    const typ = document.getElementById("typ");
+    const date = document.getElementById("date");
+    const destBtns = Array.prototype.slice.call(document.querySelectorAll("[data-dest]"));
+    if (after === "origin" && !state.dest) {
+      const group = destBtns[0] ? (destBtns[0].closest(".seg") || destBtns[0]) : null;
+      if (destBtns[0]) scrollFocus(destBtns[0]);
+      else if (group && group.scrollIntoView) group.scrollIntoView({ block: "center", behavior: "smooth" });
+      return;
+    }
+    if ((after === "origin" || after === "dest") && typ && !typ.disabled && !state.typ) {
+      scrollFocus(typ);
+      return;
+    }
+    if (date) scrollFocus(date);
+  }
 
   function originItemHtml(o, active) {
     const route = (o.kind === "inland" ? "דרך " + o.pol : "") + (o.routing ? ((o.kind === "inland" ? " · " : "") + o.routing) : "");
@@ -2289,12 +2338,6 @@
     const active = items[comboHighlight];
     if (active) input.setAttribute("aria-activedescendant", "origin-opt-" + active.id);
     else input.removeAttribute("aria-activedescendant");
-    list.querySelectorAll("[data-id]").forEach(function (btn) {
-      btn.addEventListener("pointerdown", function (e) {
-        e.preventDefault();
-        chooseOrigin(btn.getAttribute("data-id"));
-      });
-    });
     if (comboHighlight >= 0) {
       const el = list.querySelector(".is-active");
       if (el && el.scrollIntoView) el.scrollIntoView({ block: "nearest" });
@@ -2338,6 +2381,8 @@
   }
 
   function chooseOrigin(id) {
+    suppressOriginReopen(800);
+    swallowResidualClick();
     state.originId = id || "";
     state.originKey = "";
     state.typ = "";
@@ -2346,7 +2391,20 @@
     state.copyFallback = "";
     comboTyped = null;
     comboOpen = false;
+    comboHighlight = -1;
+    comboPointer = null;
+    const input = document.getElementById("origin-input");
+    const list = document.getElementById("origin-list");
+    if (list) list.hidden = true;
+    if (input) {
+      input.setAttribute("aria-expanded", "false");
+      input.removeAttribute("aria-activedescendant");
+      input.blur();
+    }
     render();
+    const again = document.getElementById("origin-input");
+    if (again) again.blur();
+    focusNextQuoteField("origin");
   }
 
   function rematchOrigin(nextId, prevOriginId, prevOrigins) {
@@ -3808,6 +3866,7 @@
     const originInput = $("origin-input");
     if (originInput) {
       originInput.addEventListener("focus", function () {
+        if (comboSuppressOpen) return;
         originInput.select();
         if (!comboOpen) {
           comboTyped = "";
@@ -3815,10 +3874,22 @@
         }
       });
       originInput.addEventListener("input", function () {
+        if (comboSuppressOpen) return;
         comboTyped = originInput.value;
         comboHighlight = comboTyped ? 0 : -1;
         if (!comboOpen) openOriginList();
         else paintOriginList();
+      });
+      originInput.addEventListener("blur", function () {
+        setTimeout(function () {
+          if (comboSuppressOpen) return;
+          if (!comboOpen) return;
+          if (comboPointer) return;
+          const combo = document.getElementById("origin-combo");
+          const active = document.activeElement;
+          if (combo && active && combo.contains(active)) return;
+          closeOriginList(true);
+        }, 150);
       });
       originInput.addEventListener("keydown", function (e) {
         const items = filterOrigins(comboOrigins, comboTyped != null ? comboTyped : "");
@@ -3847,12 +3918,44 @@
         }
       });
     }
+    const originListEl = $("origin-list");
+    if (originListEl) {
+      originListEl.addEventListener("pointerdown", function (e) {
+        const btn = e.target.closest("[data-id]");
+        if (!btn || !originListEl.contains(btn)) return;
+        comboPointer = { id: btn.getAttribute("data-id"), x: e.clientX, y: e.clientY };
+        if (e.pointerType === "mouse" || e.pointerType === "") e.preventDefault();
+      });
+      originListEl.addEventListener("mousedown", function (e) {
+        if (e.target.closest("[data-id]")) e.preventDefault();
+      });
+      originListEl.addEventListener("pointerup", function (e) {
+        if (!comboPointer) return;
+        const dx = e.clientX - comboPointer.x;
+        const dy = e.clientY - comboPointer.y;
+        const btn = e.target.closest("[data-id]");
+        const id = (btn && originListEl.contains(btn) && btn.getAttribute("data-id")) || comboPointer.id;
+        const wasTap = Math.hypot(dx, dy) < 14;
+        comboPointer = null;
+        if (!wasTap || !id) return;
+        e.preventDefault();
+        e.stopPropagation();
+        chooseOrigin(id);
+      });
+      originListEl.addEventListener("pointercancel", function () { comboPointer = null; });
+      originListEl.addEventListener("click", function (e) {
+        if (!e.target.closest("[data-id]")) return;
+        e.preventDefault();
+        e.stopPropagation();
+      });
+    }
     $("typ").addEventListener("change", (e) => {
       state.typ = e.target.value;
       state.haz = false;
       state.copied = false;
       state.copyFallback = "";
       render();
+      focusNextQuoteField("typ");
     });
     app.querySelectorAll("[data-dest]").forEach((btn) => {
       btn.addEventListener("click", () => {
@@ -3862,6 +3965,7 @@
         state.copied = false;
         state.copyFallback = "";
         render();
+        focusNextQuoteField("dest");
       });
     });
     $("date").addEventListener("change", (e) => { state.dateText = e.target.value; state.versionOverride = {}; state.copied = false; state.copyFallback = ""; render(); });
@@ -4067,6 +4171,13 @@
     if (e.key !== "Escape") return;
     if (state.calOpen) { e.preventDefault(); closeCalendar(); return; }
     if (state.noticeOpen) { e.preventDefault(); closeNotice(); return; }
+    if (comboOpen) {
+      e.preventDefault();
+      closeOriginList(true);
+      const oi = document.getElementById("origin-input");
+      if (oi) oi.blur();
+      return;
+    }
     if (state.historyOpen) {
       e.preventDefault();
       state.historyOpen = false;
