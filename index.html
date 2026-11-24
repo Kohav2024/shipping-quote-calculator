@@ -596,6 +596,12 @@
       background: var(--navy);
       color: #fff;
     }
+    .btn-clear {
+      width: 100%;
+      margin-top: 8px;
+      min-height: 48px;
+      font-size: 1rem;
+    }
     .compare-list { display: grid; gap: 16px; margin-top: 12px; }
     .compare-card .card-head { margin-bottom: 10px; }
     .compare-card .terms { margin-top: 14px; }
@@ -941,10 +947,10 @@
     <footer class="note">כלי פנימי להצעת מחיר ממחירון. התעריפים כפופים לתוקף, למקום פנוי ולתנאי החברה.</footer>
   </div>
   <noscript><p class="wrap">יש להפעיל JavaScript כדי להשתמש במחשבון.</p></noscript>
-  <script src="data/index.js?v=evergreen-fak-20261124"></script>
-  <script src="data/notices.js?v=evergreen-fak-20261124"></script>
-  <script src="data/spots.js?v=evergreen-fak-20261124"></script>
-  <script src="data/schedules.js?v=evergreen-fak-20261124"></script>
+  <script src="data/index.js?v=empty-start-20261124"></script>
+  <script src="data/notices.js?v=empty-start-20261124"></script>
+  <script src="data/spots.js?v=empty-start-20261124"></script>
+  <script src="data/schedules.js?v=empty-start-20261124"></script>
   <script>
 (function () {
   const DATA = window.QUOTE_INDEX;
@@ -1832,12 +1838,12 @@
 
   const versionCache = {};
   const state = {
-    carrierId: carriers[0].id,
+    carrierId: "",
     originId: "",
     originKey: "",
-    dest: "ASHDOD, IL",
+    dest: "",
     typ: "",
-    dateText: todayText(),
+    dateText: "",
     qtyText: "1",
     markupText: "",
     haz: false,
@@ -1859,6 +1865,58 @@
     spotCarrier: "",
     spotShowExpired: false,
   };
+
+  function resetSearchState() {
+    state.carrierId = "";
+    state.originId = "";
+    state.originKey = "";
+    state.dest = "";
+    state.typ = "";
+    state.dateText = "";
+    state.qtyText = "1";
+    state.markupText = "";
+    state.haz = false;
+    state.copied = false;
+    state.copyFallback = "";
+    state.grossWtText = "";
+    state.versionOverride = {};
+    state.historyOpen = false;
+    state.extrasOpen = false;
+    state.calOpen = false;
+    state.calYear = null;
+    state.calMonth = null;
+    state.noticeOpen = false;
+    state.noticeId = "";
+    state.compare = false;
+    state.copiedId = "";
+    state.view = "rates";
+    state.spotOrigin = "";
+    state.spotCarrier = "";
+    state.spotShowExpired = false;
+  }
+  function searchIsDirty() {
+    return !!(
+      state.carrierId ||
+      state.originId ||
+      state.dest ||
+      state.typ ||
+      String(state.dateText || "").trim() ||
+      state.compare ||
+      state.haz ||
+      String(state.markupText || "").trim() ||
+      String(state.grossWtText || "").trim() ||
+      (String(state.qtyText || "") !== "1") ||
+      (state.versionOverride && Object.keys(state.versionOverride).length)
+    );
+  }
+  function clearSearch() {
+    comboOpen = false;
+    comboTyped = null;
+    comboHighlight = -1;
+    resetSearchState();
+    render();
+    window.scrollTo(0, 0);
+  }
 
   function versionsFor(carrierId) {
     return VERSIONS.filter((v) => v.carrierId === carrierId);
@@ -1967,7 +2025,7 @@
     }
     return new Promise(function (resolve, reject) {
       const s = document.createElement("script");
-      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=evergreen-fak-20261124";
+      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=empty-start-20261124";
       s.async = true;
       s.onload = function () {
         const pack = window.QUOTE_PACK && window.QUOTE_PACK[meta.id];
@@ -1994,7 +2052,7 @@
       });
     }
     if (isCompare) carriers.forEach(function (c) { addAll(c.id); });
-    else addAll(carrier.id);
+    else if (carrier) addAll(carrier.id);
     return out;
   }
   function ratesOfLoaded(meta) {
@@ -3356,7 +3414,7 @@
       return;
     }
     const isCompare = !!state.compare;
-    const carrier = carriers.find((c) => c.id === state.carrierId) ?? carriers[0];
+    const carrier = carriers.find((c) => c.id === state.carrierId) || null;
     const shipIsoEarly = parseDateInput(state.dateText);
     const needed = neededVersions(isCompare, carrier, shipIsoEarly);
     const missing = needed.filter((v) => !versionCache[v.id]);
@@ -3371,10 +3429,10 @@
     }
     const catalogRates = isCompare
       ? carriers.flatMap((c) => allLoadedRates(c.id))
-      : allLoadedRates(carrier.id);
+      : (carrier ? allLoadedRates(carrier.id) : []);
     const rates = isCompare
       ? carriers.flatMap((c) => ratesForDate(c.id, shipIsoEarly))
-      : ratesForDate(carrier.id, shipIsoEarly);
+      : (carrier ? ratesForDate(carrier.id, shipIsoEarly) : []);
     let origins;
     if (!isCompare) origins = buildOrigins(catalogRates);
     else {
@@ -3415,7 +3473,7 @@
     const typedRates = laneRates.filter((r) => r.typ === effectiveTyp);
     const hasHaz = typedRates.some((r) => r.haz);
     const hasNonHaz = typedRates.some((r) => !r.haz);
-    const noticeHazToggle = hasNoticeHazToggle(carrier.id, shipIsoEarly, isCompare);
+    const noticeHazToggle = hasNoticeHazToggle(carrier ? carrier.id : "", shipIsoEarly, isCompare);
     const effectiveHaz = hasHaz && (state.haz || !hasNonHaz);
     const windowRates = typedRates.filter((r) => r.haz === (hasHaz ? effectiveHaz : false));
     const validRates = shipIso ? windowRates.filter((r) => isValidOn(r, shipIso)) : [];
@@ -3439,10 +3497,12 @@
           const cr = ratesForDate(c.id, shipIso);
           return { c: mergeDisplay(c, v), rates: cr, version: v };
         })
-      : [{ c: mergeDisplay(carrier, selectedVersionMeta(carrier.id, shipIso)), rates: rates, version: selectedVersionMeta(carrier.id, shipIso) }];
+      : (carrier
+        ? [{ c: mergeDisplay(carrier, selectedVersionMeta(carrier.id, shipIso)), rates: rates, version: selectedVersionMeta(carrier.id, shipIso) }]
+        : []);
 
-    const quoteVersion = (quoteRate && quoteRate.versionId && versionMeta(quoteRate.versionId)) || selectedVersionMeta(carrier.id, shipIso);
-    let displayCarrier = mergeDisplay(carrier, quoteVersion);
+    const quoteVersion = (quoteRate && quoteRate.versionId && versionMeta(quoteRate.versionId)) || (carrier ? selectedVersionMeta(carrier.id, shipIso) : null);
+    let displayCarrier = carrier ? mergeDisplay(carrier, quoteVersion) : null;
     if (isCompare && quoteRate) {
       for (const x of allByCarrier) {
         if (x.rates.some((r) =>
@@ -3452,9 +3512,9 @@
         )) { displayCarrier = x.c; break; }
       }
     }
-    const quoteOffers = siblingOffers(validRates.length ? validRates : windowRates, quoteRate, displayCarrier);
-    const pricedOffers = quoteOffers.map(function (r) { return applyCarrierRules(r, displayCarrier.id, shipIso); });
-    const pricedQuote = pricedOffers[0] || applyCarrierRules(quoteRate, displayCarrier.id, shipIso);
+    const quoteOffers = displayCarrier ? siblingOffers(validRates.length ? validRates : windowRates, quoteRate, displayCarrier) : [];
+    const pricedOffers = displayCarrier ? quoteOffers.map(function (r) { return applyCarrierRules(r, displayCarrier.id, shipIso); }) : [];
+    const pricedQuote = displayCarrier ? (pricedOffers[0] || applyCarrierRules(quoteRate, displayCarrier.id, shipIso)) : null;
     if (quoteOffers.length > 1) {
       altQuotes = validRates.filter(function (r) { return quoteOffers.indexOf(r) < 0; });
     }
@@ -3502,12 +3562,12 @@
     const t = pricedQuote ? totalsOf(pricedQuote, qty) : null;
     const saleUsd = t ? (t.shipment.USD || 0) + markup * qty : 0;
 
-    const carrierOptions = carriers.map((c) => {
-      return '<option value="' + esc(c.id) + '"' + (carrier.id === c.id ? " selected" : "") + ">" + esc(carrierSelectLabel(c, shipIso)) + "</option>";
+    const carrierOptions = '<option value="">בחרו חברת ספנות</option>' + carriers.map((c) => {
+      return '<option value="' + esc(c.id) + '"' + (carrier && carrier.id === c.id ? " selected" : "") + ">" + esc(carrierSelectLabel(c, shipIso)) + "</option>";
     }).join("");
 
-    const activeVersion = isCompare ? null : selectedVersionMeta(carrier.id, shipIso);
-    const coveringForDate = shipIso && !isCompare ? coveringVersions(carrier.id, shipIso) : [];
+    const activeVersion = (isCompare || !carrier) ? null : selectedVersionMeta(carrier.id, shipIso);
+    const coveringForDate = shipIso && !isCompare && carrier ? coveringVersions(carrier.id, shipIso) : [];
     const altVersions = coveringForDate.filter((v) => activeVersion && v.id !== activeVersion.id);
 
     let carrierMeta = "";
@@ -3530,16 +3590,18 @@
     } else if (effectiveTyp && noticeHazToggle) {
       formHaz += '<label class="toggle"><input type="checkbox" id="haz" ' + (state.haz ? "checked " : "") + "> <span>מטען מסוכן (HAZ)</span></label>";
     }
-    if (state.originId && state.dest && typesInLane.length === 0) {
+    if (carrier && state.originId && state.dest && typesInLane.length === 0) {
       const msg = (carrier.id === "yml" && state.dest.startsWith("HAIFA"))
         ? "במחירון YML שנטען כל שורות ההובלה הימית הן לאשדוד בלבד. יש תוספת TA (Transport Additional Charge) ליעד חיפה (ILHFA): 100$ ל-20DC, 200$ ל-40DC ו־40HQ — בלי תעריף הובלה ימית נפרד לחיפה. לא הומצא מחיר הובלה לחיפה."
         : "לנמל המוצא שנבחר אין שורות אל " + destHe(state.dest) + " במחירון הזה.";
       formWarn += '<div class="callout warn"><strong>אין תעריף ליעד הזה</strong>' + esc(msg) + "</div>";
     }
-    if (!shipIso) {
+    if (String(state.dateText || "").trim() && !shipIso) {
       formWarn += '<div class="callout warn"><strong>תאריך לא מזוהה</strong>כתבו את תאריך השילוח בפורמט 18.11.2026 (יום.חודש.שנה).</div>';
+    } else if (!shipIso && state.originId && state.dest && effectiveTyp) {
+      formWarn += '<div class="callout warn"><strong>חסר תאריך BL</strong>בחרו תאריך הפלגה / BL כדי לקבל הצעת מחיר.</div>';
     }
-    if (!isCompare && shipIso && !activeVersion && !rates.length) {
+    if (carrier && !isCompare && shipIso && !activeVersion && !rates.length) {
       formWarn += dateJumpNoticeHtml(carrier, shipIso);
     }
 
@@ -3656,7 +3718,7 @@
         copyFallbackHtml;
     }
 
-    const showWt = isTwentyFootTyp(effectiveTyp || state.typ) && (isCompare || carrier.id === "zim");
+    const showWt = isTwentyFootTyp(effectiveTyp || state.typ) && (!!carrier || isCompare) && (isCompare || carrier.id === "zim");
     const wtField = !showWt ? "" :
       '<div class="wt-row">' +
         '<div><label class="fld" for="gross-wt">משקל ברוטו (טון)</label>' +
@@ -3680,11 +3742,11 @@
       '<section class="card search-card">' +
       '<div class="search-top">' +
         '<div class="carrier-field"><label class="fld" for="carrier">חברת ספנות</label><select id="carrier">' + carrierOptions + "</select>" +
-        (!isCompare ? historyLinkHtml(carrier) : "") +
-        (!isCompare ? noticeBannerHtml(carrier, shipIso, selectedOrigin, null) : "") + "</div>" +
+        (!isCompare && carrier ? historyLinkHtml(carrier) : "") +
+        (!isCompare && carrier ? noticeBannerHtml(carrier, shipIso, selectedOrigin, null) : "") + "</div>" +
         '<div class="origin-combo" id="origin-combo">' +
-          '<label class="fld" for="origin-input" id="origin-field-label">נמל מוצא (' + origins.length + " במחירון)</label>" +
-          '<input type="text" id="origin-input" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="origin-list" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" placeholder="הקלידו אות לחיפוש או בחרו מהרשימה" value="' + esc(selectedOrigin ? originChoiceLabel(selectedOrigin) : "") + '">' +
+          '<label class="fld" for="origin-input" id="origin-field-label">' + (carrier || isCompare ? ("נמל מוצא (" + origins.length + " במחירון)") : "נמל מוצא") + "</label>" +
+          '<input type="text" id="origin-input" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="origin-list" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" placeholder="' + (carrier || isCompare ? "הקלידו אות לחיפוש או בחרו מהרשימה" : "בחרו קודם חברת ספנות") + '" value="' + esc(selectedOrigin ? originChoiceLabel(selectedOrigin) : "") + '"' + (!carrier && !isCompare ? " disabled" : "") + '>' +
           '<ul id="origin-list" class="origin-list" role="listbox" hidden></ul>' +
         "</div>" +
         spotBannerHtml() +
@@ -3697,7 +3759,7 @@
         '<div><label class="fld" for="typ">סוג מכולה</label><select id="typ"' +
           (!state.originId || !state.dest || typesInLane.length === 0 ? " disabled" : "") + ">" + typOpts + "</select></div>" +
         '<div class="fld-date" id="date-field"><label class="fld" for="date">תאריך הפלגה / BL</label><div class="date-wrap">' +
-          '<input type="text" id="date" value="' + esc(state.dateText) + '" placeholder="18.11.2026" inputmode="numeric" autocomplete="off" aria-haspopup="dialog" aria-expanded="' + (state.calOpen ? "true" : "false") + '" aria-controls="cal-popup">' +
+          '<input type="text" id="date" value="' + esc(state.dateText) + '" placeholder="בחרו תאריך BL" inputmode="numeric" autocomplete="off" aria-haspopup="dialog" aria-expanded="' + (state.calOpen ? "true" : "false") + '" aria-controls="cal-popup">' +
           '<button type="button" class="cal-toggle" id="cal-open" aria-label="פתח לוח שנה" aria-expanded="' + (state.calOpen ? "true" : "false") + '">' +
           '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M8 3.5v3M16 3.5v3M3.5 9.5h17"/></svg></button></div></div>' +
       "</div>" +
@@ -3705,9 +3767,10 @@
       formWarn +
       '<details class="extras-panel" id="extras-panel"' + (state.extrasOpen ? " open" : "") + "><summary>אפשרויות נוספות</summary>" + extrasInner + "</details>" +
       compareBtn +
+      (searchIsDirty() ? '<button type="button" class="btn btn-secondary btn-clear" id="clear-btn">נקה הכל</button>' : "") +
       "</section>" +
       resultsHtml +
-      (!isCompare ? historySheetHtml(carrier, shipIso) : "") +
+      (!isCompare && carrier ? historySheetHtml(carrier, shipIso) : "") +
       calendarHtml() +
       noticeSheetHtml();
     document.body.classList.toggle("hist-open", !isCompare && state.historyOpen);
@@ -3715,12 +3778,22 @@
     document.body.classList.toggle("notice-open", !!state.noticeOpen);
 
     const $ = (id) => document.getElementById(id);
+    const clearBtn = $("clear-btn");
+    if (clearBtn) {
+      clearBtn.addEventListener("click", function () { clearSearch(); });
+    }
     $("carrier").addEventListener("change", (e) => {
       const v = e.target.value;
       comboOpen = false;
       comboTyped = null;
       comboHighlight = -1;
       state.carrierId = v;
+      if (!v) {
+        state.originId = "";
+        state.originKey = "";
+        state.typ = "";
+        state.versionOverride = {};
+      }
       state.compare = false;
       state.copied = false;
       state.copiedId = "";
