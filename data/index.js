@@ -274,6 +274,31 @@ window.QUOTE_INDEX =
       }
     },
     {
+      "id": "oocl-2026-12-01",
+      "carrierId": "oocl",
+      "file": "data/oocl/2026-12-01.js",
+      "ref": "00007640",
+      "version": "",
+      "party": "Israel Scandinavian Maritime Agency Ltd, as agent for OOCL",
+      "vf": 20,
+      "vt": 33,
+      "issued": "2026-11-19",
+      "added": "2026-11-24",
+      "sourceFile": "OOCL filing 00007640 (xlsx), validity 1-14.12.2026",
+      "sourceNote": "תאריך הנפקה לפי המייל מ־19.11.2026 (Increased Rates). תוקף 01.12.2026–14.12.2026. Filing 00007640 ליבש/non-IMCO וגם ל-DG, ריפרים וציוד מיוחד. ההובלה עלתה ב-400$ ל-20׳ וב-900$ ל-40׳/HQ לעומת מחירון 15–30.11. התוספות, הימים המשוערים, הניתובים והחיובים המקומיים נשארו כפי שהיו.",
+      "label": "Filing 00007640",
+      "website": "https://www.oocl.com",
+      "agent": "Israel Scandinavian Maritime Agency Ltd",
+      "paymentTerms": "COLLECT",
+      "localCharges": {
+        "doFeeNis": 350,
+        "handlingNis": 175,
+        "agencyPct": 0.9,
+        "agencyMinNis": 90,
+        "bankTransferNis": 275
+      }
+    },
+    {
       "id": "msc-india-sl-2026-08-16",
       "carrierId": "msc",
       "file": "data/msc/2026-08-16_india-sl.js",

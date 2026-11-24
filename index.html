@@ -941,10 +941,10 @@
     <footer class="note">כלי פנימי להצעת מחיר ממחירון. התעריפים כפופים לתוקף, למקום פנוי ולתנאי החברה.</footer>
   </div>
   <noscript><p class="wrap">יש להפעיל JavaScript כדי להשתמש במחשבון.</p></noscript>
-  <script src="data/index.js?v=issued-email-20261124"></script>
-  <script src="data/notices.js?v=issued-email-20261124"></script>
-  <script src="data/spots.js?v=issued-email-20261124"></script>
-  <script src="data/schedules.js?v=issued-email-20261124"></script>
+  <script src="data/index.js?v=oocl-dec-20261124"></script>
+  <script src="data/notices.js?v=oocl-dec-20261124"></script>
+  <script src="data/spots.js?v=oocl-dec-20261124"></script>
+  <script src="data/schedules.js?v=oocl-dec-20261124"></script>
   <script>
 (function () {
   const DATA = window.QUOTE_INDEX;
@@ -1961,7 +1961,7 @@
     }
     return new Promise(function (resolve, reject) {
       const s = document.createElement("script");
-      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=issued-email-20261124";
+      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=oocl-dec-20261124";
       s.async = true;
       s.onload = function () {
         const pack = window.QUOTE_PACK && window.QUOTE_PACK[meta.id];
@@ -2359,7 +2359,11 @@
         + "40DV ו-40HC באותו מחיר. קודי מכולה במחירון: 2SD=20'DV, 4SD=40'DV, 4SH=40'HC.</p>";
     }
     if (displayCarrier.id === "oocl") {
-      return "<p>תיקון מספר חוזה / filing שגוי עולה 100$. ההובלה מתומחרת לפי תאריך הטעינה בשטר המטען (BL loading date) בלי חריגים. מטען כללי / non-IMCO, Freight Collect. תוקף 15.11.2026–30.11.2026. ההצעה תקפה לתשלום במזומן ולמטען בשווי נמוך מ-500,000$ למכולה, וכפופה למקום פנוי.</p>" +
+      const ovf = displayCarrier.vf != null ? addDays(displayCarrier.vf) : null;
+      const ovt = displayCarrier.vt != null ? addDays(displayCarrier.vt) : null;
+      const owin = (ovf && ovt) ? (fmtDate(ovf) + "–" + fmtDate(ovt)) : "";
+      const ovalid = owin ? ("תוקף " + owin + ". ") : "";
+      return "<p>תיקון מספר חוזה / filing שגוי עולה 100$. ההובלה מתומחרת לפי תאריך הטעינה בשטר המטען (BL loading date) בלי חריגים. מטען כללי / non-IMCO, Freight Collect. " + ovalid + "ההצעה תקפה לתשלום במזומן ולמטען בשווי נמוך מ-500,000$ למכולה, וכפופה למקום פנוי.</p>" +
         "<p>הסוכן: Israel Scandinavian Maritime Agency Ltd (סוכן בלבד ל-OOCL). אתר הסוכן: www.Israscan.co.il. חיפה: 2 Khayat Sq., POB 33557. אשדוד: Haorgim 35, room 602, P.O.B 4060. תנאי התעריף וה-B/L ב-www.OOCL.com. התעריפים כפופים לשינוי (V.A.T.O.S). אינם כוללים ביטוח, שחרור מכס, אגרות ומיסים. המוביל רשאי לנתב דרך סואץ או כף התקווה הטובה (COGH) בלי הודעה. זמני ההפלגה משוערים.</p>" +
         "<p>לפי האקסל: התעריף מבוסס על הניתוב שצוין (Rates from NON BASE PORTS); ניתוב אחר עלול לשנות את המחיר. B/L שימוזגו עם B/L אחר יהיו כפופים ל-roll over. לפי הטקסט הנלווה (לא בתאי האקסל): Foshan, Jiangmen ו-Huangpu דרך טרמינלים מסוימים בלבד — לפנות לסוכן; וכן אם נדרש תעריף מ-POL אחר.</p>";
     }
