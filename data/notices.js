@@ -556,7 +556,7 @@ window.CARRIER_NOTICES = [
       "msc"
     ],
     "title": "MSC: מחירון FAK ליבוא מהודו ומסרי לנקה, 19.11.2026–15.12.2026, ואיסור Granite Blocks",
-    "banner": "MSC יבוא מהודו/סרי לנקה: מחירון FAK בתוקף 19.11.2026–15.12.2026, חוזה R26824020000093. לא מקבלים Granite Blocks.",
+    "banner": "MSC יבוא מהודו/סרי לנקה: מחירון FAK בתוקף 19.11.2026–15.12.2026, חוזה FAK R26824020000093, חוזה COIR R26825020000029. לא מקבלים Granite Blocks.",
     "publishedDate": "2026-11-19",
     "added": "2026-11-24",
     "effectiveFromVessel": null,
@@ -568,11 +568,11 @@ window.CARRIER_NOTICES = [
       "LK"
     ],
     "quoteWarningTitle": "MSC: יבוא מהודו / סרי לנקה — לא מקבלים Granite Blocks",
-    "quoteWarning": "מחירון FAK HARMLESS בתוקף 19.11.2026–15.12.2026, חוזה R26824020000093. במחירון נכתב במפורש: לא מקבלים מטען Granite Blocks. תעריפי Coir pith דורשים הסכם נפרד ולא נכללו.",
+    "quoteWarning": "מחירון FAK HARMLESS בתוקף 19.11.2026–15.12.2026, חוזה FAK R26824020000093, חוזה COIR R26825020000029 (מכותרת המייל מ-22.11.2026). במחירון נכתב במפורש: לא מקבלים מטען Granite Blocks. תעריפי Coir pith דורשים הסכם נפרד ולא נכללו.",
     "sections": [
       {
         "kind": "meta",
-        "text": "התקבל במייל מ-24.11.2026 כהארכת תוקף עד 15.12.2026. כותרת המחירון עודכנה ב-23.11.26. תוקף: 19.11.2026–15.12.2026 (*Effective last container Received for export at train depots, terminals or POL'S). מספר חוזה: R26824020000093 (FAK). הצד: MSC Mediterranean Shipping Agency AG, as agent only for MSC Mediterranean Shipping Company S.A., Geneva."
+        "text": "התקבל במייל מ-24.11.2026 כהארכת תוקף עד 15.12.2026. כותרת המחירון עודכנה ב-23.11.26. תוקף: 19.11.2026–15.12.2026 (*Effective last container Received for export at train depots, terminals or POL'S). מספר חוזה: R26824020000093 (FAK). חוזה COIR: R26825020000029 (מכותרת המייל מ-22.11.2026 באותו שרשור). הצד: MSC Mediterranean Shipping Agency AG, as agent only for MSC Mediterranean Shipping Company S.A., Geneva."
       },
       {
         "kind": "p",
@@ -585,12 +585,12 @@ window.CARRIER_NOTICES = [
       },
       {
         "kind": "p",
-        "text": "אין במחירון תעריף COIR. ל-Coir pith/Flammable material נדרש הסכם נפרד (EIS 50$ למכולה) — לא הומצא תעריף."
+        "text": "אין במחירון תעריף COIR. מספר חוזה COIR R26825020000029 מוצג לפי כותרת המייל מ-22.11.2026. ל-Coir pith/Flammable material נדרש הסכם נפרד (EIS 50$ למכולה) — לא הומצא תעריף."
       },
       {
         "kind": "original",
         "lead": "נוסח מקורי",
-        "text": "Updated rate offer Ex India + Sri Lanka as from 19.11.2026 till 15.12.2026* (F.A.K HARMLESS) To Haifa/Ashdod — Updated 23.11.26\n\nPAY ATTENTION: We Don’t Accept Granite Blocks commodity\n\nEIS $50/container applicable for Commodity Coir pith/ Flammable material-  A separate agreement is required for this cargo upon request\n\nRates are subject to EFS.\nEFS IN USD - NOV/DEC: 167/168 X TEU\n14 DAYS FREE OF DEMURRAGE IS APPLICABLE AT POD - UNLESS STATED DIFFERENTLY BY YOUR SALES PERSON.\nORIGIN THC SHOULD BE PAID BY SHIPPER\n\nPlease find our attached extended rate offer with validity of 15.12.2026.\nThe rate agreement mentioned in the subject line has been filed accordingly in our system."
+        "text": "Updated rate offer Ex India + Sri Lanka as from 19.11.2026 till 15.12.2026* (F.A.K HARMLESS) To Haifa/Ashdod — Updated 23.11.26\n\nPAY ATTENTION: We Don’t Accept Granite Blocks commodity\n\nEIS $50/container applicable for Commodity Coir pith/ Flammable material-  A separate agreement is required for this cargo upon request\n\nRates are subject to EFS.\nEFS IN USD - NOV/DEC: 167/168 X TEU\n14 DAYS FREE OF DEMURRAGE IS APPLICABLE AT POD - UNLESS STATED DIFFERENTLY BY YOUR SALES PERSON.\nORIGIN THC SHOULD BE PAID BY SHIPPER\n\nPlease find our attached extended rate offer with validity of 15.12.2026.\nThe rate agreement mentioned in the subject line has been filed accordingly in our system.\n\nFrom the 22.11.2026 email in the same thread:\nSubject: RE: RATE OFFER EX INDIA VALID as from 19.11.2026-30.11.2026 CONTRACT R26824020000093(FAK)+ R26825020000029 (COIR) MAYAN OVERSEAS LTD\n\nPls find below the updated Transit Time ex the main ports of loading:\nNorth India POL Mundra to POD ASH / HFA : 48-49\nPOL Nhava Sheva to POD ASH / HFA : 47-48\nSouth and West India POL Tuticorin to POD ASH / HFA : 44-45\nPOL Kolkata to POD ASH / HFA : 53-54\nColombo POL SRI LANKA to POD ASH / HFA : 37-38"
       }
     ]
   }
