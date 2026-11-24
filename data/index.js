@@ -484,6 +484,110 @@ window.QUOTE_INDEX =
       }
     },
     {
+      "id": "one-fe-2026-11-01",
+      "carrierId": "one",
+      "file": "data/one/2026-11-01_fe.js",
+      "version": "",
+      "party": "Crown Shipping, as general agent for ONE",
+      "vf": -10,
+      "vt": 19,
+      "issued": "2026-10-22",
+      "added": "2026-11-24",
+      "sourceFile": "WB RATE SHEET   01.11. - 15.11.2026..xlsx",
+      "sourceNote": "מייל מ-22.10.2026 (Crown Shipping, as general agent for ONE). כותרת המייל: ONE- MD1 WB rates from FAR EAST AMW 01.11. - 15.11.2026. תוקף לפי המחירון והמייל: המזרח הרחוק 01.11.2026–15.11.2026; אוסטרליה (Oceania) 01.11.2026–30.11.2026; הודו וסרי לנקה (IOM LANE) 01.11.2026–15.11.2026. לא צוין מספר הסכם או filing במחירון או במייל, ולא הומצא. ההובלה נקובה בדולר. FAK. טבלת התוספות במחירון תחת הכותרת MD3-WB. מחירון חלקי (אין בו את נמלי צפון אירופה).",
+      "label": "יבוא מזרח רחוק / אוקיאניה / הודו (MD1)",
+      "offerTitle": "DESTINATION ASHDOD and HAIFA - MD1 SERVICE",
+      "partialCoverage": true,
+      "website": "https://www.one-line.com",
+      "agent": "Crown Shipping, as general agent for ONE",
+      "paymentTerms": "Freight collect, subject to filing before booking. Clients without credit: cash payment in NIS.",
+      "frtCurrency": "USD",
+      "localCharges": {
+        "title": "Local Charges for Import",
+        "items": [
+          {
+            "name": "AGENCY FEE",
+            "basis": "PER B/L",
+            "currency": "NIS",
+            "quantum": "0.3% with minimum 80",
+            "remarks": "(% from freight + surcharge). לא חושב לסה״כ: הרצפה בשקלים — אין שער במחירון."
+          },
+          {
+            "name": "CONTAINER ADMIN. FEE",
+            "basis": "PER CONTAINER",
+            "currency": "USD",
+            "quantum": "10/20' & 14/40'",
+            "amount20": 10,
+            "amount40": 14
+          },
+          {
+            "name": "COMMUNICATIONS FEE",
+            "basis": "PER B/L",
+            "currency": "NIS",
+            "amount": 75
+          },
+          {
+            "name": "ISPS",
+            "basis": "PER CONTAINER",
+            "currency": "USD",
+            "amount": 22
+          },
+          {
+            "name": "INLAND TRANSPORT FEE",
+            "basis": "PER TEU",
+            "currency": "NIS",
+            "quantum": "6% with minimum 58",
+            "remarks": "(% from inland transport). לא נוסף: במחירון זה אין תעריף הובלה יבשתית."
+          },
+          {
+            "name": "IT CHARGE",
+            "basis": "PER B/L",
+            "currency": "NIS",
+            "amount": 190
+          },
+          {
+            "name": "TRANSFER FEES",
+            "basis": "PER B/L",
+            "currency": "NIS",
+            "quantum": "0.6% with minimum 55",
+            "remarks": "(% from freight + surcharge). לא חושב לסה״כ — אין שער במחירון."
+          },
+          {
+            "name": "WORLD GATE FEE",
+            "basis": "PER B/L",
+            "currency": "NIS",
+            "amount": 45
+          },
+          {
+            "name": "IMCO HANDING FEE",
+            "basis": "PER B/L",
+            "currency": "NIS",
+            "amount": 90,
+            "remarks": "כך במחירון (Handing). חל על מטען IMCO/מסוכן — לא נוסף אוטומטית (המחירון: general cargo / non imco ONLY)."
+          },
+          {
+            "name": "REFFER HANDING FEE",
+            "basis": "PER B/L",
+            "currency": "NIS",
+            "amount": 90,
+            "remarks": "כך במחירון (Reffer). חל על ריפר — לפנות מקרה-מקרה, לא נוסף אוטומטית."
+          },
+          {
+            "name": "MONITORING",
+            "basis": "PER CONTAINER",
+            "currency": "USD",
+            "amount": 145,
+            "remarks": "3 days of monitoring + connect/disconnect. לריפר, לא נוסף אוטומטית."
+          }
+        ],
+        "notes": [
+          "Monitoring: After 3 days – USD 30/day. Saturday/Holiday – USD 50/day",
+          "Graph Temp.: USD 100 per graph",
+          "Additional Plug in/out: USD 25 per additional action"
+        ]
+      }
+    },
+    {
       "id": "evergreen-fak-2026-11-15",
       "carrierId": "evergreen",
       "file": "data/evergreen/2026-11-15_fak.js",
@@ -802,7 +906,9 @@ window.QUOTE_INDEX =
     "MARSEILLE, FR",
     "VISAKHAPATNAM, IN",
     "LONDON GATEWAY, GB",
-    "HAMBURG, DE"
+    "HAMBURG, DE",
+    "ADELAIDE, AU",
+    "FREMANTLE, AU"
   ],
   "types": [
     "DV20",
@@ -843,7 +949,8 @@ window.QUOTE_INDEX =
     "DETENTION: ASH - $ 42 ; HFA - $ 34",
     "Dry FAK only, not Ceramics. DETENTION: ASH - $ 21 ; HFA - $ 17",
     "Dry FAK only, not Ceramics. DETENTION: ASH - $ 42 ; HFA - $ 34",
-    "F.A.K. ליעדי אשדוד וחיפה (אותו מחיר; במייל לא צוין נמל יעד, וההצעה היא ליבוא לישראל). תוקף 01.12.2026–31.12.2026. מספר חוזה/הסכם: Q73WC4P6G (יש להשתמש במספר המעודכן; מספרי החוזה הקודמים אינם בתוקף עוד). תעריפי הובלה: מלונדון גייטוויי (UK) 200$/20׳ ו-300$/40׳; מאנטוורפן, רוטרדם, לה האבר והמבורג (NWC) 375$/20׳ ו-600$/40׳. 40׳ HC לא צוין במחירון ולא הומצא תעריף. התוספות הבאות נוספו לסה״כ בדולר, לפי /TEU כפול 2 ל-40׳ ולפי /CNTR כסכום למכולה: BRC 367$/TEU, PSS 200$/TEU, IEI (Import Emergency Imbalance) 100$/מכולה, ECA 160$/TEU, ETS 66$/TEU, EFS 81$/TEU, FEU 12$/TEU. EBS: NO EBS — לא נוסף. THC יעד (VATOS) 275$/20׳ ו-400$/40׳ נוסף כ-DTHC (Collect). אין EBS. 21 ימי demurrage בהסכם — הימים החופשיים בהצעה תקפים רק למשלוחי Collect. דירוג לפי תאריך הפלגת הפרופורמה בלוח MSC. כפוף לתוספות חירום V.A.T.O.S, לזמינות ציוד במוצא, לביקורת בנמלי שטעון, לדמי D/O ולהוצאות מקומיות (סכומים לא צוינו — לא הומצאו). לא כולל שחרור מכס, שירותי פורוורדינג, הטענה/קשירה/אבטחת מטען, אחסנה, demurrage מעבר לימי הפטור, זמן המתנה, ביטוח ומסי יבוא מקומיים במוצא וביעד. לא נוספו אוטומטית: HAZ (Med & Low Risk) 50$/TEU בשורות NWC בלבד (בתא UK התא היה ריק); תעריף HAZ לפי רמת סיכון מ-01.01.2023: Low 300$/מכולה, Med 400$, High 800$ (סוללות ליתיום = High Risk); למטען מסוכן נדרש אישור מוקדם של MSC ישראל לפי Packing Group ו-Class; THC ל-IMO ולציוד מיוחד 320$/20׳ ו-460$/40׳; EIS 50$/מכולה למטען self-heating לפי קודי HS שצוינו (0305 / 1214 / 1404 / 1802 / 2301 / 2304 / 2305 / 2306 / 2308 / 2309 / 2803 / 3802 / 3804 / 4004 / 4400 / 4401 / 4402 / 5200 / 5201 / 5300 / 5301 / 5302 / 5303 / 5305 / 7204 / 7602; ייתכנו קודים נוספים בלי הודעה מוקדמת); Foodgraded units additional (בלי סכום); Flexitank — התעריפים אינם תקפים, יש לבדוק מול המשרד; מטען בשווי מעל 500,000$ למכולה או תרופות יקרות — התעריפים אינם תקפים; ISPS במוצא (כפוף, בלי סכום); LWS אם/מתי/היכן שחל; GRI. תנאי ההובלה: https://www.msc.com/che/contract-of-carriage."
+    "F.A.K. ליעדי אשדוד וחיפה (אותו מחיר; במייל לא צוין נמל יעד, וההצעה היא ליבוא לישראל). תוקף 01.12.2026–31.12.2026. מספר חוזה/הסכם: Q73WC4P6G (יש להשתמש במספר המעודכן; מספרי החוזה הקודמים אינם בתוקף עוד). תעריפי הובלה: מלונדון גייטוויי (UK) 200$/20׳ ו-300$/40׳; מאנטוורפן, רוטרדם, לה האבר והמבורג (NWC) 375$/20׳ ו-600$/40׳. 40׳ HC לא צוין במחירון ולא הומצא תעריף. התוספות הבאות נוספו לסה״כ בדולר, לפי /TEU כפול 2 ל-40׳ ולפי /CNTR כסכום למכולה: BRC 367$/TEU, PSS 200$/TEU, IEI (Import Emergency Imbalance) 100$/מכולה, ECA 160$/TEU, ETS 66$/TEU, EFS 81$/TEU, FEU 12$/TEU. EBS: NO EBS — לא נוסף. THC יעד (VATOS) 275$/20׳ ו-400$/40׳ נוסף כ-DTHC (Collect). אין EBS. 21 ימי demurrage בהסכם — הימים החופשיים בהצעה תקפים רק למשלוחי Collect. דירוג לפי תאריך הפלגת הפרופורמה בלוח MSC. כפוף לתוספות חירום V.A.T.O.S, לזמינות ציוד במוצא, לביקורת בנמלי שטעון, לדמי D/O ולהוצאות מקומיות (סכומים לא צוינו — לא הומצאו). לא כולל שחרור מכס, שירותי פורוורדינג, הטענה/קשירה/אבטחת מטען, אחסנה, demurrage מעבר לימי הפטור, זמן המתנה, ביטוח ומסי יבוא מקומיים במוצא וביעד. לא נוספו אוטומטית: HAZ (Med & Low Risk) 50$/TEU בשורות NWC בלבד (בתא UK התא היה ריק); תעריף HAZ לפי רמת סיכון מ-01.01.2023: Low 300$/מכולה, Med 400$, High 800$ (סוללות ליתיום = High Risk); למטען מסוכן נדרש אישור מוקדם של MSC ישראל לפי Packing Group ו-Class; THC ל-IMO ולציוד מיוחד 320$/20׳ ו-460$/40׳; EIS 50$/מכולה למטען self-heating לפי קודי HS שצוינו (0305 / 1214 / 1404 / 1802 / 2301 / 2304 / 2305 / 2306 / 2308 / 2309 / 2803 / 3802 / 3804 / 4004 / 4400 / 4401 / 4402 / 5200 / 5201 / 5300 / 5301 / 5302 / 5303 / 5305 / 7204 / 7602; ייתכנו קודים נוספים בלי הודעה מוקדמת); Foodgraded units additional (בלי סכום); Flexitank — התעריפים אינם תקפים, יש לבדוק מול המשרד; מטען בשווי מעל 500,000$ למכולה או תרופות יקרות — התעריפים אינם תקפים; ISPS במוצא (כפוף, בלי סכום); LWS אם/מתי/היכן שחל; GRI. תנאי ההובלה: https://www.msc.com/che/contract-of-carriage.",
+    "FAK, General cargo / Non IMCO only. יעדים: אשדוד וחיפה, אותו מחיר. כותרת המחירון: DESTINATION ASHDOD and HAIFA - MD1 SERVICE (טבלת התוספות תחת הכותרת MD3-WB). תוקף: המזרח הרחוק, הודו וסרי לנקה 01.11.2026–15.11.2026; אוסטרליה 01.11.2026–30.11.2026. Inclusive במחיר ההובלה: CAF, MBS, CSS, PSS, EFS. LSF מצוין כ-0 ולא נוסף. נוספו לסה״כ לפי המחירון (Valid for all import bookings): OBS 275$/20׳ ו-550$/40׳–40HC; CMD 21$ למכולה; FGP (Food Grade Premium) 100$ למכולה; ו-THC ביעד (במחירון: THC; טופל כ-DTHC כמו במחירון ONE מצפון אירופה, כי הסכומים 270$/20׳ ו-390$/40׳–40HC הם תעריף היעד) 270$/20׳ ו-390$/40׳–40HC. מאוסטרליה נוסף גם ISL (International security fee) 32$ למכולה (Only from Australia). SCT (Suez Canal Transit) 18$/20׳ ו-36$/40׳–40HC חל רק אם המטען עובר בתעלת סואץ — לא נוסף אוטומטית. תוספת משקל כבד ל-20׳ (HEA, לפי משקל המטען נטו): 0–13.99 טון 0$; 14–17.99 טון 300$; 18–27 טון 600$ — מותנה במשקל, לא נוסף לסה״כ. GOH (Garment On Hanger) צוין במייל כחל על כל היבוא — לא צוין סכום, לא נוסף. כפוף לכל התוספות התקפות במועד השילוח. Freight collect, בכפוף להגשת תעריף (filing) לפני הזמנה. תאריך דירוג ה-B/L: Proforma ETD (לוח הזמנים במועד ההזמנה). ליצוא מהודו: תאריך היישום הוא תאריך קבלת המטען (CRD). ניתוב סטנדרטי בלבד. ללקוחות ללא אשראי: תשלום במזומן בשקלים."
   ],
   "incl": [
     "CNS/AGC/SSD/WR/THC",
@@ -873,7 +980,8 @@ window.QUOTE_INDEX =
     "BAF",
     "BAF/War/Detention",
     "BAF/War/V. ISPS/Detention/ES",
-    "CNS/AGC/SSD/WR/IPS"
+    "CNS/AGC/SSD/WR/IPS",
+    "CAF/MBS/CSS/PSS/EFS"
   ],
   "codes": [
     "GFS",
@@ -947,7 +1055,10 @@ window.QUOTE_INDEX =
     "BRC",
     "IEI",
     "ECA",
-    "FEU"
+    "FEU",
+    "FGP",
+    "SCT",
+    "ISL"
   ],
   "curs": [
     "USD",
@@ -1910,6 +2021,14 @@ window.QUOTE_INDEX =
     "HAMBURG": [
       "DEHAM",
       "Germany"
+    ],
+    "ADELAIDE": [
+      "AUADL",
+      "Australia"
+    ],
+    "FREMANTLE": [
+      "AUFRE",
+      "Australia"
     ]
   },
   "countryHe": {
@@ -2105,7 +2224,15 @@ window.QUOTE_INDEX =
     "FEEDER": "הובלת פידר (Feeder Freight)",
     "BRC": "תוספת דלק (Bunker Recovery Charge)",
     "IEI": "תוספת חוסר איזון בציוד ביבוא (Import Emergency Imbalance)",
-    "ECA": "אזור בקרת פליטות (Emission Control Area)"
+    "ECA": "אזור בקרת פליטות (Emission Control Area)",
+    "OBS": "תוספת דלק של ONE (OBS; במחירון: ONE Banker Surcharge)",
+    "CMD": "דמי ניהול מכולה בפריקה (Container management fee for discharge)",
+    "FGP": "תוספת מטען למזון (Food Grade Premium)",
+    "SCT": "תוספת מעבר בתעלת סואץ (Suez Canal Transit)",
+    "ISL": "דמי ביטחון בינלאומיים (International security fee)",
+    "CAF": "מקדם התאמת מטבע (Currency Adjustment Factor)",
+    "MBS": "תוספת דלק חודשית (Monthly bunker surcharge)",
+    "CSS": "תוספת ביטחון של המוביל (Carrier Security Surcharge)"
   },
   "payHe": {
     "prepaid": "במוצא (Prepaid)",

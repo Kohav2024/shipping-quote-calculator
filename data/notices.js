@@ -33,6 +33,52 @@ window.CARRIER_NOTICES = [
     ]
   },
   {
+    "id": "one-bl-rating-proforma-etd-2026-10-22",
+    "carrierIds": [
+      "one"
+    ],
+    "title": "ONE: עדכון לכלל דירוג ה-B/L — Proforma ETD",
+    "banner": "ONE: עדכון לכלל דירוג ה-B/L — Proforma ETD (הודעה מ־22.10.26)",
+    "publishedDate": "2026-10-22",
+    "added": "2026-11-24",
+    "effectiveFromVessel": null,
+    "validTo": null,
+    "appliesWhen": "always",
+    "severity": "info",
+    "quoteWarningTitle": "ONE: כלל דירוג ה-B/L הוא Proforma ETD",
+    "quoteWarning": "תאריך דירוג ה-B/L הוא Proforma ETD (לוח הזמנים במועד ההזמנה). עיכוב רגיל של האונייה לא משנה את התאריך, אבל אם האונייה מתעכבת לשבוע מאוחר יותר או ששבוע השיבוץ משתנה, עשוי לחול PFS ETD חדש כשהוא מתעדכן במערכת. ליצוא מהודו, תאריך היישום הוא תמיד תאריך קבלת המטען (CRD). הודעה מ־22.10.2026.",
+    "sections": [
+      {
+        "kind": "meta",
+        "text": "תאריך ההודעה: 22.10.2026"
+      },
+      {
+        "kind": "p",
+        "text": "ONE עדכנה את הניסוח בכלל הדירוג הגלובלי של שטר המטען. תאריך הדירוג הוא Proforma ETD (לוח הזמנים במועד ההזמנה)."
+      },
+      {
+        "kind": "p",
+        "lead": "מה לא משתנה:",
+        "text": "אם יש עיכוב באונייה, תאריך ה-ETD של הפרופורמה עצמו לא זז, ולכן תאריך היישום לא משתנה רק בגלל עיכוב."
+      },
+      {
+        "kind": "p",
+        "lead": "מתי התאריך כן משתנה:",
+        "text": "אם האונייה מתעכבת לשבוע מאוחר יותר, או ששבוע השיבוץ שלה שונה מסיבה כלשהי, עשוי לחול PFS ETD חדש. תאריך היישום יתעדכן אוטומטית רק אם תאריך ה-PFS ETD עודכן במערכת."
+      },
+      {
+        "kind": "p",
+        "lead": "יצוא מהודו:",
+        "text": "תאריך היישום יהיה תמיד זהה לתאריך קבלת המטען (CRD)."
+      },
+      {
+        "kind": "original",
+        "lead": "נוסח מקורי",
+        "text": "UPDATE B/L Rating date will be “Proforma ETD” (Schedule at the time of booking)\nPlease note that some wording clarification has been added to the Global B/L Freight Rule.\nThe previous wording stated:\n“In case we face some vessel delays, we do NOT change any ETD date since Proforma ETD is not moving ETD.”\nThe updated version is:\n“In case we face some vessel delays, we do NOT change any PFS ETD date since Proforma ETD is not moving ETD. However, if a vessel slides to a later week or if the assigned week for a vessel was changed for some reason, a new PFS ETD may apply.”\nEffectively it means that the application date will only change if the PFS ETD date is updated in the system. For a sliding or week-changing vessel, the application date will be automatically adjusted to match the new PFS ETD date when it is updated in the system.\nApplication Date: For exports from India, the application date will always be the same as the cargo receiving date (CRD)."
+      }
+    ]
+  },
+  {
     "id": "yml-md1-dg-2026-11-18",
     "carrierIds": ["yml"],
     "title": "YML: הגבלות DG בשירות MD1",
