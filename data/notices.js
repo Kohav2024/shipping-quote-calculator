@@ -484,5 +484,24 @@ window.CARRIER_NOTICES = [
       ]},
       { "kind": "original", "lead": "נוסח מקורי", "text": "FOR HAZ COMMODITY YOU MUST GET MSC ISRAEL PREAPPROVAL BEFORE LOADING BASED ON THE PACKING GROUP (PG) AND CLASS.\nHAZARDOUS CARGO TARIFF LEVEL WILL BE BASED ON LEVEL OF RISK IMPLEMENTED AS FROM JAN 1ST 2023 ON ALL TRADES, AS FOLLOWS:\nHAZ LOW RISK $300/CNTR\nHAZ MED RISK $400/CNTR\nHAZ HIGH RISK $800/CNTR\n*LITHIUM BATTERIES ARE CONSIDERED AS HIGH RISK HAZ\nHAZ (MED & LOW RISK): NWC $50/TEU (UK cell blank)\nTHC FOR IMO CARGO AND SPECIAL EQUIP  $320 / $460\nEIS SURCHARGE AT USD 50 PER CNTR FOR ALL SELF-HEATING CARGOES WILL BE ADDED ON TOP ANY FREIGHT TERMS AGREED" }
     ]
+  },
+  {
+    "id": "oocl-no-military-cargo-2026-11",
+    "carrierIds": ["oocl"],
+    "title": "OOCL: אין קבלה של מטען ביטחוני או צבאי",
+    "banner": "⚠️ OOCL אינה מקבלת מטען ביטחוני או צבאי, ולא סחורות הקשורות לו.",
+    "publishedDate": "2026-11-04",
+    "added": "2026-11-24",
+    "effectiveFromVessel": null,
+    "validTo": "2026-12-14",
+    "appliesWhen": "always",
+    "severity": "warning",
+    "quoteWarningTitle": "⚠️ OOCL: אין קבלה של מטען ביטחוני או צבאי",
+    "quoteWarning": "OOCL אינה מקבלת מטען ביטחוני או צבאי, ולא סחורות הקשורות לו.",
+    "sections": [
+      { "kind": "meta", "text": "מופיע במיילי OOCL מ־04.11.2026 (תוקף 15–30.11) ומ־19.11.2026 (תוקף 01–14.12), filing 00007640." },
+      { "kind": "p", "text": "OOCL אינה מקבלת מטען ביטחוני או צבאי, ולא סחורות הקשורות לו." },
+      { "kind": "original", "lead": "נוסח מקורי", "text": "Not accepting security  / military cargo or related commodities." }
+    ]
   }
 ];
