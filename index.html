@@ -49,6 +49,78 @@
       -webkit-touch-callout: default;
     }
     .wrap { max-width: 980px; margin: 0 auto; padding: 10px 12px 40px; }
+    .source-toggle {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px;
+      padding: 5px;
+      background: #efebe3;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+    }
+    .source-toggle button {
+      min-height: 52px;
+      font: inherit;
+      font-size: 1.05rem;
+      font-weight: 700;
+      border: 0;
+      border-radius: 12px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .source-toggle button[aria-pressed="true"] {
+      background: var(--navy);
+      color: #fff;
+      box-shadow: 0 1px 3px rgba(22, 49, 77, 0.18);
+    }
+    .source-list { margin-top: 10px; }
+    .source-list .fld-label { margin-bottom: 8px; font-size: 0.86rem; font-weight: 700; color: var(--navy); }
+    .source-hint { margin: 10px 2px 0; font-size: 0.9rem; color: var(--muted); line-height: 1.45; }
+    .source-chips {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .source-chips.agents { grid-template-columns: 1fr; }
+    .source-chip {
+      min-height: 48px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: #fff;
+      font: inherit;
+      font-weight: 700;
+      color: var(--navy);
+      text-align: center;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .source-chips.agents .source-chip {
+      min-height: 56px;
+      font-size: 1.08rem;
+      text-align: start;
+      padding: 12px 16px;
+    }
+    .source-chip .chip-meta {
+      display: block;
+      margin-top: 2px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--muted);
+    }
+    .source-chip[aria-pressed="true"] {
+      background: var(--navy);
+      color: #fff;
+      border-color: var(--navy);
+    }
+    .source-chip[aria-pressed="true"] .chip-meta { color: rgba(255,255,255,0.82); }
+    .source-picker { min-width: 0; }
+    .search-card .origin-combo { margin-top: 8px; }
+    @media (min-width: 721px) {
+      .search-top { grid-template-columns: 1fr !important; }
+    }
     header.hero {
       background: var(--navy);
       color: #fff;
@@ -1062,10 +1134,10 @@
     <footer class="note">כלי פנימי להצעת מחיר ממחירון. התעריפים כפופים לתוקף, למקום פנוי ולתנאי החברה.</footer>
   </div>
   <noscript><p class="wrap">יש להפעיל JavaScript כדי להשתמש במחשבון.</p></noscript>
-  <script src="data/index.js?v=agents-utrust-20261125"></script>
-  <script src="data/notices.js?v=agents-utrust-20261125"></script>
-  <script src="data/spots.js?v=agents-utrust-20261125"></script>
-  <script src="data/schedules.js?v=agents-utrust-20261125"></script>
+  <script src="data/index.js?v=source-toggle-20261125"></script>
+  <script src="data/notices.js?v=source-toggle-20261125"></script>
+  <script src="data/spots.js?v=source-toggle-20261125"></script>
+  <script src="data/schedules.js?v=source-toggle-20261125"></script>
   <script>
 (function () {
   const DATA = window.QUOTE_INDEX;
@@ -1964,6 +2036,7 @@
   const state = {
     carrierId: "",
     agentId: "",
+    sourceKind: "",
     originId: "",
     originKey: "",
     dest: "",
@@ -1995,6 +2068,7 @@
   function resetSearchState() {
     state.carrierId = "";
     state.agentId = "";
+    state.sourceKind = "";
     state.originId = "";
     state.originKey = "";
     state.dest = "";
@@ -2026,6 +2100,7 @@
     return !!(
       state.carrierId ||
       state.agentId ||
+      state.sourceKind ||
       state.originId ||
       state.dest ||
       state.typ ||
@@ -2161,7 +2236,7 @@
     }
     return new Promise(function (resolve, reject) {
       const s = document.createElement("script");
-      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=agents-utrust-20261125";
+      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=source-toggle-20261125";
       s.async = true;
       s.onload = function () {
         const pack = window.QUOTE_PACK && window.QUOTE_PACK[meta.id];
@@ -3652,7 +3727,7 @@
     }
     return new Promise(function (resolve, reject) {
       const s = document.createElement("script");
-      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=agents-utrust-20261125";
+      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=source-toggle-20261125";
       s.async = true;
       s.onload = function () {
         const pack = window.AGENT_PACK && window.AGENT_PACK[meta.id];
@@ -3982,7 +4057,7 @@
     const neededAgents = neededAgentVersions(isCompare, carrier, state.agentId);
     const missingAgents = neededAgents.filter((v) => !agentPackCache[v.id]);
     if (missing.length || missingAgents.length) {
-      if (!document.getElementById("carrier")) {
+      if (!document.getElementById("source-toggle")) {
         document.getElementById("app").innerHTML = '<p class="hint">טוען את המחירון…</p>';
       }
       Promise.all(missing.map(loadVersion).concat(missingAgents.map(loadAgentVersion))).then(function () { render(); }).catch(function (err) {
@@ -4478,12 +4553,39 @@
     app.innerHTML =
       '<section class="card search-card">' +
       '<div class="search-top">' +
-        '<div class="carrier-field"><label class="fld" for="carrier">חברת ספנות</label><select id="carrier">' + carrierOptions + "</select>" +
-        (!isCompare && carrier && versionsFor(carrier.id).length ? historyLinkHtml(carrier) : "") +
-        (!isCompare && carrier ? noticeBannerHtml(carrier, shipIso, selectedOrigin, null) : "") + "</div>" +
-        '<div class="origin-combo" id="origin-combo">' +
+        (function () {
+          const kind = state.sourceKind || "";
+          let listHtml = "";
+          if (!kind) {
+            listHtml = '<p class="source-hint">בחרו למעלה אם ההצעה היא מחברת ספנות או מסוכן. אחר כך יופיעו כאן רק האפשרויות הרלוונטיות, בלי רשימה ארוכה שנגללת.</p>';
+          } else if (kind === "carrier") {
+            const chips = carriers.map(function (c) {
+              const on = !!(carrier && carrier.id === c.id);
+              return '<button type="button" class="source-chip" data-pick-carrier="' + esc(c.id) + '" aria-pressed="' + on + '">' + esc(c.name) + "</button>";
+            }).join("");
+            listHtml = '<div class="source-list"><div class="fld-label" id="source-list-label">בחרו חברת ספנות</div><div class="source-chips carriers" role="group" aria-labelledby="source-list-label">' + chips + "</div></div>";
+          } else if (kind === "agent") {
+            const chips = AGENTS.map(function (a) {
+              const on = !!(selectedAgent && selectedAgent.id === a.id);
+              return '<button type="button" class="source-chip" data-pick-agent="' + esc(a.id) + '" aria-pressed="' + on + '">' + esc(a.name) + '<span class="chip-meta">סוכן</span></button>';
+            }).join("");
+            listHtml = '<div class="source-list"><div class="fld-label" id="source-list-label">בחרו סוכן</div><div class="source-chips agents" role="group" aria-labelledby="source-list-label">' + chips + "</div></div>";
+          }
+          const originPh = hasSource
+            ? "הקלידו אות לחיפוש או בחרו מהרשימה"
+            : (kind === "agent" ? "בחרו קודם סוכן" : (kind === "carrier" ? "בחרו קודם חברת ספנות" : "בחרו קודם חברת ספנות או סוכן"));
+          return '<div class="source-picker">' +
+            '<div class="source-toggle" id="source-toggle" role="group" aria-label="סוג מקור">' +
+              '<button type="button" id="source-kind-carrier" aria-pressed="' + (kind === "carrier") + '">חברת ספנות</button>' +
+              '<button type="button" id="source-kind-agent" aria-pressed="' + (kind === "agent") + '">סוכן</button>' +
+            "</div>" + listHtml +
+            (!isCompare && carrier && versionsFor(carrier.id).length ? historyLinkHtml(carrier) : "") +
+            (!isCompare && carrier ? noticeBannerHtml(carrier, shipIso, selectedOrigin, null) : "") +
+          "</div>" +
+          '<div class="origin-combo" id="origin-combo">' +
           '<label class="fld" for="origin-input" id="origin-field-label">' + (hasSource ? ("נמל מוצא (" + origins.length + " במחירון)") : "נמל מוצא") + "</label>" +
-          '<input type="text" id="origin-input" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="origin-list" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" placeholder="' + (hasSource ? "הקלידו אות לחיפוש או בחרו מהרשימה" : "בחרו קודם חברת ספנות") + '" value="' + esc(selectedOrigin ? originChoiceLabel(selectedOrigin) : "") + '"' + (!hasSource ? " disabled" : "") + '>' +
+          '<input type="text" id="origin-input" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="origin-list" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" placeholder="' + originPh + '" value="' + esc(selectedOrigin ? originChoiceLabel(selectedOrigin) : "") + '"' + (!hasSource ? " disabled" : "") + '>';
+        })() +
           '<ul id="origin-list" class="origin-list" role="listbox" hidden></ul>' +
         "</div>" +
         spotBannerHtml() +
@@ -4519,25 +4621,10 @@
     if (clearBtn) {
       clearBtn.addEventListener("click", function () { clearSearch(); });
     }
-    $("carrier").addEventListener("change", (e) => {
-      const v = e.target.value;
+    function resetSourceTransient() {
       comboOpen = false;
       comboTyped = null;
       comboHighlight = -1;
-      if (v.indexOf("agent:") === 0) {
-        state.agentId = v.slice(6);
-        state.carrierId = "";
-      } else {
-        state.agentId = "";
-        state.carrierId = v;
-      }
-      if (!v) {
-        state.agentId = "";
-        state.originId = "";
-        state.originKey = "";
-        state.typ = "";
-        state.versionOverride = {};
-      }
       state.compare = false;
       state.copied = false;
       state.copiedId = "";
@@ -4547,7 +4634,46 @@
       state.calOpen = false;
       state.noticeOpen = false;
       state.noticeId = "";
+    }
+    const kindCarrierBtn = $("source-kind-carrier");
+    const kindAgentBtn = $("source-kind-agent");
+    if (kindCarrierBtn) kindCarrierBtn.addEventListener("click", function () {
+      if (state.sourceKind === "carrier") return;
+      resetSourceTransient();
+      state.sourceKind = "carrier";
+      state.agentId = "";
+      state.carrierId = "";
       render();
+    });
+    if (kindAgentBtn) kindAgentBtn.addEventListener("click", function () {
+      if (state.sourceKind === "agent") return;
+      resetSourceTransient();
+      state.sourceKind = "agent";
+      state.carrierId = "";
+      state.agentId = "";
+      render();
+    });
+    document.querySelectorAll("[data-pick-carrier]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        const id = btn.getAttribute("data-pick-carrier");
+        if (state.carrierId === id) return;
+        resetSourceTransient();
+        state.sourceKind = "carrier";
+        state.carrierId = id;
+        state.agentId = "";
+        render();
+      });
+    });
+    document.querySelectorAll("[data-pick-agent]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        const id = btn.getAttribute("data-pick-agent");
+        if (state.agentId === id) return;
+        resetSourceTransient();
+        state.sourceKind = "agent";
+        state.agentId = id;
+        state.carrierId = "";
+        render();
+      });
     });
     const originInput = $("origin-input");
     if (originInput) {
