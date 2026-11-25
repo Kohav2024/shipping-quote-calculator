@@ -602,16 +602,104 @@
       min-height: 48px;
       font-size: 1rem;
     }
-    .compare-list { display: grid; gap: 16px; margin-top: 12px; }
+    .compare-list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+    .compare-hint { margin: 8px 0 0; font-size: 0.88rem; color: var(--muted); }
+    .compare-item { margin: 0; }
+    .compare-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      min-height: 64px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+      font: inherit;
+      color: inherit;
+      text-align: start;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .compare-row:hover, .compare-item.is-open .compare-row {
+      border-color: var(--navy);
+    }
+    .compare-row-main { flex: 1; min-width: 0; }
+    .compare-row-name {
+      font-weight: 700;
+      font-size: 1.05rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .compare-row-meta {
+      display: block;
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-top: 3px;
+      line-height: 1.35;
+    }
+    .compare-row-price { text-align: end; flex-shrink: 0; }
+    .compare-row-usd {
+      font-weight: 700;
+      font-size: 1.12rem;
+      display: block;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.02em;
+    }
+    .compare-row-other {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 2px;
+      font-variant-numeric: tabular-nums;
+    }
+    .compare-row-tag {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 1px 7px;
+      border-radius: 999px;
+      background: var(--warn-bg);
+      color: var(--warn-ink);
+      border: 1px solid var(--warn-bd);
+      line-height: 1.4;
+    }
+    .compare-row-warn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--warn-bg);
+      border: 1px solid var(--warn-bd);
+      color: var(--warn-ink);
+      font-size: 0.78rem;
+      font-weight: 700;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+    .compare-row-chevron {
+      width: 0.55em;
+      height: 0.55em;
+      border-right: 2px solid var(--muted);
+      border-bottom: 2px solid var(--muted);
+      transform: rotate(45deg);
+      margin-inline-start: 2px;
+      flex-shrink: 0;
+      transition: transform 0.15s ease;
+    }
+    .compare-item.is-open .compare-row-chevron { transform: rotate(225deg); }
+    .compare-detail { margin-top: 8px; }
     .compare-card .card-head { margin-bottom: 10px; }
     .compare-card .terms { margin-top: 14px; }
     .compare-missing {
       margin: 16px 0 0;
       font-size: 0.92rem;
       color: var(--muted);
-    }
-    @media (min-width: 900px) {
-      .compare-list { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
     }
     .callout {
       border-radius: 12px;
@@ -1860,6 +1948,7 @@
     noticeOpen: false,
     noticeId: "",
     compare: false,
+    compareOpenId: "",
     copiedId: "",
     view: "rates",
     spotOrigin: "",
@@ -1889,6 +1978,7 @@
     state.noticeOpen = false;
     state.noticeId = "";
     state.compare = false;
+    state.compareOpenId = "";
     state.copiedId = "";
     state.view = "rates";
     state.spotOrigin = "";
@@ -3752,16 +3842,60 @@
         compareEntries.push({ c: x.c, ctx: ctx, card: card });
       });
       compareEntries.sort(function (a, b) {
-        const fa = (a.ctx.fallbackNote || !a.ctx.validRate) ? 1 : 0;
-        const fb = (b.ctx.fallbackNote || !b.ctx.validRate) ? 1 : 0;
-        if (fa !== fb) return fa - fb;
         const ta = a.ctx.pricedQuote ? totalsOf(a.ctx.pricedQuote, 1) : null;
         const tb = b.ctx.pricedQuote ? totalsOf(b.ctx.pricedQuote, 1) : null;
-        const ua = ta && ta.perCtr && ta.perCtr.USD;
-        const ub = tb && tb.perCtr && tb.perCtr.USD;
-        if (ua != null && ub != null && ua !== ub) return ua - ub;
+        const ua = ta && ta.perCtr && ta.perCtr.USD != null ? ta.perCtr.USD : Infinity;
+        const ub = tb && tb.perCtr && tb.perCtr.USD != null ? tb.perCtr.USD : Infinity;
+        if (ua !== ub) return ua - ub;
         return a.c.nameHe.localeCompare(b.c.nameHe, "he");
       });
+    }
+
+    function compareRowHtml(entry) {
+      const c = entry.c;
+      const ctx = entry.ctx;
+      const open = state.compareOpenId === c.id;
+      const tot = ctx.pricedQuote ? totalsOf(ctx.pricedQuote, 1) : null;
+      const usd = tot && tot.perCtr && tot.perCtr.USD;
+      const otherCcys = tot ? tot.currencies.filter(function (cur) { return cur !== "USD" && (tot.perCtr[cur] || 0); }) : [];
+      const mixed = !!(tot && tot.currencies.length > 1);
+      const fbKind = (ctx.quoteRate && ctx.quoteRate.fallbackKind) || (ctx.fallbackNote && ctx.quoteRate && ctx.quoteRate.vt && shipIso && ctx.quoteRate.vt < shipIso ? "past" : "") || "";
+      const kind = fbKind || ((ctx.fallbackNote || !ctx.validRate) ? (ctx.isNotYetValid ? "future" : "past") : "");
+      let tag = "";
+      if (kind === "past") tag = "מחיר אחרון ידוע";
+      else if (kind === "future") tag = "מחירון עתידי";
+      const meta = [];
+      if (ctx.fallbackNote) meta.push(ctx.fallbackNote);
+      else if (ctx.quoteRate && ctx.quoteRate.vf && ctx.quoteRate.vt) {
+        meta.push("תוקף " + fmtDate(ctx.quoteRate.vf) + "–" + fmtDate(ctx.quoteRate.vt));
+      }
+      const tt = ctx.quoteRate ? ttLabel(ctx.quoteRate) : "";
+      if (tt && tt !== "לא צוין במחירון") meta.push(tt);
+      if (mixed) meta.push("מטבע מעורב");
+      const notices = quoteNoticesFor(c.id, shipIso, ctx.pricedQuote || ctx.quoteRate, selectedOrigin);
+      const warn = notices.length
+        ? '<span class="compare-row-warn" aria-label="יש הודעה לחברה זו">!</span>'
+        : "";
+      const otherHtml = otherCcys.length
+        ? '<span class="compare-row-other">' + otherCcys.map(function (cur) {
+            return "+" + money(tot.perCtr[cur], cur);
+          }).join(" · ") + "</span>"
+        : "";
+      const usdHtml = usd != null ? moneyHtml(usd, "USD") : "—";
+      return '<div class="compare-item' + (open ? " is-open" : "") + '" id="compare-item-' + esc(c.id) + '">' +
+        '<button type="button" class="compare-row" data-compare-open="' + esc(c.id) + '" aria-expanded="' + (open ? "true" : "false") + '" aria-controls="compare-detail-' + esc(c.id) + '">' +
+          '<span class="compare-row-main">' +
+            '<span class="compare-row-name">' + esc(c.nameHe) +
+              (tag ? ' <span class="compare-row-tag">' + esc(tag) + "</span>" : "") +
+              warn +
+            "</span>" +
+            (meta.length ? '<span class="compare-row-meta">' + esc(meta.join(" · ")) + "</span>" : "") +
+          "</span>" +
+          '<span class="compare-row-price"><span class="compare-row-usd">' + usdHtml + "</span>" + otherHtml + "</span>" +
+          '<span class="compare-row-chevron" aria-hidden="true"></span>' +
+        "</button>" +
+        (open ? '<div class="compare-detail" id="compare-detail-' + esc(c.id) + '">' + entry.card + "</div>" : "") +
+      "</div>";
     }
 
     const copyFallbackHtml = state.copyFallback
@@ -3773,7 +3907,7 @@
     let resultsHtml = "";
     if (isCompare) {
       if (!(state.originId && state.dest && effectiveTyp && shipIso)) {
-        resultsHtml = '<section class="card" id="compare-panel"><h2>השוואה בין חברות הספנות</h2><div class="callout info"><strong>מוכנים להשוות</strong>בחרו נמל מוצא, יעד, סוג מכולה ותאריך BL. יוצגו כל החברות שיש להן תעריף לאותה בקשה, עם התנאים וההודעות של כל אחת.</div></section>';
+        resultsHtml = '<section class="card" id="compare-panel"><h2>השוואה בין חברות הספנות</h2><div class="callout info"><strong>מוכנים להשוות</strong>בחרו נמל מוצא, יעד, סוג מכולה ותאריך BL. תופיע רשימה פשוטה של כל החברות שיש להן תעריף, מהזול ליקר. לחצו על שורה לפירוט.</div></section>';
       } else {
         const routeLine = '<p class="meta-line"><span>מסלול</span> ' + routeHtml(selectedOrigin, state.dest) +
           " · " + esc(TYPE_HE[effectiveTyp] || effectiveTyp) +
@@ -3784,7 +3918,7 @@
           '<div class="card" id="compare-head"><div class="card-head"><h2>השוואה בין חברות הספנות</h2>' +
           (compareEntries.length ? '<button type="button" class="btn' + (copiedAll ? " ok" : "") + '" id="copy-compare-btn">' + (copiedAll ? "ההשוואה הועתקה" : "העתק השוואה") + "</button>" : "") +
           "</div>" + (carrierMeta ? '<p class="meta-line">' + carrierMeta + "</p>" : "") + routeLine + "</div>" +
-          (compareEntries.length ? '<div class="compare-list">' + compareEntries.map(function (e) { return e.card; }).join("") + "</div>" : '<div class="card"><div class="callout warn"><strong>אין תעריף לאף חברה</strong>למסלול, סוג המכולה והתאריך שנבחרו אין שורה במחירונים שנטענו.</div></div>') +
+          (compareEntries.length ? '<p class="compare-hint">מהזול ליקר, לפי סה״כ למכולה. לחצו על שורה לפירוט.</p><div class="compare-list" id="compare-list">' + compareEntries.map(compareRowHtml).join("") + "</div>" : '<div class="card"><div class="callout warn"><strong>אין תעריף לאף חברה</strong>למסלול, סוג המכולה והתאריך שנבחרו אין שורה במחירונים שנטענו.</div></div>') +
           (compareMissing.length ? '<p class="compare-missing">אין תעריף אצל: ' + esc(compareMissing.map(function (c) { return c.nameHe; }).join(" · ")) + ".</p>" : "") +
           copyFallbackHtml +
           "</section>";
@@ -4036,6 +4170,7 @@
     if (compareBtnEl) {
       compareBtnEl.addEventListener("click", function () {
         state.compare = !state.compare;
+        state.compareOpenId = "";
         state.copied = false;
         state.copiedId = "";
         state.copyFallback = "";
@@ -4073,6 +4208,18 @@
         writeCopiedText(quoteText(displayCarrier, selectedOrigin, state.dest, quoteRate, qty, markup, shipIso, !validRate, quoteOffers), "one");
       });
     }
+    document.querySelectorAll("[data-compare-open]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        const id = btn.getAttribute("data-compare-open");
+        state.compareOpenId = state.compareOpenId === id ? "" : id;
+        const keep = state.compareOpenId;
+        render();
+        if (keep) {
+          const el = document.getElementById("compare-item-" + keep);
+          if (el && el.scrollIntoView) el.scrollIntoView({ block: "nearest", behavior: "smooth" });
+        }
+      });
+    });
     document.querySelectorAll("[data-copy-carrier]").forEach(function (btn) {
       btn.addEventListener("click", function () {
         const id = btn.getAttribute("data-copy-carrier");
