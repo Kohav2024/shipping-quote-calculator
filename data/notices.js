@@ -690,11 +690,11 @@ window.CARRIER_NOTICES = [
       "JP"
     ],
     "quoteWarningTitle": "MSC: מגבלת משקל ב-20׳, קוד SCT ומדיניות תמחור",
-    "quoteWarning": "מחירון SPOT HARMLESS בתוקף 1.12.2026–14.12.2026 ליעדי אשדוד וחיפה. תעריף מכולת 20׳ DV חל רק עד משקל ברוטו 22.9 טון; למטען כבד יותר חלות תוספות — הסכום לא צוין במחירון ולא הומצא. יש לאמת את קוד ה-SCT מול משרד MSC לפני ההזמנה: שינוי אחרי שההזמנה הוצבה — קנס 3,500$ למכולה; קוד שגוי בלי תעריף — יחולו תעריפי FAK; אם המכולות הריקות טרם שוחררו, ניתן לשנות את הקוד בלי קנס. הובלה מנמלי בסיס לפי תאריך יציאת הפרופורמה, ומנמלי out לפי היציאה בפועל. ההצעה כפופה לזמינות מקום. לא צוין במחירון מספר SCT או הסכם.",
+    "quoteWarning": "מחירון SPOT HARMLESS בתוקף 1.12.2026–14.12.2026 ליעדי אשדוד וחיפה. תעריף מכולת 20׳ DV חל רק עד משקל ברוטו 22.9 טון; למטען כבד יותר חלות תוספות — הסכום לא צוין במחירון ולא הומצא. יש לאמת את קוד ה-SCT מול משרד MSC לפני ההזמנה: שינוי אחרי שההזמנה הוצבה — קנס 3,500$ למכולה; קוד שגוי בלי תעריף — יחולו תעריפי FAK; אם המכולות הריקות טרם שוחררו, ניתן לשנות את הקוד בלי קנס. הובלה מנמלי בסיס לפי תאריך יציאת הפרופורמה, ומנמלי out לפי היציאה בפועל. ההצעה כפופה לזמינות מקום. מספר SCT: 2361-88888-ST.",
     "sections": [
       {
         "kind": "meta",
-        "text": "התקבל ב-25.11.2026 כ-revised rates. לא צורף תאריך מייל, ובמחירון עצמו לא צוין תאריך עדכון — תאריך ההנפקה סומן בקירוב 25.11.2026. תוקף: Effective as of 1.12.2026 until further notice but not beyond 14.12.2026 (HARMLESS). כותרת המחירון: SPOT rate offer to Ashdod (HCT) and Haifa ports. זה עדכון תעריפים לאותו חלון של המחירון הקודם (FAK rate offer, הונפק 15.11.2026): אותם נמלים ותוספות, והובלה ימית הופחתה ב-200$ ל-20׳ וב-200$ ל-40׳/HC. לא צוין במחירון מספר SCT / הסכם / filing."
+        "text": "התקבל ב-25.11.2026 כ-revised rates. תאריך ההנפקה 25.11.2026. תוקף: Effective as of 1.12.2026 until further notice but not beyond 14.12.2026 (HARMLESS). כותרת המחירון: SPOT rate offer to Ashdod (HCT) and Haifa ports. זה עדכון תעריפים לאותו חלון של המחירון הקודם (FAK rate offer, הונפק 15.11.2026): אותם נמלים ותוספות, והובלה ימית הופחתה ב-200$ ל-20׳ וב-200$ ל-40׳/HC. מספר SCT: 2361-88888-ST."
       },
       {
         "kind": "p",
@@ -704,12 +704,22 @@ window.CARRIER_NOTICES = [
       {
         "kind": "p",
         "lead": "קוד SCT:",
-        "text": "יש לאמת את קוד ה-SCT מול משרד MSC לפני ההזמנה. אחרי שההזמנה הוצבה לא ניתן לשנות את הקוד, ושינוי יגרור קנס של 3,500$ למכולה. הזמנה שאושרה עם קוד SCT שגוי ובלי תעריף — יחולו תעריפי FAK. אם המכולות הריקות טרם שוחררו, ניתן לשנות את קוד ה-SCT בלי קנס. האחריות להעביר את הקוד הנכון לסוכן או לספק במוצא היא על המזמין."
+        "text": "מספר SCT: 2361-88888-ST. יש לאמת את הקוד מול משרד MSC לפני ההזמנה. אחרי שההזמנה הוצבה לא ניתן לשנות את הקוד, ושינוי יגרור קנס של 3,500$ למכולה. הזמנה שאושרה עם קוד SCT שגוי ובלי תעריף — יחולו תעריפי FAK. אם המכולות הריקות טרם שוחררו, ניתן לשנות את קוד ה-SCT בלי קנס. האחריות להעביר את הקוד הנכון לסוכן או לספק במוצא היא על המזמין."
       },
       {
         "kind": "p",
         "lead": "מדיניות תמחור וזמינות:",
         "text": "הובלה מנמלי בסיס מחושבת לפי תאריך יציאת הפרופורמה (scheduled vessel departure = proforma sailing date), לא לפי היציאה בפועל ולא לפי כניסת המכולה לטרמינל. מנמלי out (Sihanoukville, Makassar, Songkhla ונמלי out בסין) — לפי היציאה בפועל; בנגקוק לפי פרופורמת Laem Chabang. ההצעה כפופה לזמינות מקום במועד ההזמנה, וצוין שהזמינות מוגבלת. החברה אינה מתחייבת לטעינה באונייה, בתאריך או בשעה מסוימים; לוחות הזמנים הם הערכות בלבד. הזמנה מהווה הסכמה לתנאי MSC Israel."
+      },
+      {
+        "kind": "p",
+        "lead": "הערות מגיליונות pre-carriage:",
+        "text": "גיליונות pre-carriage / TAO-PRE וסין inland לא נכללו בסה״כ (התעריפים הם מעל תעריף נמל האם). בגיליון Third Party Feeders TAO & PRE נכתב שיש להוסיף CRS לכל נמלי הטעינה/הקבלה שברשימה. בגיליון China Pre-carriage: MSC שומרת לעצמה את הזכות להחיל תעריפי inland/ONC/תוספות מעודכנים בלי הודעה מוקדמת. התעריפים אינם חלים על מטען מיוחד כגון DG, OOG וריפר (אלא אם צוין במפורש), ויש לבדוק מול כל נמל טעינה בנפרד. קבלת מטען מסוכן כפופה לאישור Medlog. התעריפים אינם כוללים שחרור מכס, דמי בדיקה וחיובים אחרים. ליעדי סוריה, איראן וסודן התעריף באירו בלבד. דוברה בין-לאומית דרך הונג קונג כפופה ל-THC ולדמי מסמכים בהונג קונג, ודרך יאנטיאן — ל-THC ולדמי מסמכים ביאנטיאן. עלות משאיות SPRC הוסרה בשל ביקוש נמוך ותטופל מקרה-מקרה. תעריף משאית הוא אינדיקטיבי בלבד, והמחיר בפועל לפי הכתובת ודרישות השולח. תעריפי המשאית הם עלות הובלה יבשתית בלבד, למטען/ציוד כללי, ואינם כוללים שחרור מכס, בדיקה, חיטוי וחיובים אחרים. מטען מיוחד או מסוכן — הצעה מקרה-מקרה, ולמטען מסוכן תיתכן תוספת (בכפוף לאישור Medlog). אם ההזמנה בוטלה אחרי איסוף המכולה הריקה, יחויבו 80% מהעלויות על השולח. תוספת שעות נוספות: 100 RMB או 15$ למשאית לשעה (מעל 4 שעות). תוספת לינה: 1,000 RMB או 143$ למשאית ללילה. לנקודות inland שאינן ברשימה יש לפנות ל-MSC הונג קונג עם פרטי הכתובת. פרטי קשר אישיים או כתובות דוא״ל שהופיעו בגיליון לא פורסמו."
+      },
+      {
+        "kind": "original",
+        "lead": "נוסח מקורי — גיליונות pre-carriage",
+        "text": "South East Asia pre carriage (THIRD PARTY FEEDERS TAO & PRE):\nCRS to be added for all below POLs\n\nChina Pre-carriage:\nMSC reserves the right to apply latest Inlands/ONC/additional rates without Pre-notice\nBelow rate does not apply to special cargos e.g, DG, OOG, Reefer etc (unless specially specify), please check with each POL separately\nD.G cargo acceptance are subjected to Medlog approval, please check with each POL separately\nBelow rate does not include customs clearance, inspection fee, and any other charges\nEuro for POD: Syria/ Iran/Sudan  only\n\nInternational Barge via Hong Kong: Subject to Hong Kong THC and Document Fees\nInternational Barge via Yantian: Subject to Yantian THC and Document Fees\n\nSPRC Trucking Cost removed due to low demand, to be handled case by case basis\nTrucking rate is served as indication only\nActual rates will be quoted basis on actual address and trucking requirements from shipper.\nBelow rates are trucking cost only and do not include customs clearance, inspection fee, fumigation and any other charges\nBelow rates are applicable to general goods/equipment type only\nSpecial commodity/equipment e.g. reefer, dangerous goods are subject to offer case by case\nFor D.G cargo, rates are subjected to additional surcharge, pls check with MSC Hong Kong. The acceptance of booking for D.G cargo is subject to Medlog approval.\n80% of above costs will be charged to shipper if booking is cancelled after empty has ben picked up\nOvertime charge: RMB100 or USD15 per truck per hour (over 4 hours )\nOvernight charge: RMB1000 or USD143 / per truck / night\nFor any inland points not included above, please contact MSC HK with address details."
       },
       {
         "kind": "original",

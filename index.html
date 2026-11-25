@@ -947,10 +947,10 @@
     <footer class="note">כלי פנימי להצעת מחיר ממחירון. התעריפים כפופים לתוקף, למקום פנוי ולתנאי החברה.</footer>
   </div>
   <noscript><p class="wrap">יש להפעיל JavaScript כדי להשתמש במחשבון.</p></noscript>
-  <script src="data/index.js?v=msc-spot-asia-20261125"></script>
-  <script src="data/notices.js?v=msc-spot-asia-20261125"></script>
-  <script src="data/spots.js?v=msc-spot-asia-20261125"></script>
-  <script src="data/schedules.js?v=msc-spot-asia-20261125"></script>
+  <script src="data/index.js?v=msc-spot-asia-20261125b"></script>
+  <script src="data/notices.js?v=msc-spot-asia-20261125b"></script>
+  <script src="data/spots.js?v=msc-spot-asia-20261125b"></script>
+  <script src="data/schedules.js?v=msc-spot-asia-20261125b"></script>
   <script>
 (function () {
   const DATA = window.QUOTE_INDEX;
@@ -1186,6 +1186,7 @@
         return q.ref + " · חוזה " + q.contract + " · Trade " + q.tradeId;
       }
     }
+    if (carrier && carrier.sct && !carrier.ref) return "SCT " + carrier.sct;
     if (!carrier || !carrier.ref) return "";
     if (carrier.coirRef) {
       return carrier.ref + " (FAK) · " + carrier.coirRef + " (חוזה COIR)";
@@ -1996,14 +1997,19 @@
     return html;
   }
   function versionTitle(v) {
+    let title;
     if (v.coirRef && v.ref) {
-      return "הסכם " + v.ref + " (FAK) · " + v.coirRef + " (חוזה COIR)" + (v.version ? " · גרסה " + v.version : "");
+      title = "הסכם " + v.ref + " (FAK) · " + v.coirRef + " (חוזה COIR)" + (v.version ? " · גרסה " + v.version : "");
+    } else if (v.ref && v.version) title = "הסכם " + v.ref + " · גרסה " + v.version;
+    else if (v.label) title = v.label;
+    else if (v.ref) title = "הסכם " + v.ref;
+    else if (v.version) title = "גרסה " + v.version;
+    else title = v.id;
+    if (v.sct) {
+      const sctLab = "SCT " + v.sct;
+      title = (title && title !== v.id) ? (title + " · " + sctLab) : sctLab;
     }
-    if (v.ref && v.version) return "הסכם " + v.ref + " · גרסה " + v.version;
-    if (v.label) return v.label;
-    if (v.ref) return "הסכם " + v.ref;
-    if (v.version) return "גרסה " + v.version;
-    return v.id;
+    return title;
   }
   function versionWindow(v) {
     return fmtDate(addDays(v.vf)) + "–" + fmtDate(addDays(v.vt));
@@ -2027,7 +2033,7 @@
     }
     return new Promise(function (resolve, reject) {
       const s = document.createElement("script");
-      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=msc-spot-asia-20261125";
+      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=msc-spot-asia-20261125b";
       s.async = true;
       s.onload = function () {
         const pack = window.QUOTE_PACK && window.QUOTE_PACK[meta.id];
@@ -2529,7 +2535,20 @@
           + "דמי מועמדות למכולה כבדה בהונג קונג ודרום סין (Nansha RMB 100, Shekou RMB 200, Yantian RMB 400, Hong Kong HKD 700, Shantou RMB 100 ל-20DV בלבד, Qinzhou Nil — לא הומרו ולא נוספו). "
           + "גיליונות South East Asia pre carriage (TAO/PRE מעל תעריף נמל האם, ובנוסף CRS) ו-China Pre Carriage (inland) לא נכללו בסה״כ ההובלה. הובלה פנים-ארצית ביעד לא נכללה בסה״כ. לא צוין במחירון דוא״ל הזמנות כללי.</p>";
       }
-      if (vid === "msc-india-sl-2026-08-16") {
+      if (vid === "msc-spot-asia-2026-12-01") {
+        return head + "הכותרת במחירון: SPOT rate offer to Ashdod (HCT) and Haifa ports — Effective as of 1.12.2026 until further notice but not beyond 14.12.2026 (HARMLESS). הצד: MEDITERRANEAN SHIPPING CO. (Israel) Ltd. "
+          + "מספר SCT: <span class=\"ltr\">2361-88888-ST</span>. אחרי שההזמנה הוצבה לא ניתן לשנות את קוד ה-SCT; שינוי/קוד שגוי — קנס 3,500$ למכולה, ואם אין תעריף בגלל קוד שגוי יחולו תעריפי FAK. אם המכולות הריקות טרם שוחררו, ניתן לשנות את הקוד בלי קנס. יש לאמת את הקוד מול משרד MSC לפני הזמנה.</p>"
+          + "<p>התעריפים הם SPOT harmless לחיפה ולאשדוד (אותו מחיר). 40DV ו-40HC באותו מחיר. תעריף 20׳ DV חל רק עד 22.9 טון משקל מטען ברוטו; תוספות למשקל כבד חלות, אבל הסכום לא צוין בגיליון התעריפים ולא הומצא. "
+          + "THC במחירון (THC IN USD) 275$/20׳ ו-400$/40׳ נוסף לסה״כ כטיפול יעד; Origin THC משולם ע״י השולח. PRS (Piracy Risk Surcharge) 55$/20׳ ו-110$/40׳ ו-SCS (Suez Canal Surcharge) 36$/20׳ ו-72$/40׳ נוספו לפי הטבלה. "
+          + "CLS 20$/40$ רק בנמלי סין היבשתית שבהם צוין; CRS 131$/262$ רק בשורות שבהן צוין (הונג קונג ושאר המוצאים). EFS לא מופיע במחירון הזה ולא נוסף. "
+          + "הובלה מנמלי בסיס לפי תאריך יציאת הפרופורמה (scheduled / proforma); מנמלי out (Sihanoukville, Makassar, Songkhla ונמלי out בסין) לפי היציאה בפועל; בנגקוק לפי פרופורמת Laem Chabang. אין התחייבות לכלי שיט או לתאריך. 12 ימי demurrage חינם ביעד. כפוף לתוספות במועד השילוח, לזמינות מקום וציוד, ולתנאי MSC Israel: "
+          + "<span class=\"ltr\">https://www.msc.com/che/contract-of-carriage</span>.</p>"
+          + "<p>חיובים מקומיים ליבוא (Dry / Harmless) מוצגים בנפרד ולא נכללים בסה״כ ההובלה: Handling Fee 76$ לשטר מטען, Container Fee 15$ למכולה יבשה, Fuel Energy Transition 70$/20׳ ו-140$/40׳. כפוף גם לדמי D/O ולהוצאות מקומיות נוספות. "
+          + "לא נוספו אוטומטית (מותנים): Flexi/Flexibag 14$ למכולה; מטען עם בעירה ספונטנית / חימום עצמי 50$/מכולה (גיליון SCF — כותרת בלבד, רשימת הסחורות לא הייתה בטקסט מחלץ); "
+          + "דמי מועמדות למכולה כבדה בהונג קונג ודרום סין (Nansha RMB 100, Shekou RMB 200, Yantian RMB 400, Hong Kong HKD 700, Shantou RMB 100 ל-20DV בלבד, Qinzhou Nil — לא הומרו ולא נוספו). "
+          + "גיליונות South East Asia pre carriage (TAO/PRE מעל תעריף נמל האם, ובנוסף CRS) ו-China Pre Carriage (inland) לא נכללו בסה״כ ההובלה; ההערות שמופיעות בהם נוספו להודעת המחירון. הובלה פנים-ארצית ביעד לא נכללה בסה״כ.</p>";
+      }
+            if (vid === "msc-india-sl-2026-08-16") {
         return head + "הכותרת במחירון: Updated rate offer Ex India + Sri Lanka as from 16.08.2026 till 31.10.2026* (F.A.K HARMLESS) To Haifa/Ashdod — Updated 15.09.26. הערת הכוכבית: Effective last container Received for export at train depots, terminals or POL'S. הצד במכתב: MEDITERRANEAN SHIPPING CO. (Israel) Ltd. לא נמצא במחירון מספר הסכם, filing או חוזה. במייל צוין שההסכם כבר הוגש לפי שורת הנושא, אבל המספר אינו מופיע בקובץ ולא הומצא.</p>" +
           "<p>התעריפים הם F.A.K. harmless ליעדי חיפה ואשדוד (אותו מחיר לשני היעדים). 40DV ו-40HC באותו מחיר. DTHC: 275$/20׳ ו-400$/40׳. EFS IN USD - SEP: 156$ × TEU (156$/20׳, 312$/40׳) — נוסף לסה״כ לפי הטבלה, בלי להמציא סכום אחר. OVW כלול בתעריף ל-20׳. 14 ימי demurrage חינם ביעד, אלא אם צוין אחרת. Origin THC משולם על ידי השולח. כפוף לדמי D/O ולהוצאות מקומיות (סכומים לא צוינו — לא הומצאו). כפוף לתוספות במועד השילוח. תנאי ההובלה: <span class=\"ltr\">https://www.msc.com/che/contract-of-carriage</span>.</p>" +
           "<p>לא נוספו אוטומטית (מותנים / ציוד מיוחד / מסוכן, והמחירון הוא FAK harmless): EIS 50$/מכולה ל-Coir pith/Flammable (הסכם נפרד) ולמטען עם סכנת בעירה ספונטנית; FTS 14$/TEU ל-FlexiTank/FlexiBag; SWB FEE 35$ לסוכן/שולח ב-POL שאינו אשראי; דמי HAZ ב-POL (בלי VIZAK ו-GOA): 500/150/250$ ל-TEU לפי PG 1/3/2; OTS 500$ ל-20׳ Open Top ו-1000$ ל-40׳ Open Top/High; Israel THC למסוכן/ציוד מיוחד 320$/20׳ ו-460$/40׳; SOC FEE 500$ × TEU. ביטול הזמנה: 200$/מכולה. לא מקבלים Granite Blocks. הובלה יבשתית עד מחסן הלקוח הוצעה במייל בנפרד ולא תומחרה במחירון. לא צוין במחירון דוא״ל להזמנה.</p>";
