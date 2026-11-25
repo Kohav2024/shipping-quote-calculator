@@ -663,5 +663,59 @@ window.CARRIER_NOTICES = [
         "text": "Dear Valued Customers,\nPlease be advised that effective December 1st, 2026, a Peak Season Surcharge (PSS) will apply to import shipments from Japan to Israel as follows:\n•\tUSD 750 per 20’ container\n•\tUSD 1,500 per 40’ container\nThe surcharge will remain in effect until further notice.\nThank you for your understanding and continued support.\nBest regards,\nCrown Shipping"
       }
     ]
+  },
+  {
+    "id": "msc-spot-asia-2026-12-01",
+    "carrierIds": [
+      "msc"
+    ],
+    "title": "MSC: מחירון SPOT למזרח הרחוק ולדרום-מזרח אסיה, 1.12.2026–14.12.2026 — מגבלת משקל, SCT ומדיניות תמחור",
+    "banner": "MSC SPOT מזרח הרחוק / דרום-מזרח אסיה: תוקף 1.12.2026–14.12.2026. תעריף 20׳ עד 22.9 טון; יש לאמת קוד SCT לפני הזמנה.",
+    "publishedDate": "2026-11-25",
+    "added": "2026-11-25",
+    "effectiveFromVessel": null,
+    "validTo": "2026-12-14",
+    "appliesWhen": "always",
+    "severity": "warning",
+    "originCountries": [
+      "CN",
+      "HK",
+      "ID",
+      "TH",
+      "VN",
+      "KR",
+      "TW",
+      "SG",
+      "PH",
+      "JP"
+    ],
+    "quoteWarningTitle": "MSC: מגבלת משקל ב-20׳, קוד SCT ומדיניות תמחור",
+    "quoteWarning": "מחירון SPOT HARMLESS בתוקף 1.12.2026–14.12.2026 ליעדי אשדוד וחיפה. תעריף מכולת 20׳ DV חל רק עד משקל ברוטו 22.9 טון; למטען כבד יותר חלות תוספות — הסכום לא צוין במחירון ולא הומצא. יש לאמת את קוד ה-SCT מול משרד MSC לפני ההזמנה: שינוי אחרי שההזמנה הוצבה — קנס 3,500$ למכולה; קוד שגוי בלי תעריף — יחולו תעריפי FAK; אם המכולות הריקות טרם שוחררו, ניתן לשנות את הקוד בלי קנס. הובלה מנמלי בסיס לפי תאריך יציאת הפרופורמה, ומנמלי out לפי היציאה בפועל. ההצעה כפופה לזמינות מקום. לא צוין במחירון מספר SCT או הסכם.",
+    "sections": [
+      {
+        "kind": "meta",
+        "text": "התקבל ב-25.11.2026 כ-revised rates. לא צורף תאריך מייל, ובמחירון עצמו לא צוין תאריך עדכון — תאריך ההנפקה סומן בקירוב 25.11.2026. תוקף: Effective as of 1.12.2026 until further notice but not beyond 14.12.2026 (HARMLESS). כותרת המחירון: SPOT rate offer to Ashdod (HCT) and Haifa ports. זה עדכון תעריפים לאותו חלון של המחירון הקודם (FAK rate offer, הונפק 15.11.2026): אותם נמלים ותוספות, והובלה ימית הופחתה ב-200$ ל-20׳ וב-200$ ל-40׳/HC. לא צוין במחירון מספר SCT / הסכם / filing."
+      },
+      {
+        "kind": "p",
+        "lead": "מגבלת משקל:",
+        "text": "תעריפי 20׳ DV חלים רק על מטען במשקל ברוטו עד 22.9 טון. למטען כבד יותר חלות תוספות נוספות; הסכום לא צוין במחירון ולא הומצא."
+      },
+      {
+        "kind": "p",
+        "lead": "קוד SCT:",
+        "text": "יש לאמת את קוד ה-SCT מול משרד MSC לפני ההזמנה. אחרי שההזמנה הוצבה לא ניתן לשנות את הקוד, ושינוי יגרור קנס של 3,500$ למכולה. הזמנה שאושרה עם קוד SCT שגוי ובלי תעריף — יחולו תעריפי FAK. אם המכולות הריקות טרם שוחררו, ניתן לשנות את קוד ה-SCT בלי קנס. האחריות להעביר את הקוד הנכון לסוכן או לספק במוצא היא על המזמין."
+      },
+      {
+        "kind": "p",
+        "lead": "מדיניות תמחור וזמינות:",
+        "text": "הובלה מנמלי בסיס מחושבת לפי תאריך יציאת הפרופורמה (scheduled vessel departure = proforma sailing date), לא לפי היציאה בפועל ולא לפי כניסת המכולה לטרמינל. מנמלי out (Sihanoukville, Makassar, Songkhla ונמלי out בסין) — לפי היציאה בפועל; בנגקוק לפי פרופורמת Laem Chabang. ההצעה כפופה לזמינות מקום במועד ההזמנה, וצוין שהזמינות מוגבלת. החברה אינה מתחייבת לטעינה באונייה, בתאריך או בשעה מסוימים; לוחות הזמנים הם הערכות בלבד. הזמנה מהווה הסכמה לתנאי MSC Israel."
+      },
+      {
+        "kind": "original",
+        "lead": "נוסח מקורי",
+        "text": "Please find attached the revised rates.\n\nKindly note that the quoted rates for 20' DV containers apply only to shipments with a gross cargo weight of up to 22.9 tons. Additional charges apply to heavier cargo.\n\nPlease note that if the empty containers have not yet been released, you may change the SCT code without any penalty. Kindly instruct your supplier/agent to update the SCT code accordingly. This should help avoid any unnecessary delays or complications.\n\nPlease note that the offer remains subject to space availability at the time of booking.\n\nWe will do our utmost to assist and support your bookings within the given circumstances, however, space availability remains limited.\n\nThe carrier does not promise or undertake to load, carry, or discharge the Goods on or by any particular Vessel, date or time. Advertised sailings and arrivals are only estimated times, and such schedules may be advanced, delayed, or cancelled without notice. In no event shall the Carrier be liable for consequential damages or for any delay in scheduled departures or arrivals of any Vessel or other conveyances used to transport the Goods by sea or otherwise.\n\nBy Placing a Booking, you confirm Accepting MSC Israel terms & conditions (available on MSC site https://www.msc.com/che/contract-of-carriage)\n\nF.Y.I, the rates are subject to space, availability of equip & contingency plans, optional loading without pre advise.\n\nFurther to our previous messages, this is a reminder of MSC's freighting policy which is applicable as of April 1st 2015. MSC is basing its rates from the BASE PORTS on the scheduled vessel departure date= proforma sailing date, NEITHER the actual sailing date nor the gate in of the container into the terminal. (From the OUT PORTS we apply the rates as per the actual sailing date). The price calculation rate is indicative.\n\nWe herewith ask you, due to the rapid changes of the ocean freight, to double check with our office your SCT code PRIOR to booking. SCT number can't change after booking is placed or it will result with a penalty of usd3500 per container.\nWhen a booking received and confirmed without rates available since booking submitted with incorrect SCT code, F.A.K rates to be applied.\n\nKindly be advised that it's your responsibility to advise your agent/supplier at origin, of the correct SCT code to be applied upon booking. Any changes later will result with a penalty."
+      }
+    ]
   }
 ];
