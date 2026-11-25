@@ -727,5 +727,31 @@ window.CARRIER_NOTICES = [
         "text": "Please find attached the revised rates.\n\nKindly note that the quoted rates for 20' DV containers apply only to shipments with a gross cargo weight of up to 22.9 tons. Additional charges apply to heavier cargo.\n\nPlease note that if the empty containers have not yet been released, you may change the SCT code without any penalty. Kindly instruct your supplier/agent to update the SCT code accordingly. This should help avoid any unnecessary delays or complications.\n\nPlease note that the offer remains subject to space availability at the time of booking.\n\nWe will do our utmost to assist and support your bookings within the given circumstances, however, space availability remains limited.\n\nThe carrier does not promise or undertake to load, carry, or discharge the Goods on or by any particular Vessel, date or time. Advertised sailings and arrivals are only estimated times, and such schedules may be advanced, delayed, or cancelled without notice. In no event shall the Carrier be liable for consequential damages or for any delay in scheduled departures or arrivals of any Vessel or other conveyances used to transport the Goods by sea or otherwise.\n\nBy Placing a Booking, you confirm Accepting MSC Israel terms & conditions (available on MSC site https://www.msc.com/che/contract-of-carriage)\n\nF.Y.I, the rates are subject to space, availability of equip & contingency plans, optional loading without pre advise.\n\nFurther to our previous messages, this is a reminder of MSC's freighting policy which is applicable as of April 1st 2015. MSC is basing its rates from the BASE PORTS on the scheduled vessel departure date= proforma sailing date, NEITHER the actual sailing date nor the gate in of the container into the terminal. (From the OUT PORTS we apply the rates as per the actual sailing date). The price calculation rate is indicative.\n\nWe herewith ask you, due to the rapid changes of the ocean freight, to double check with our office your SCT code PRIOR to booking. SCT number can't change after booking is placed or it will result with a penalty of usd3500 per container.\nWhen a booking received and confirmed without rates available since booking submitted with incorrect SCT code, F.A.K rates to be applied.\n\nKindly be advised that it's your responsibility to advise your agent/supplier at origin, of the correct SCT code to be applied upon booking. Any changes later will result with a penalty."
       }
     ]
+  },
+  {
+    "id": "port-congestion-2026-11-25",
+    "carrierIds": ["yml", "one", "msc", "hpl", "msk"],
+    "title": "עיכובים כבדים בנמלים בגלל עומס — YML/ONE, MSC, HPL+MSK",
+    "banner": "עיכובים כבדים בנמלים בגלל עומס: YML/ONE כ־10 ימים או יותר; MSC ו־HPL+MSK כ־5 ימים או יותר. שם האונייה/ההפלגה ב־HPL+MSK עשוי להשתנות בכל עת. (התקבל 25.11.2026)",
+    "publishedDate": "2026-11-25",
+    "added": "2026-11-25",
+    "issuedApprox": true,
+    "effectiveFromVessel": null,
+    "validTo": null,
+    "appliesWhen": "always",
+    "severity": "warning",
+    "quoteWarningTitle": "עיכובים כבדים בנמלים בגלל עומס",
+    "quoteWarning": "התקבל ב־25.11.2026 (טקסט מודבק, בלי תאריך מייל — תאריך ההנפקה סומן בקירוב לפי יום הקבלה). בגלל עומס כבד בנמלים יש עיכובים גדולים בכל הנמלים: YML/ONE — כ־10 ימים או יותר; MSC — כ־5 ימים או יותר; HPL+MSK — כ־5 ימים או יותר, ושם האונייה/ההפלגה (V/V) עשוי להשתנות בכל עת. לא צוין תוקף סיום. באותה הודעה צוינו גם: MSC — ים סוף בשירות ישיר; MD1 (YML/ONE/HMM) — ים סוף דרך DAM; Gemini (MSK+HPL) — ים סוף דרך פורט סעיד.",
+    "sections": [
+      { "kind": "meta", "text": "התקבל ב־25.11.2026. תאריך הנפקה לא צוין במקור (טקסט מודבק, בלי תאריך מייל) — סומן בקירוב לפי יום הקבלה. לא צוין תוקף סיום." },
+      { "kind": "p", "lead": "עיכובים:", "text": "בגלל עומס כבד בנמלים, יש עיכובים גדולים בכל הנמלים." },
+      { "kind": "list", "items": [
+        "YML/ONE — כ־10 ימים או יותר",
+        "MSC — כ־5 ימים או יותר",
+        "HPL+MSK — כ־5 ימים או יותר, ושם האונייה/ההפלגה (V/V) עשוי להשתנות בכל עת"
+      ] },
+      { "kind": "p", "lead": "שירותים שצוינו באותה הודעה:", "text": "MSC — ים סוף בשירות ישיר; MD1 (YML/ONE/HMM) — ים סוף דרך DAM; Gemini (MSK+HPL) — ים סוף דרך פורט סעיד." },
+      { "kind": "original", "lead": "נוסח מקורי", "text": "MSK space is overbooked in Dec.\nWe only have below space in hands by now.\nPls check if any order we can get?\n\nMSK SPOT\nNINGBO-HAIFA\nOF:USD6100/40HQ for ETD:8-DEC--only 3*40HQ\n7FT\n35TT\nNO MSDS/BATTERY\ncancellation fee：USD600/40HQ\n\nMSK SPOT\nTIANJIN-ASHDOD/HAIFA\nOF:USD4900/20GP for ETD:19-DEC--only 1*20GP+1*20GP\n7FT\n45TT\n20GP OWS FEE: USD 400/20 DV for cargo ≥ 21 tons\nNO MSDS/BATTERY  MSC RED-SEA direct service\nMD1(YML/ONE/HMM) RED-SEA via DAM service\nGemini（MSK+HPL) RED-SEA via PORT SAID\n\nImportant notice\nDue to terrible port congestion, all the port have huge delay\nYML/ONE(Around 10 days or even more）\nMSC(Around 5 days or even more）\nHPL+MSK(Aroudn 5 days or even more and change the V/V name in any time）\n\ncancellation fee：USD600/40HQ" }
+    ]
   }
 ];

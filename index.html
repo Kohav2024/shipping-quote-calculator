@@ -406,6 +406,10 @@
     .spot-facts .full { grid-column: 1 / -1; }
     .spot-facts dt { color: var(--muted); font-size: 0.75rem; font-weight: 600; }
     .spot-facts dd { margin: 0; font-weight: 600; }
+    .spot-notes { margin: 10px 0 0; font-size: 0.86rem; line-height: 1.45; }
+    .spot-notes p { margin: 0 0 6px; font-weight: 500; }
+    .spot-notes p:last-child { margin-bottom: 0; }
+    .spot-card .notice-original { margin-top: 10px; }
     .spot-empty { margin-top: 12px; }
     @media (min-width: 720px) {
       .spot-filters .spot-filter-row { grid-template-columns: 1fr 1fr; }
@@ -1035,10 +1039,10 @@
     <footer class="note">כלי פנימי להצעת מחיר ממחירון. התעריפים כפופים לתוקף, למקום פנוי ולתנאי החברה.</footer>
   </div>
   <noscript><p class="wrap">יש להפעיל JavaScript כדי להשתמש במחשבון.</p></noscript>
-  <script src="data/index.js?v=compare-list-20261125"></script>
-  <script src="data/notices.js?v=compare-list-20261125"></script>
-  <script src="data/spots.js?v=compare-list-20261125"></script>
-  <script src="data/schedules.js?v=compare-list-20261125"></script>
+  <script src="data/index.js?v=msk-spot-20261125"></script>
+  <script src="data/notices.js?v=msk-spot-20261125"></script>
+  <script src="data/spots.js?v=msk-spot-20261125"></script>
+  <script src="data/schedules.js?v=msk-spot-20261125"></script>
   <script>
 (function () {
   const DATA = window.QUOTE_INDEX;
@@ -2123,7 +2127,7 @@
     }
     return new Promise(function (resolve, reject) {
       const s = document.createElement("script");
-      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=compare-list-20261125";
+      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=msk-spot-20261125";
       s.async = true;
       s.onload = function () {
         const pack = window.QUOTE_PACK && window.QUOTE_PACK[meta.id];
@@ -3162,9 +3166,18 @@
     if (!c) return "לא צוין";
     return ltrHtml(money(c.amount, c.ccy) + " / " + typLabel(c.typ));
   }
+
+  function spotOriginKeys(offer) {
+    const keys = [offer.originKey].concat(offer.originAliases || []);
+    return keys.filter(Boolean);
+  }
+  function spotMatchesOrigin(offer, key) {
+    if (!key) return true;
+    return spotOriginKeys(offer).indexOf(key) >= 0;
+  }
   function filteredSpots(today) {
     return SPOTS.filter(function (o) {
-      if (state.spotOrigin && o.originKey !== state.spotOrigin) return false;
+      if (state.spotOrigin && !spotMatchesOrigin(o, state.spotOrigin)) return false;
       if (state.spotCarrier && o.carrierId !== state.spotCarrier) return false;
       if (!state.spotShowExpired && spotOfferExpired(o, today)) return false;
       return true;
@@ -3173,7 +3186,7 @@
   function activeSpotsForOrigin(originKey, today) {
     if (!originKey) return [];
     return SPOTS.filter(function (o) {
-      return o.originKey === originKey && !spotOfferExpired(o, today);
+      return spotMatchesOrigin(o, originKey) && !spotOfferExpired(o, today);
     });
   }
   function currentSpotOriginKey() {
@@ -3182,7 +3195,7 @@
       // selected origin key is already on state.originKey after render computes it;
       if (state.originKey) {
         const k = String(state.originKey).toUpperCase();
-        if (SPOTS.some(function (o) { return o.originKey === k; })) return k;
+        if (SPOTS.some(function (o) { return spotMatchesOrigin(o, k); })) return k;
       }
     }
     return "";
@@ -3229,7 +3242,7 @@
     const expired = spotOfferExpired(offer, today);
     let html = '<article class="spot-card' + (expired ? " is-expired" : "") + '" data-spot-id="' + esc(offer.id) + '">';
     html += '<div class="spot-card-head"><span class="spot-source">' + esc(spotAgentLabel(offer)) + "</span>";
-    html += '<span class="spot-received">התקבל ' + esc(fmtDate(offer.received)) + "</span>";
+    html += '<span class="spot-received">התקבל ' + esc(fmtDate(offer.received)) + (offer.issuedApprox ? " (בקירוב)" : "") + "</span>";
     if (expired) html += '<span class="spot-expired-tag">פג תוקף</span>';
     html += "</div>";
     html += "<h2>" + esc(offer.carrierName) + "</h2>";
@@ -3247,7 +3260,18 @@
     html += '<div class="full"><dt>הגבלות</dt><dd>' + restrictHtml(offer) + "</dd></div>";
     html += '<div class="full"><dt>תוספת OWS</dt><dd>' + owsHtml(offer) + "</dd></div>";
     html += '<div class="full"><dt>דמי ביטול</dt><dd>' + cancelHtml(offer) + "</dd></div>";
-    html += "</dl></article>";
+    html += "</dl>";
+    const notes = offer.notesHe || [];
+    if (notes.length) {
+      html += '<div class="spot-notes">';
+      notes.forEach(function (n) { html += "<p>" + esc(n) + "</p>"; });
+      html += "</div>";
+    }
+    if (offer.original) {
+      html += '<details class="notice-original"><summary>נוסח מקורי</summary>';
+      html += '<div class="notice-original-text" dir="ltr">' + esc(offer.original) + "</div></details>";
+    }
+    html += "</article>";
     return html;
   }
   function spotViewHtml() {
