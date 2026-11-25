@@ -69,6 +69,12 @@ window.QUOTE_INDEX =
       "agent": "Lucy Borchard Shipping LTD, as Agents Only of Borchard Lines",
       "party": "Lucy Borchard Shipping LTD, as Agents Only of Borchard Lines",
       "paymentTerms": "התשלום בש״ח עפ״י שער ספנות ביום התשלום."
+    },
+    {
+      "id": "msk",
+      "name": "MSK",
+      "nameHe": "מארסק (MSK / Maersk)",
+      "website": "https://www.maersk.com"
     }
   ],
   "versions": [
@@ -2526,3 +2532,18 @@ window.QUOTE_INDEX =
     "fixed": "קבוע"
   }
 };
+
+window.QUOTE_INDEX.agents = [
+  { id: "utrust", name: "UTRUST", nameHe: "UTRUST" }
+];
+window.QUOTE_INDEX.agentVersions = [
+  {
+    id: "utrust-2026-11-25",
+    agentId: "utrust",
+    file: "data/agents/utrust/2026-11-25.js",
+    received: "2026-11-25",
+    issued: "2026-11-25",
+    issuedApprox: true,
+    added: "2026-11-25"
+  }
+];

@@ -697,6 +697,29 @@
       transition: transform 0.15s ease;
     }
     .compare-item.is-open .compare-row-chevron { transform: rotate(225deg); }
+    .compare-row-tag.tag-red {
+      background: #fdecec;
+      color: #7a1f1f;
+      border-color: #e8b4b4;
+    }
+    .compare-row-usd.price-red { color: #7a1f1f; }
+    .compare-row-basis {
+      display: block;
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 2px;
+      font-variant-numeric: tabular-nums;
+    }
+    #agent-panel { margin-top: 16px; }
+    #agent-panel .card { margin-bottom: 0; }
+    pre.agent-original-text {
+      margin: 0;
+      white-space: pre-wrap;
+      font: inherit;
+      direction: ltr;
+      text-align: left;
+      line-height: 1.45;
+    }
     .compare-detail { margin-top: 8px; }
     .compare-card .card-head { margin-bottom: 10px; }
     .compare-card .terms { margin-top: 14px; }
@@ -1039,10 +1062,10 @@
     <footer class="note">כלי פנימי להצעת מחיר ממחירון. התעריפים כפופים לתוקף, למקום פנוי ולתנאי החברה.</footer>
   </div>
   <noscript><p class="wrap">יש להפעיל JavaScript כדי להשתמש במחשבון.</p></noscript>
-  <script src="data/index.js?v=msk-spot-20261125"></script>
-  <script src="data/notices.js?v=msk-spot-20261125"></script>
-  <script src="data/spots.js?v=msk-spot-20261125"></script>
-  <script src="data/schedules.js?v=msk-spot-20261125"></script>
+  <script src="data/index.js?v=agents-utrust-20261125"></script>
+  <script src="data/notices.js?v=agents-utrust-20261125"></script>
+  <script src="data/spots.js?v=agents-utrust-20261125"></script>
+  <script src="data/schedules.js?v=agents-utrust-20261125"></script>
   <script>
 (function () {
   const DATA = window.QUOTE_INDEX;
@@ -1062,6 +1085,8 @@
   const COMPARE_ID = "compare-all";
   const carriers = DATA.carriers;
   const VERSIONS = DATA.versions;
+  const AGENTS = DATA.agents || [];
+  const AGENT_VERSIONS = DATA.agentVersions || [];
 
   function addDays(offset) {
     const t = Date.UTC(EPOCH[0], EPOCH[1], EPOCH[2]) + offset * 86400000;
@@ -1378,7 +1403,9 @@
     });
   }
   function originChoiceLabel(o) {
-    let s = o.name + " — " + (o.countryHe || o.countryEn || "");
+    let s;
+    if (o.originHe && o.originEn) s = o.originHe + " (" + o.originEn + ") — " + (o.countryHe || o.countryEn || "");
+    else s = o.name + " — " + (o.countryHe || o.countryEn || "");
     if (o.kind === "inland") s += " · דרך " + o.pol;
     if (o.routing) s += " · " + o.routing;
     return s;
@@ -1396,6 +1423,10 @@
     const bare = searchNorm(portBare(o.name));
     if (name.startsWith(nq) || bare.startsWith(nq)) return 1;
     if (searchWords(o.name).some(function (w) { return w.startsWith(nq); })) return 2;
+    const he = searchNorm(o.originHe || "");
+    const en = searchNorm(o.originEn || "");
+    if ((he && he.indexOf(nq) >= 0) || (en && en.indexOf(nq) >= 0)) return 2;
+    if (o.aliases && o.aliases.some(function (al) { return searchNorm(al).indexOf(nq) >= 0; })) return 2;
     if (o.pol && searchNorm(portBare(o.pol)).startsWith(nq)) return 3;
     return 0;
   }
@@ -1932,6 +1963,7 @@
   const versionCache = {};
   const state = {
     carrierId: "",
+    agentId: "",
     originId: "",
     originKey: "",
     dest: "",
@@ -1962,6 +1994,7 @@
 
   function resetSearchState() {
     state.carrierId = "";
+    state.agentId = "";
     state.originId = "";
     state.originKey = "";
     state.dest = "";
@@ -1992,6 +2025,7 @@
   function searchIsDirty() {
     return !!(
       state.carrierId ||
+      state.agentId ||
       state.originId ||
       state.dest ||
       state.typ ||
@@ -2127,7 +2161,7 @@
     }
     return new Promise(function (resolve, reject) {
       const s = document.createElement("script");
-      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=msk-spot-20261125";
+      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=agents-utrust-20261125";
       s.async = true;
       s.onload = function () {
         const pack = window.QUOTE_PACK && window.QUOTE_PACK[meta.id];
@@ -2153,8 +2187,8 @@
         if (!seen[v.id]) { seen[v.id] = true; out.push(v); }
       });
     }
-    if (isCompare) carriers.forEach(function (c) { addAll(c.id); });
-    else if (carrier) addAll(carrier.id);
+    if (isCompare) carriers.forEach(function (c) { if (versionsFor(c.id).length) addAll(c.id); });
+    else if (carrier && versionsFor(carrier.id).length) addAll(carrier.id);
     return out;
   }
   function ratesOfLoaded(meta) {
@@ -3597,6 +3631,340 @@
     return notices + badge + body;
   }
 
+
+  const AGENT_BASIS_LABEL = "הובלה + עמלת סוכן בלבד (לא כולל מקומיים)";
+  const TIANJIN_KEYS = ["XINGANG", "TIANJIN", "TIANJIN XINGANG PT", "TIANJIN XINGANG"];
+  const agentPackCache = {};
+
+  function agentById(id) {
+    return AGENTS.find(function (a) { return a.id === id; }) || null;
+  }
+  function neededAgentVersions(isCompare, carrier, agentId) {
+    if (!isCompare && !carrier && !agentId) return [];
+    return AGENT_VERSIONS.slice();
+  }
+  function loadAgentVersion(meta) {
+    if (!meta) return Promise.resolve(null);
+    if (agentPackCache[meta.id]) return Promise.resolve(agentPackCache[meta.id]);
+    if (window.AGENT_PACK && window.AGENT_PACK[meta.id]) {
+      agentPackCache[meta.id] = window.AGENT_PACK[meta.id];
+      return Promise.resolve(agentPackCache[meta.id]);
+    }
+    return new Promise(function (resolve, reject) {
+      const s = document.createElement("script");
+      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=agents-utrust-20261125";
+      s.async = true;
+      s.onload = function () {
+        const pack = window.AGENT_PACK && window.AGENT_PACK[meta.id];
+        if (!pack) { reject(new Error("חסר גיליון סוכן " + meta.id)); return; }
+        agentPackCache[meta.id] = pack;
+        resolve(pack);
+      };
+      s.onerror = function () { reject(new Error("טעינת גיליון הסוכן נכשלה: " + meta.file)); };
+      document.head.appendChild(s);
+    });
+  }
+  function loadedAgentPacks() {
+    return AGENT_VERSIONS.map(function (v) { return agentPackCache[v.id]; }).filter(Boolean);
+  }
+  function isTianjinKey(k) {
+    return TIANJIN_KEYS.indexOf(k) >= 0;
+  }
+  function originKeySet(nameOrKey) {
+    const k = bareKey(nameOrKey || "");
+    const set = {};
+    if (k) set[k] = true;
+    if (isTianjinKey(k)) TIANJIN_KEYS.forEach(function (x) { set[x] = true; });
+    return set;
+  }
+  function keysIntersect(a, b) {
+    for (const k in a) if (b[k]) return true;
+    return false;
+  }
+  function agentRateKeys(rate) {
+    const set = originKeySet(rate.originKey || rate.originName || "");
+    (rate.aliases || []).forEach(function (al) { Object.assign(set, originKeySet(al)); });
+    return set;
+  }
+  function originMatchesAgentRate(origin, rate) {
+    if (!origin || !rate) return false;
+    const oset = originKeySet(origin.name);
+    (origin.aliases || []).forEach(function (al) { Object.assign(oset, originKeySet(al)); });
+    return keysIntersect(oset, agentRateKeys(rate));
+  }
+  function sameOriginFamily(a, b) {
+    const na = typeof a === "string" ? a : (a && a.name);
+    const nb = typeof b === "string" ? b : (b && b.name);
+    return keysIntersect(originKeySet(na), originKeySet(nb));
+  }
+  function findOriginByKey(origins, keyOrName) {
+    return origins.find(function (o) { return keysIntersect(originKeySet(o.name), originKeySet(keyOrName)); }) || null;
+  }
+  function agentOffersFromPacks(filterAgentId) {
+    const out = [];
+    loadedAgentPacks().forEach(function (pack) {
+      if (filterAgentId && pack.agentId !== filterAgentId) return;
+      (pack.offers || []).forEach(function (offer) {
+        out.push({ pack: pack, offer: offer });
+      });
+    });
+    return out;
+  }
+  function agentOriginList(filterAgentId, filterCarrierId) {
+    const map = {};
+    agentOffersFromPacks(filterAgentId).forEach(function (x) {
+      if (filterCarrierId && x.offer.carrierId !== filterCarrierId) return;
+      (x.offer.rates || []).forEach(function (r) {
+        const key = r.originKey;
+        if (!key || map[key]) return;
+        map[key] = {
+          id: "agent-origin::" + key,
+          name: r.originName || (key + ", CN"),
+          pol: r.originName || (key + ", CN"),
+          countryHe: COUNTRY_HE.CN || "סין",
+          countryEn: (COUNTRY_EN && COUNTRY_EN.CN) || "China",
+          iso: "CN",
+          unlocode: "",
+          kind: "port",
+          mode: null,
+          mot: null,
+          routing: null,
+          originHe: r.originHe || "",
+          originEn: r.originEn || "",
+          aliases: r.aliases || []
+        };
+      });
+    });
+    return Object.keys(map).map(function (k) { return map[k]; });
+  }
+  function mergeOriginsWithAgents(origins, agentOrigins) {
+    const out = (origins || []).slice();
+    (agentOrigins || []).forEach(function (ao) {
+      if (!out.some(function (o) { return sameOriginFamily(o, ao); })) out.push(ao);
+    });
+    out.sort(function (a, b) {
+      const c = (a.countryHe || "").localeCompare(b.countryHe || "", "he");
+      return c !== 0 ? c : a.name.localeCompare(b.name, "en");
+    });
+    return out;
+  }
+  function agentTypesInLane(origin, dest, filterAgentId, filterCarrierId) {
+    const types = {};
+    agentOffersFromPacks(filterAgentId).forEach(function (x) {
+      if (filterCarrierId && x.offer.carrierId !== filterCarrierId) return;
+      (x.offer.rates || []).forEach(function (r) {
+        if (dest && r.dest !== dest) return;
+        if (origin && !originMatchesAgentRate(origin, r)) return;
+        types[r.typ] = true;
+      });
+    });
+    return types;
+  }
+  function applyAgentOws(offer, typ, wt) {
+    if (wt == null || !offer || !offer.ows || !offer.ows.length) return null;
+    if (offer.owsTyp && typ !== offer.owsTyp) return null;
+    let best = null;
+    offer.ows.forEach(function (b) {
+      if (wt >= b.minTons && (!best || b.minTons >= best.minTons)) best = b;
+    });
+    return best;
+  }
+  function owsNoteText(offer) {
+    if (!offer) return "";
+    if (offer.noOws) return "למכולת 20GP אין OWS.";
+    if (!offer.ows || !offer.ows.length) return "";
+    const parts = offer.ows.map(function (b) {
+      return "מ־" + b.minTons + " טון ומעלה " + money(b.amount, b.ccy || "USD");
+    });
+    return "למכולת 20GP: OWS " + parts.join(", ") + ".";
+  }
+  function priceAgentRate(pack, offer, rate, wt, qty, markup) {
+    const fee = pack.agencyFee || 0;
+    const feeCcy = pack.agencyFeeCcy || "USD";
+    const ows = applyAgentOws(offer, rate.typ, wt);
+    const owsAmt = ows ? ows.amount : 0;
+    const of = rate.of;
+    const perCtr = of + fee + owsAmt;
+    const agent = agentById(pack.agentId) || { id: pack.agentId, name: pack.agentName, nameHe: pack.agentName };
+    const agentName = agent.name || pack.agentName || pack.agentId;
+    return {
+      pack: pack,
+      offer: offer,
+      rate: rate,
+      agent: agent,
+      rowId: pack.agentId + "-" + offer.carrierId,
+      nameHe: offer.carrierName + " · דרך סוכן " + agentName,
+      of: of,
+      fee: fee,
+      feeCcy: feeCcy,
+      ows: ows,
+      owsAmt: owsAmt,
+      perCtr: perCtr,
+      qty: qty || 1,
+      markup: markup || 0,
+      priceWatch: !!rate.priceWatch,
+      vf: offer.vf,
+      vt: offer.vt
+    };
+  }
+  function agentRowsForLane(opts) {
+    const rows = [];
+    const wt = parseGrossWt(state.grossWtText);
+    const qty = opts.qty || 1;
+    const markup = opts.markup || 0;
+    agentOffersFromPacks(opts.agentId || null).forEach(function (x) {
+      const pack = x.pack;
+      const offer = x.offer;
+      if (opts.onlyCarrierId && offer.carrierId !== opts.onlyCarrierId) return;
+      if (!opts.shipIso || opts.shipIso < offer.vf || opts.shipIso > offer.vt) return;
+      (offer.rates || []).forEach(function (rate) {
+        if (opts.typ && rate.typ !== opts.typ) return;
+        if (opts.dest && rate.dest !== opts.dest) return;
+        if (opts.origin && !originMatchesAgentRate(opts.origin, rate)) return;
+        rows.push(priceAgentRate(pack, offer, rate, wt, qty, markup));
+      });
+    });
+    return rows;
+  }
+  function agentValidityText(offer) {
+    return "תוקף " + fmtDate(offer.vf) + "–" + fmtDate(offer.vt);
+  }
+  function agentIssuedText(pack) {
+    const rec = pack.received ? fmtDate(pack.received) : "";
+    if (!rec) return "";
+    if (pack.issuedApprox) return "התקבל " + rec + " (תאריך הנפקה בקירוב)";
+    return "התקבל " + rec;
+  }
+  function agentMetaBits(priced) {
+    const offer = priced.offer;
+    const bits = [agentValidityText(offer)];
+    if (offer.spaceOpen) bits.push(offer.confirmFirst ? "מקום פתוח להזמנה" : "מקום פתוח");
+    if (offer.freeDaysHe) bits.push(offer.freeDaysHe);
+    if (offer.confirmFirst) bits.push("יאושר מול הסוכן קודם");
+    bits.push("הובלה + עמלת סוכן בלבד");
+    return bits;
+  }
+  function agentCardHtml(priced, opts) {
+    const pack = priced.pack;
+    const offer = priced.offer;
+    const qty = priced.qty || 1;
+    const copyId = opts && opts.copyId ? opts.copyId : "";
+    let html = '<section class="card compare-card agent-card">';
+    html += '<div class="card-head"><h2>' + esc(priced.nameHe) + "</h2>";
+    if (copyId) {
+      const copied = state.copied && state.copiedId === copyId;
+      html += '<button type="button" class="btn' + (copied ? " ok" : "") + '" data-copy-agent="' + esc(copyId) + '">' +
+        (copied ? "הסיכום הועתק" : "העתק סיכום") + "</button>";
+    }
+    html += "</div>";
+    if (priced.priceWatch) {
+      html += '<div class="callout warn"><strong>מחיר בשינוי – לאשר מול הסוכן</strong>מחיר ה־40HQ למוצא זה סומן באדום בגיליון הסוכן. יש לאשר מול הסוכן לפני הצעה ללקוח.</div>';
+    }
+    html += '<p class="meta-line"><span>סוכן</span> ' + esc(pack.agentName) +
+      (agentIssuedText(pack) ? " · " + esc(agentIssuedText(pack)) : "") + "</p>";
+    html += '<p class="meta-line"><span>תוקף</span> ' + ltrHtml(fmtDate(offer.vf) + "–" + fmtDate(offer.vt)) + "</p>";
+    html += '<div class="table-wrap"><table><thead><tr><th>חיוב</th><th>סכום</th><th>בסיס</th></tr></thead><tbody>';
+    html += "<tr><td>הובלה ימית (OF)</td><td class='num'>" + esc(money(priced.of, "USD")) + "</td><td>למכולה</td></tr>";
+    html += "<tr><td>עמלת סוכן</td><td class='num'>" + esc(money(priced.fee, priced.feeCcy)) + "</td><td>למכולה</td></tr>";
+    if (priced.ows) {
+      html += "<tr><td>OWS (משקל יתר)</td><td class='num'>" + esc(money(priced.owsAmt, priced.ows.ccy || "USD")) + "</td><td>למכולה</td></tr>";
+    }
+    html += "<tr><td><strong>" + esc(AGENT_BASIS_LABEL) + "</strong></td><td class='num'><strong>" + esc(money(priced.perCtr, "USD")) + "</strong></td><td>למכולה</td></tr>";
+    html += "</tbody></table></div>";
+    if (qty > 1) {
+      html += "<p>ל־" + qty + " מכולות: " + esc(money(priced.perCtr * qty, "USD")) + ".</p>";
+    }
+    if (priced.markup) {
+      html += "<p>רווח למכולה " + esc(money(priced.markup, "USD")) + " · סה״כ מכירה למכולה " + esc(money(priced.perCtr + priced.markup, "USD")) + ".</p>";
+    }
+    if (offer.ows && offer.ows.length && priced.rate.typ === (offer.owsTyp || "DV20") && !priced.ows) {
+      const wt = parseGrossWt(state.grossWtText);
+      if (wt == null) {
+        html += '<div class="callout info"><strong>OWS לפי משקל</strong>' + esc(owsNoteText(offer) + " לא נוסף לסה״כ כי לא הוזן משקל ברוטו.") + "</div>";
+      } else {
+        html += '<div class="callout info"><strong>OWS לפי משקל</strong>' + esc("המשקל שהוזן (" + wt + " טון) אינו מגיע למדרגת OWS. " + owsNoteText(offer) + " לא נוסף לסה״כ.") + "</div>";
+      }
+    } else if (offer.noOws && priced.rate.typ === "DV20") {
+      html += '<div class="callout info"><strong>OWS</strong>' + esc(owsNoteText(offer)) + "</div>";
+    }
+    if (offer.notesHe) {
+      html += '<div class="callout info"><strong>הערות הסוכן</strong>' + esc(offer.notesHe) + "</div>";
+    }
+    if (pack.originalEn) {
+      html += '<details class="terms agent-original"><summary>המקור באנגלית</summary><div class="terms-inner"><pre class="agent-original-text">' + esc(pack.originalEn) + "</pre></div></details>";
+    }
+    html += "</section>";
+    return html;
+  }
+  function agentQuoteText(priced, origin, destName, shipDate) {
+    const pack = priced.pack;
+    const offer = priced.offer;
+    const lines = [];
+    lines.push(priced.nameHe);
+    if (priced.priceWatch) lines.push("*** מחיר בשינוי – לאשר מול הסוכן ***");
+    lines.push(AGENT_BASIS_LABEL);
+    lines.push("מסלול: " + routePlain(origin, destName));
+    lines.push("סוג מכולה: " + (TYPE_HE[priced.rate.typ] || priced.rate.typ));
+    lines.push("תאריך BL: " + fmtDate(shipDate));
+    lines.push(agentValidityText(offer));
+    const issued = agentIssuedText(pack);
+    if (issued) lines.push(issued);
+    lines.push("");
+    lines.push("הובלה: " + money(priced.of, "USD") + " למכולה");
+    lines.push("עמלת סוכן: " + money(priced.fee, priced.feeCcy) + " למכולה");
+    if (priced.ows) lines.push("OWS: " + money(priced.owsAmt, priced.ows.ccy || "USD") + " למכולה");
+    lines.push("סה״כ למכולה: " + money(priced.perCtr, "USD"));
+    if (priced.qty > 1) lines.push("ל־" + priced.qty + " מכולות: " + money(priced.perCtr * priced.qty, "USD"));
+    if (priced.markup) lines.push("רווח למכולה: " + money(priced.markup, "USD") + " · סה״כ מכירה למכולה: " + money(priced.perCtr + priced.markup, "USD"));
+    lines.push("");
+    if (offer.notesHe) {
+      lines.push("הערות:");
+      lines.push(offer.notesHe);
+      lines.push("");
+    }
+    if (pack.originalEn) {
+      lines.push("מקור באנגלית:");
+      lines.push(pack.originalEn);
+    }
+    return lines.join("\n");
+  }
+  function agentListSectionHtml(title, hint, rows, selectedOrigin, dest, shipIso) {
+    let html = '<section id="agent-panel">';
+    html += '<div class="card" id="agent-head"><h2>' + esc(title) + "</h2>";
+    if (selectedOrigin && dest && shipIso) {
+      html += '<p class="meta-line"><span>מסלול</span> ' + routeHtml(selectedOrigin, dest) +
+        " · " + esc(TYPE_HE[(rows[0] && rows[0].rate.typ) || ""] || "") +
+        " · BL " + esc(fmtDate(shipIso)) + "</p>";
+    }
+    html += "</div>";
+    if (hint) html += '<p class="compare-hint">' + esc(hint) + "</p>";
+    html += '<div class="compare-list" id="agent-list">';
+    rows.forEach(function (priced) {
+      const open = state.compareOpenId === priced.rowId;
+      const tagRed = priced.priceWatch
+        ? ' <span class="compare-row-tag tag-red">מחיר בשינוי – לאשר מול הסוכן</span>'
+        : "";
+      const usdClass = "compare-row-usd" + (priced.priceWatch ? " price-red" : "");
+      const meta = agentMetaBits(priced);
+      const basis = "הובלה " + money(priced.of, "USD") + " + סוכן " + money(priced.fee, priced.feeCcy) +
+        (priced.ows ? " + OWS " + money(priced.owsAmt, priced.ows.ccy || "USD") : "");
+      html += '<div class="compare-item' + (open ? " is-open" : "") + '" id="compare-item-' + esc(priced.rowId) + '">';
+      html += '<button type="button" class="compare-row" data-compare-open="' + esc(priced.rowId) + '" aria-expanded="' + (open ? "true" : "false") + '" aria-controls="compare-detail-' + esc(priced.rowId) + '">';
+      html += '<span class="compare-row-main"><span class="compare-row-name">' + esc(priced.nameHe) + tagRed + "</span>";
+      html += '<span class="compare-row-meta">' + esc(meta.join(" · ")) + "</span></span>";
+      html += '<span class="compare-row-price"><span class="' + usdClass + '">' + moneyHtml(priced.perCtr, "USD") + "</span>";
+      html += '<span class="compare-row-basis">' + esc(basis) + "</span></span>";
+      html += '<span class="compare-row-chevron" aria-hidden="true"></span></button>';
+      if (open) {
+        html += '<div class="compare-detail" id="compare-detail-' + esc(priced.rowId) + '">' +
+          agentCardHtml(priced, { copyId: priced.rowId }) + "</div>";
+      }
+      html += "</div>";
+    });
+    html += "</div></section>";
+    return html;
+  }
+
   function render() {
     updateViewTabs();
     if (state.view === "spots") {
@@ -3606,14 +3974,18 @@
     }
     const isCompare = !!state.compare;
     const carrier = carriers.find((c) => c.id === state.carrierId) || null;
+    const selectedAgent = state.agentId ? agentById(state.agentId) : null;
+    const hasSource = !!(carrier || isCompare || selectedAgent);
     const shipIsoEarly = parseDateInput(state.dateText);
     const needed = neededVersions(isCompare, carrier, shipIsoEarly);
     const missing = needed.filter((v) => !versionCache[v.id]);
-    if (missing.length) {
+    const neededAgents = neededAgentVersions(isCompare, carrier, state.agentId);
+    const missingAgents = neededAgents.filter((v) => !agentPackCache[v.id]);
+    if (missing.length || missingAgents.length) {
       if (!document.getElementById("carrier")) {
         document.getElementById("app").innerHTML = '<p class="hint">טוען את המחירון…</p>';
       }
-      Promise.all(missing.map(loadVersion)).then(function () { render(); }).catch(function (err) {
+      Promise.all(missing.map(loadVersion).concat(missingAgents.map(loadAgentVersion))).then(function () { render(); }).catch(function (err) {
         document.getElementById("app").innerHTML = '<div class="callout warn"><strong>טעינת מחירון נכשלה</strong>' + esc(err && err.message ? err.message : String(err)) + "</div>";
       });
       return;
@@ -3637,10 +4009,18 @@
         return c !== 0 ? c : a.name.localeCompare(b.name, "en");
       });
     }
+    const agentOriginAgentId = (!isCompare && selectedAgent) ? selectedAgent.id : null;
+    const agentOriginCarrierId = (!isCompare && carrier && !selectedAgent) ? carrier.id : null;
+    origins = mergeOriginsWithAgents(origins, agentOriginList(agentOriginAgentId, agentOriginCarrierId));
     comboOrigins = origins;
     if (state.originId && !origins.some((o) => o.id === state.originId)) {
-      const key = state.originKey || (state.originId.startsWith("cmp::") ? state.originId.slice(5) : bareKey(state.originId));
-      const match = origins.find((o) => bareKey(o.name) === key);
+      let key = state.originKey || "";
+      if (!key) {
+        if (state.originId.startsWith("cmp::")) key = state.originId.slice(5);
+        else if (state.originId.startsWith("agent-origin::")) key = state.originId.slice(14);
+        else key = bareKey(state.originId);
+      }
+      const match = findOriginByKey(origins, key);
       state.originId = match ? match.id : "";
       if (!match) state.typ = "";
     }
@@ -3653,13 +4033,19 @@
     let laneRates = [];
     if (state.originId) {
       if (isCompare) {
-        const key = state.originId.startsWith("cmp::") ? state.originId.slice(5) : bareKey(state.originId);
+        const key = state.originId.startsWith("cmp::") ? state.originId.slice(5)
+          : (state.originId.startsWith("agent-origin::") ? state.originId.slice(14) : bareKey(state.originId));
         laneRates = rates.filter((r) => bareKey(r.origin ?? r.pol) === key && r.pod === state.dest);
       } else {
         laneRates = rates.filter((r) => originIdOf(r) === state.originId && r.pod === state.dest);
       }
     }
-    const typesInLane = PACKED.types.filter((t) => laneRates.some((r) => r.typ === t));
+    const agentTypeAgentId = (!isCompare && selectedAgent) ? selectedAgent.id : null;
+    const agentTypeCarrierId = (!isCompare && carrier && !selectedAgent) ? carrier.id : null;
+    const agentTypes = (selectedOrigin && state.dest)
+      ? agentTypesInLane(selectedOrigin, state.dest, agentTypeAgentId, agentTypeCarrierId)
+      : {};
+    const typesInLane = PACKED.types.filter((t) => laneRates.some((r) => r.typ === t) || agentTypes[t]);
     const effectiveTyp = state.typ && typesInLane.includes(state.typ) ? state.typ : "";
     const typedRates = laneRates.filter((r) => r.typ === effectiveTyp);
     const hasHaz = typedRates.some((r) => r.haz);
@@ -3753,9 +4139,35 @@
     const t = pricedQuote ? totalsOf(pricedQuote, qty) : null;
     const saleUsd = t ? (t.shipment.USD || 0) + markup * qty : 0;
 
-    const carrierOptions = '<option value="">בחרו חברת ספנות</option>' + carriers.map((c) => {
+    const agentLaneRows = (selectedOrigin && state.dest && effectiveTyp && shipIso)
+      ? agentRowsForLane({
+          origin: selectedOrigin,
+          dest: state.dest,
+          typ: effectiveTyp,
+          shipIso: shipIso,
+          agentId: (!isCompare && selectedAgent) ? selectedAgent.id : null,
+          onlyCarrierId: (!isCompare && carrier && !selectedAgent) ? carrier.id : null,
+          qty: qty,
+          markup: markup
+        }).slice().sort(function (a, b) {
+          if (a.perCtr !== b.perCtr) return a.perCtr - b.perCtr;
+          return a.nameHe.localeCompare(b.nameHe, "he");
+        })
+      : [];
+
+    let carrierOptions = '<option value="">בחרו חברת ספנות</option>';
+    carrierOptions += '<optgroup label="חברות ספנות">';
+    carrierOptions += carriers.map((c) => {
       return '<option value="' + esc(c.id) + '"' + (carrier && carrier.id === c.id ? " selected" : "") + ">" + esc(carrierSelectLabel(c, shipIso)) + "</option>";
     }).join("");
+    carrierOptions += "</optgroup>";
+    if (AGENTS.length) {
+      carrierOptions += '<optgroup label="סוכנים">';
+      carrierOptions += AGENTS.map(function (a) {
+        return '<option value="agent:' + esc(a.id) + '"' + (selectedAgent && selectedAgent.id === a.id ? " selected" : "") + ">" + esc(a.nameHe || a.name) + "</option>";
+      }).join("");
+      carrierOptions += "</optgroup>";
+    }
 
     const activeVersion = (isCompare || !carrier) ? null : selectedVersionMeta(carrier.id, shipIso);
     const coveringForDate = shipIso && !isCompare && carrier ? coveringVersions(carrier.id, shipIso) : [];
@@ -3792,7 +4204,7 @@
     } else if (!shipIso && state.originId && state.dest && effectiveTyp) {
       formWarn += '<div class="callout warn"><strong>חסר תאריך BL</strong>בחרו תאריך הפלגה / BL כדי לקבל הצעת מחיר.</div>';
     }
-    if (carrier && !isCompare && shipIso && !activeVersion && !rates.length) {
+    if (carrier && !isCompare && shipIso && !activeVersion && !rates.length && versionsFor(carrier.id).length) {
       formWarn += dateJumpNoticeHtml(carrier, shipIso);
     }
 
@@ -3802,8 +4214,16 @@
     } else if (!shipIso) {
       quoteHtml = "<p>יש לתקן את תאריך השילוח כדי לשלוף תעריף בתוקף.</p>";
     } else if (!quoteRate) {
-      quoteHtml = '<div class="callout warn"><strong>אין שורה במחירון</strong>אין תעריף למסלול הזה בסוג המכולה' +
-        (effectiveHaz ? " ולמטען מסוכן" : "") + " שנבחרו.</div>";
+      if (agentLaneRows.length) {
+        let emptyMsg = "לחברה זו אין שורה במחירון הישיר למסלול שנבחר. הצעת סוכן מוצגת למטה.";
+        if (carrier && carrier.id === "yml" && state.dest && state.dest.startsWith("HAIFA")) {
+          emptyMsg = "במחירון YML שנטען כל שורות ההובלה הימית הן לאשדוד בלבד. יש תוספת TA (Transport Additional Charge) ליעד חיפה (ILHFA): 100$ ל-20DC, 200$ ל-40DC ו־40HQ — בלי תעריף הובלה ימית נפרד לחיפה. לא הומצא מחיר הובלה לחיפה. הצעת סוכן מוצגת למטה.";
+        }
+        quoteHtml = '<div class="callout info"><strong>אין מחירון ישיר למסלול הזה</strong>' + esc(emptyMsg) + "</div>";
+      } else {
+        quoteHtml = '<div class="callout warn"><strong>אין שורה במחירון</strong>אין תעריף למסלול הזה בסוג המכולה' +
+          (effectiveHaz ? " ולמטען מסוכן" : "") + " שנבחרו.</div>";
+      }
     } else if (!isCompare) {
       const ctx = {
         displayCarrier: displayCarrier,
@@ -3829,13 +4249,16 @@
       });
     }
 
-    if (!isCompare && shipIso && !activeVersion && !quoteRate) {
+    if (!isCompare && carrier && shipIso && !activeVersion && !quoteRate && versionsFor(carrier.id).length) {
       const near = nearestVersions(carrier.id, shipIso);
       quoteHtml = '<div class="callout warn" id="no-version-msg"><strong>אין מחירון בתוקף לתאריך זה</strong>לתאריך ההפלגה / BL ' +
         esc(fmtDate(shipIso)) + " אין מחירון של " + esc(carrier.nameHe) + " שחל באותו תאריך." +
         (near.prev ? " המחירון הקודם: " + esc(versionTitle(near.prev) + " · " + versionWindow(near.prev)) + "." : "") +
         (near.next ? " המחירון הבא: " + esc(versionTitle(near.next) + " · " + versionWindow(near.next)) + "." : "") +
         " אפשר לפתוח מחירון ישן מ«היסטוריית מחירונים» לעיון.</div>";
+    } else if (!isCompare && carrier && shipIso && !quoteRate && !versionsFor(carrier.id).length) {
+      quoteHtml = '<div class="callout info"><strong>אין מחירון ישיר</strong>לחברת ' + esc(carrier.nameHe) +
+        " אין מחירון ישיר במחשבון." + (agentLaneRows.length ? " הצעת סוכן מוצגת למטה." : "") + "</div>";
     }
 
     const copyBtn = (!isCompare && quoteRate)
@@ -3863,13 +4286,40 @@
         const card = '<section class="card compare-card" id="compare-card-' + esc(x.c.id) + '"><div class="card-head"><h2>' +
           esc(x.c.nameHe) + '</h2><button type="button" class="btn' + (copied ? " ok" : "") + '" data-copy-carrier="' + esc(x.c.id) + '">' +
           copyLabel + "</button></div>" + html + "</section>";
-        compareEntries.push({ c: x.c, ctx: ctx, card: card });
+        compareEntries.push({ c: x.c, ctx: ctx, card: card, kind: "direct" });
       });
+      agentLaneRows.forEach(function (priced) {
+        const card = agentCardHtml(priced, { copyId: priced.rowId });
+        compareEntries.push({
+          kind: "agent",
+          agentRow: priced,
+          agentCarrierId: priced.offer.carrierId,
+          c: { id: priced.rowId, name: priced.offer.carrierName, nameHe: priced.nameHe },
+          ctx: {
+            displayCarrier: priced,
+            pricedQuote: { frt: priced.perCtr, frtCur: "USD", sc: [], typ: priced.rate.typ, vf: priced.vf, vt: priced.vt },
+            quoteRate: { vf: priced.vf, vt: priced.vt, typ: priced.rate.typ },
+            validRate: true,
+            fallbackNote: "",
+            isNotYetValid: false
+          },
+          card: card,
+          sortUsd: priced.perCtr
+        });
+      });
+      const agentCarrierIds = {};
+      agentLaneRows.forEach(function (r) { agentCarrierIds[r.offer.carrierId] = true; });
+      for (let i = compareMissing.length - 1; i >= 0; i--) {
+        if (agentCarrierIds[compareMissing[i].id] || !versionsFor(compareMissing[i].id).length) compareMissing.splice(i, 1);
+      }
       compareEntries.sort(function (a, b) {
-        const ta = a.ctx.pricedQuote ? totalsOf(a.ctx.pricedQuote, 1) : null;
-        const tb = b.ctx.pricedQuote ? totalsOf(b.ctx.pricedQuote, 1) : null;
-        const ua = ta && ta.perCtr && ta.perCtr.USD != null ? ta.perCtr.USD : Infinity;
-        const ub = tb && tb.perCtr && tb.perCtr.USD != null ? tb.perCtr.USD : Infinity;
+        function usdOf(entry) {
+          if (entry.kind === "agent" && entry.sortUsd != null) return entry.sortUsd;
+          const tot = entry.ctx && entry.ctx.pricedQuote ? totalsOf(entry.ctx.pricedQuote, 1) : null;
+          return tot && tot.perCtr && tot.perCtr.USD != null ? tot.perCtr.USD : Infinity;
+        }
+        const ua = usdOf(a);
+        const ub = usdOf(b);
         if (ua !== ub) return ua - ub;
         return a.c.nameHe.localeCompare(b.c.nameHe, "he");
       });
@@ -3878,25 +4328,34 @@
     function compareRowHtml(entry) {
       const c = entry.c;
       const ctx = entry.ctx;
+      const isAgent = entry.kind === "agent";
+      const priced = entry.agentRow;
       const open = state.compareOpenId === c.id;
-      const tot = ctx.pricedQuote ? totalsOf(ctx.pricedQuote, 1) : null;
-      const usd = tot && tot.perCtr && tot.perCtr.USD;
+      const tot = !isAgent && ctx.pricedQuote ? totalsOf(ctx.pricedQuote, 1) : null;
+      const usd = isAgent ? priced.perCtr : (tot && tot.perCtr && tot.perCtr.USD);
       const otherCcys = tot ? tot.currencies.filter(function (cur) { return cur !== "USD" && (tot.perCtr[cur] || 0); }) : [];
       const mixed = !!(tot && tot.currencies.length > 1);
       const fbKind = (ctx.quoteRate && ctx.quoteRate.fallbackKind) || (ctx.fallbackNote && ctx.quoteRate && ctx.quoteRate.vt && shipIso && ctx.quoteRate.vt < shipIso ? "past" : "") || "";
       const kind = fbKind || ((ctx.fallbackNote || !ctx.validRate) ? (ctx.isNotYetValid ? "future" : "past") : "");
       let tag = "";
-      if (kind === "past") tag = "מחיר אחרון ידוע";
+      let tagClass = "compare-row-tag";
+      if (isAgent && priced.priceWatch) { tag = "מחיר בשינוי – לאשר מול הסוכן"; tagClass += " tag-red"; }
+      else if (kind === "past") tag = "מחיר אחרון ידוע";
       else if (kind === "future") tag = "מחירון עתידי";
       const meta = [];
-      if (ctx.fallbackNote) meta.push(ctx.fallbackNote);
+      if (isAgent) {
+        agentMetaBits(priced).forEach(function (bit) { meta.push(bit); });
+      } else if (ctx.fallbackNote) meta.push(ctx.fallbackNote);
       else if (ctx.quoteRate && ctx.quoteRate.vf && ctx.quoteRate.vt) {
         meta.push("תוקף " + fmtDate(ctx.quoteRate.vf) + "–" + fmtDate(ctx.quoteRate.vt));
       }
-      const tt = ctx.quoteRate ? ttLabel(ctx.quoteRate) : "";
-      if (tt && tt !== "לא צוין במחירון") meta.push(tt);
-      if (mixed) meta.push("מטבע מעורב");
-      const notices = quoteNoticesFor(c.id, shipIso, ctx.pricedQuote || ctx.quoteRate, selectedOrigin);
+      if (!isAgent) {
+        const tt = ctx.quoteRate ? ttLabel(ctx.quoteRate) : "";
+        if (tt && tt !== "לא צוין במחירון") meta.push(tt);
+        if (mixed) meta.push("מטבע מעורב");
+      }
+      const noticeCarrierId = isAgent ? entry.agentCarrierId : c.id;
+      const notices = quoteNoticesFor(noticeCarrierId, shipIso, isAgent ? null : (ctx.pricedQuote || ctx.quoteRate), selectedOrigin);
       const warn = notices.length
         ? '<span class="compare-row-warn" aria-label="יש הודעה לחברה זו">!</span>'
         : "";
@@ -3904,18 +4363,19 @@
         ? '<span class="compare-row-other">' + otherCcys.map(function (cur) {
             return "+" + money(tot.perCtr[cur], cur);
           }).join(" · ") + "</span>"
-        : "";
+        : (isAgent ? '<span class="compare-row-basis">' + esc("הובלה " + money(priced.of, "USD") + " + סוכן " + money(priced.fee, priced.feeCcy) + (priced.ows ? " + OWS " + money(priced.owsAmt, priced.ows.ccy || "USD") : "")) + "</span>" : "");
       const usdHtml = usd != null ? moneyHtml(usd, "USD") : "—";
+      const usdClass = "compare-row-usd" + (isAgent && priced.priceWatch ? " price-red" : "");
       return '<div class="compare-item' + (open ? " is-open" : "") + '" id="compare-item-' + esc(c.id) + '">' +
         '<button type="button" class="compare-row" data-compare-open="' + esc(c.id) + '" aria-expanded="' + (open ? "true" : "false") + '" aria-controls="compare-detail-' + esc(c.id) + '">' +
           '<span class="compare-row-main">' +
             '<span class="compare-row-name">' + esc(c.nameHe) +
-              (tag ? ' <span class="compare-row-tag">' + esc(tag) + "</span>" : "") +
+              (tag ? ' <span class="' + tagClass + '">' + esc(tag) + "</span>" : "") +
               warn +
             "</span>" +
             (meta.length ? '<span class="compare-row-meta">' + esc(meta.join(" · ")) + "</span>" : "") +
           "</span>" +
-          '<span class="compare-row-price"><span class="compare-row-usd">' + usdHtml + "</span>" + otherHtml + "</span>" +
+          '<span class="compare-row-price"><span class="' + usdClass + '">' + usdHtml + "</span>" + otherHtml + "</span>" +
           '<span class="compare-row-chevron" aria-hidden="true"></span>' +
         "</button>" +
         (open ? '<div class="compare-detail" id="compare-detail-' + esc(c.id) + '">' + entry.card + "</div>" : "") +
@@ -3942,23 +4402,65 @@
           '<div class="card" id="compare-head"><div class="card-head"><h2>השוואה בין חברות הספנות</h2>' +
           (compareEntries.length ? '<button type="button" class="btn' + (copiedAll ? " ok" : "") + '" id="copy-compare-btn">' + (copiedAll ? "ההשוואה הועתקה" : "העתק השוואה") + "</button>" : "") +
           "</div>" + (carrierMeta ? '<p class="meta-line">' + carrierMeta + "</p>" : "") + routeLine + "</div>" +
-          (compareEntries.length ? '<p class="compare-hint">מהזול ליקר, לפי סה״כ למכולה. לחצו על שורה לפירוט.</p><div class="compare-list" id="compare-list">' + compareEntries.map(compareRowHtml).join("") + "</div>" : '<div class="card"><div class="callout warn"><strong>אין תעריף לאף חברה</strong>למסלול, סוג המכולה והתאריך שנבחרו אין שורה במחירונים שנטענו.</div></div>') +
+          (compareEntries.length ? '<p class="compare-hint">' + esc(compareEntries.some(function (e) { return e.kind === "agent"; })
+            ? "מהזול ליקר, לפי הסכום המוצג למכולה. שורות סוכן: " + AGENT_BASIS_LABEL + ". שורות ישירות: סה״כ All-in מהמחירון. הבסיסים שונים — אין להשוות אחד-לאחד בלי לבדוק את הרכיבים. לחצו על שורה לפירוט."
+            : "מהזול ליקר, לפי סה״כ למכולה. לחצו על שורה לפירוט.") + '</p><div class="compare-list" id="compare-list">' + compareEntries.map(compareRowHtml).join("") + "</div>" : '<div class="card"><div class="callout warn"><strong>אין תעריף לאף חברה</strong>למסלול, סוג המכולה והתאריך שנבחרו אין שורה במחירונים שנטענו.</div></div>') +
           (compareMissing.length ? '<p class="compare-missing">אין תעריף אצל: ' + esc(compareMissing.map(function (c) { return c.nameHe; }).join(" · ")) + ".</p>" : "") +
           copyFallbackHtml +
           "</section>";
       }
     } else if (state.originId && state.dest && effectiveTyp) {
-      resultsHtml = '<section class="card" id="quote-card"><div class="card-head"><h2>הצעת מחיר</h2>' + copyBtn + "</div>" + quoteHtml + "</section>" +
-        '<details class="terms"><summary>תנאים שחשוב לציין</summary><div class="card">' + termsHtml(displayCarrier, shipIso) + "</div></details>" +
-        copyFallbackHtml;
+      const parts = [];
+      if (carrier) {
+        parts.push('<section class="card" id="quote-card"><div class="card-head"><h2>הצעת מחיר</h2>' + copyBtn + "</div>" + quoteHtml + "</section>");
+        if (displayCarrier && quoteRate) {
+          parts.push('<details class="terms"><summary>תנאים שחשוב לציין</summary><div class="card">' + termsHtml(displayCarrier, shipIso) + "</div></details>");
+        }
+      }
+      if (selectedAgent && !carrier) {
+        if (!shipIso) {
+          parts.push('<section class="card" id="agent-panel"><h2>הצעות סוכן ' + esc(selectedAgent.name) + "</h2><p>יש לתקן את תאריך השילוח כדי לשלוף הצעת סוכן בתוקף.</p></section>");
+        } else if (!agentLaneRows.length) {
+          parts.push('<section class="card" id="agent-panel"><h2>הצעות סוכן ' + esc(selectedAgent.name) + '</h2><div class="callout warn"><strong>אין הצעת סוכן בתוקף</strong>למסלול, סוג המכולה והתאריך שנבחרו אין שורה בגיליון הסוכן שחלה באותו תאריך. לא הוצג מחיר מחלון אחר.</div></section>');
+        } else {
+          parts.push(agentListSectionHtml(
+            "הצעות סוכן " + selectedAgent.name,
+            "מהזול ליקר, לפי הסכום המוצג למכולה. כל השורות הן מגיליון סוכן " + selectedAgent.name + ": " + AGENT_BASIS_LABEL + ".",
+            agentLaneRows,
+            selectedOrigin,
+            state.dest,
+            shipIso
+          ));
+        }
+      } else if (agentLaneRows.length) {
+        parts.push(agentListSectionHtml(
+          "גם דרך סוכן",
+          "אותו מסלול, סוג מכולה ותאריך. הסכום כאן הוא " + AGENT_BASIS_LABEL + ".",
+          agentLaneRows,
+          selectedOrigin,
+          state.dest,
+          shipIso
+        ));
+      }
+      resultsHtml = parts.join("") + copyFallbackHtml;
+    } else if (selectedAgent) {
+      resultsHtml = '<section class="card" id="agent-panel"><h2>הצעות סוכן ' + esc(selectedAgent.name) + '</h2><div class="callout info"><strong>מוכנים להתחיל</strong>בחרו נמל מוצא, יעד וסוג מכולה. יוצגו הצעות הסוכן בתוקף לתאריך השילוח, מהזול ליקר.</div></section>';
     }
 
-    const showWt = isTwentyFootTyp(effectiveTyp || state.typ) && (!!carrier || isCompare) && (isCompare || carrier.id === "zim");
+    const agentHasOws = agentLaneRows.some(function (r) { return r.offer && r.offer.ows && r.offer.ows.length; });
+    const showZimWt = isCompare || (carrier && carrier.id === "zim");
+    const showWt = isTwentyFootTyp(effectiveTyp || state.typ) && (!!carrier || isCompare || !!selectedAgent) && (showZimWt || agentHasOws || !!selectedAgent);
+    let wtHint = "תוספת KLG למכולת 20׳ מסין והמזרח הרחוק, לפי משקל ברוטו. אם השדה ריק — יוצגו המדרגות בלי חיוב. לא חל על הודו.";
+    if (agentHasOws && !showZimWt) {
+      wtHint = "תוספת OWS במכולת 20׳ לפי גיליון הסוכן, אם הוזן משקל ברוטו והמדרגה חד־משמעית. אם השדה ריק — מוצגות המדרגות בלי חיוב.";
+    } else if (agentHasOws && showZimWt) {
+      wtHint = "משקל ברוטו למכולת 20׳. לצים: תוספת KLG מסין והמזרח הרחוק (לא חל על הודו). לסוכן: תוספת OWS לפי המדרגות בגיליון, רק אם הוזן משקל והמדרגה חד־משמעית. אם השדה ריק — יוצגו המדרגות בלי חיוב.";
+    }
     const wtField = !showWt ? "" :
       '<div class="wt-row">' +
         '<div><label class="fld" for="gross-wt">משקל ברוטו (טון)</label>' +
         '<input type="number" id="gross-wt" min="0" step="0.1" inputmode="decimal" placeholder="רשות" value="' + esc(state.grossWtText || "") + '"></div>' +
-        '<p class="hint">תוספת KLG למכולת 20׳ מסין והמזרח הרחוק, לפי משקל ברוטו. אם השדה ריק — יוצגו המדרגות בלי חיוב. לא חל על הודו.</p>' +
+        '<p class="hint">' + esc(wtHint) + "</p>" +
       "</div>";
 
     const app = document.getElementById("app");
@@ -3977,11 +4479,11 @@
       '<section class="card search-card">' +
       '<div class="search-top">' +
         '<div class="carrier-field"><label class="fld" for="carrier">חברת ספנות</label><select id="carrier">' + carrierOptions + "</select>" +
-        (!isCompare && carrier ? historyLinkHtml(carrier) : "") +
+        (!isCompare && carrier && versionsFor(carrier.id).length ? historyLinkHtml(carrier) : "") +
         (!isCompare && carrier ? noticeBannerHtml(carrier, shipIso, selectedOrigin, null) : "") + "</div>" +
         '<div class="origin-combo" id="origin-combo">' +
-          '<label class="fld" for="origin-input" id="origin-field-label">' + (carrier || isCompare ? ("נמל מוצא (" + origins.length + " במחירון)") : "נמל מוצא") + "</label>" +
-          '<input type="text" id="origin-input" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="origin-list" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" placeholder="' + (carrier || isCompare ? "הקלידו אות לחיפוש או בחרו מהרשימה" : "בחרו קודם חברת ספנות") + '" value="' + esc(selectedOrigin ? originChoiceLabel(selectedOrigin) : "") + '"' + (!carrier && !isCompare ? " disabled" : "") + '>' +
+          '<label class="fld" for="origin-input" id="origin-field-label">' + (hasSource ? ("נמל מוצא (" + origins.length + " במחירון)") : "נמל מוצא") + "</label>" +
+          '<input type="text" id="origin-input" role="combobox" aria-expanded="false" aria-autocomplete="list" aria-controls="origin-list" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" placeholder="' + (hasSource ? "הקלידו אות לחיפוש או בחרו מהרשימה" : "בחרו קודם חברת ספנות") + '" value="' + esc(selectedOrigin ? originChoiceLabel(selectedOrigin) : "") + '"' + (!hasSource ? " disabled" : "") + '>' +
           '<ul id="origin-list" class="origin-list" role="listbox" hidden></ul>' +
         "</div>" +
         spotBannerHtml() +
@@ -4005,7 +4507,7 @@
       (searchIsDirty() ? '<button type="button" class="btn btn-secondary btn-clear" id="clear-btn">נקה הכל</button>' : "") +
       "</section>" +
       resultsHtml +
-      (!isCompare && carrier ? historySheetHtml(carrier, shipIso) : "") +
+      (!isCompare && carrier && versionsFor(carrier.id).length ? historySheetHtml(carrier, shipIso) : "") +
       calendarHtml() +
       noticeSheetHtml();
     document.body.classList.toggle("hist-open", !isCompare && state.historyOpen);
@@ -4022,8 +4524,15 @@
       comboOpen = false;
       comboTyped = null;
       comboHighlight = -1;
-      state.carrierId = v;
+      if (v.indexOf("agent:") === 0) {
+        state.agentId = v.slice(6);
+        state.carrierId = "";
+      } else {
+        state.agentId = "";
+        state.carrierId = v;
+      }
       if (!v) {
+        state.agentId = "";
         state.originId = "";
         state.originKey = "";
         state.typ = "";
@@ -4252,10 +4761,23 @@
         writeCopiedText(quoteText(entry.ctx.displayCarrier, selectedOrigin, state.dest, entry.ctx.quoteRate, qty, markup, shipIso, !entry.ctx.validRate, entry.ctx.quoteOffers), id);
       });
     });
+    document.querySelectorAll("[data-copy-agent]").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        const id = btn.getAttribute("data-copy-agent");
+        let row = agentLaneRows.find(function (r) { return r.rowId === id; });
+        if (!row) {
+          const entry = compareEntries.find(function (e) { return e.kind === "agent" && e.c.id === id; });
+          row = entry && entry.agentRow;
+        }
+        if (!row || !selectedOrigin || !shipIso) return;
+        writeCopiedText(agentQuoteText(row, selectedOrigin, state.dest, shipIso), id);
+      });
+    });
     const copyCompareEl = $("copy-compare-btn");
     if (copyCompareEl && selectedOrigin && shipIso && compareEntries.length) {
       copyCompareEl.addEventListener("click", function () {
         const chunks = compareEntries.map(function (e) {
+          if (e.kind === "agent") return agentQuoteText(e.agentRow, selectedOrigin, state.dest, shipIso);
           return quoteText(e.ctx.displayCarrier, selectedOrigin, state.dest, e.ctx.quoteRate, qty, markup, shipIso, !e.ctx.validRate, e.ctx.quoteOffers);
         });
         writeCopiedText(chunks.join("\n\n==========\n\n"), "all");
