@@ -1134,10 +1134,10 @@
     <footer class="note">כלי פנימי להצעת מחיר ממחירון. התעריפים כפופים לתוקף, למקום פנוי ולתנאי החברה.</footer>
   </div>
   <noscript><p class="wrap">יש להפעיל JavaScript כדי להשתמש במחשבון.</p></noscript>
-  <script src="data/index.js?v=toptrans-20261126"></script>
-  <script src="data/notices.js?v=toptrans-20261126"></script>
-  <script src="data/spots.js?v=toptrans-20261126"></script>
-  <script src="data/schedules.js?v=toptrans-20261126"></script>
+  <script src="data/index.js?v=one-rf-20261126"></script>
+  <script src="data/notices.js?v=one-rf-20261126"></script>
+  <script src="data/spots.js?v=one-rf-20261126"></script>
+  <script src="data/schedules.js?v=one-rf-20261126"></script>
   <script>
 (function () {
   const DATA = window.QUOTE_INDEX;
@@ -1836,7 +1836,7 @@
       lines.push("חיובים מקומיים ביעד — מוצגים בנפרד, לא נכללים בסה״כ ההובלה, ולא הומרו (אין שער במחירון):");
       for (const it of lc.items) {
         let amt = it.quantum || "";
-        if (it.amount20 != null) amt = (rate.typ === "DV20" ? it.amount20 : it.amount40) + " " + it.currency + " למכולה";
+        if (it.amount20 != null) amt = (isTwentyFootTyp(rate.typ) ? it.amount20 : it.amount40) + " " + it.currency + " למכולה";
         else if (it.amount != null) amt = it.amount + " " + it.currency + (it.basis && it.basis.indexOf("B/L") >= 0 ? " לשטר מטען" : " למכולה");
         lines.push(it.name + ": " + amt + (it.remarks ? " · " + it.remarks : ""));
       }
@@ -2236,7 +2236,7 @@
     }
     return new Promise(function (resolve, reject) {
       const s = document.createElement("script");
-      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=toptrans-20261126";
+      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=one-rf-20261126";
       s.async = true;
       s.onload = function () {
         const pack = window.QUOTE_PACK && window.QUOTE_PACK[meta.id];
@@ -2270,7 +2270,7 @@
     return meta && versionCache[meta.id] ? versionCache[meta.id].rates : [];
   }
   function isTwentyFootTyp(typ) {
-    return typ === "DV20" || typ === "OT20" || typ === "FL20";
+    return typ === "DV20" || typ === "OT20" || typ === "FL20" || typ === "RF20";
   }
   function parseGrossWt(text) {
     if (text == null || String(text).trim() === "") return null;
@@ -2874,6 +2874,69 @@
         + "<p>חיובים מקומיים ליבוא מוצגים בבלוק נפרד לפי המטבע שצוין במחירון, ולא נכללים בסה״כ ההובלה. "
         + "דמי סוכנות (0.3%, מינימום 80 ₪) ודמי העברה (0.6%, מינימום 55 ₪) מחושבים מאחוז מההובלה והתוספות — לא הומרו לשקלים (אין שער). "
         + "דמי הובלה יבשתית (6%, מינימום 58 ₪) לא נוספו כי אין במחירון תעריף inland.</p>";
+      }
+      if (vid === "one-rf-2026-11-16") {
+        return head
+        + "<p>מחירון יבוא <strong>ריפר</strong> מהמזרח הרחוק, מאוקיאניה ומהודו לאשדוד וחיפה (אותו מחיר). "
+        + "כותרת המחירון: ONE RATES FROM FAR EAST TO ASH/HFA FOR REEFER CONTAINERS. "
+        + "סחורה: FAK / general cargo / non imco ONLY. סוגים במחירון: 20RF ו-40RH בלבד. "
+        + "התקבל ב-26.11.2026 (לא צוין תאריך הנפקה מודפס במחירון; צוין כתאריך משוער). "
+        + "תוקף לפי המחירון המודפס: 16.11.2026–30.11.2026 (UPDATED). ליפן צוין Valid until 31 Dec 2026 — התעריפים ליפן במחשבון עד 31.12.2026. "
+        + "במייל נכתב שאוקיאניה ללא שינוי 01.11–30.11.2026 ושהודו הוארכה ל-16.11–30.11.2026; בכותרת הגיליון Valid From הוא 16.11.2026 לכל הטבלה, והתוקף במחשבון לפי התאריכים המודפסים. "
+        + "ההובלה והתוספות נקובות בדולר. לא צוין מספר הסכם / quotation / filing במחירון, ולא הומצא.</p>"
+        + "<p>Inclusive במחיר ההובלה: CAF, CSS, EFS, IFP, MBS. LSF כלול רק מסין, מדרום קוריאה ומטייוואן (לא ממוצאים אחרים). "
+        + "נוספו לסה״כ: OBS 455$/20׳ ו-910$/40RH; CMD 21$ למכולה; DTHC 305$/20׳ ו-435$/40RH. "
+        + "מאוסטרליה נוסף גם ISL (International security fee) 32$ למכולה. "
+        + "SCT (Suez Canal Transit) 18$/20׳ ו-36$/40RH חל רק אם המטען עובר בתעלת סואץ (applicable only when cargo is in transit through the Suez canal). "
+        + "במחירון לא צוין ניתוב דרך סואץ לאף קו, ולכן לא נוסף לסה״כ. "
+        + "בגיליון PSS מצוין 0/0 לחלון נובמבר ולא נוסף; מ-01.12.2026 חלה הודעת PSS ליבוא מיפן (750$/20׳, 1,500$/40׳) ומחושבת אוטומטית. "
+        + "כפוף ל-FGP (Food Grade Premium) — לא צוין סכום בגיליון זה, ולא נוסף לסה״כ.</p>"
+        + "<p>ניתוב מודפס בגיליון (מוצג גם בהערות השורה): Nansha ו-Xiamen דרך Shekou; Qingdao דרך Shanghai; "
+        + "הונג קונג, ג׳קרטה, סורבאיה, מנילה, בנגקוק, למ צ׳אבנג, הייפונג והו צ׳י מין דרך סינגפור. אין זמני מעבר במחירון. "
+        + "התעריפים תקפים ל-freight collect, בכפוף להגשת תעריף (filing) לפני הזמנה. ללקוחות ללא אשראי — תשלום במזומן בשקלים. "
+        + "כפוף לניתוב סטנדרטי של ONE (ניתוב חריג דורש פנייה לצוות התמחור), לאישור תפעולי ולזמינות ציוד ומקום.</p>"
+        + "<p><strong>תאריך דירוג ה-B/L</strong> הוא Proforma ETD (לוח הזמנים במועד ההזמנה). אם המטען נטען על דוברה/פידר — Proforma ETD של הדוברה/פידר. "
+        + "לפי העדכון לכלל הגלובלי: במקרה של עיכוב אונייה לא משנים את תאריך ה-PFS ETD, כי Proforma ETD אינו ETD זז. "
+        + "עם זאת, אם האונייה מתעכבת (slides) לשבוע מאוחר יותר, או ששבוע השיבוץ של האונייה שונה, עשוי לחול PFS ETD חדש. "
+        + "בפועל תאריך היישום משתנה רק אם תאריך ה-PFS ETD מתעדכן במערכת (לאונייה מחליקה או שמשתנה שבוע השיבוץ — התאריך מותאם אוטומטית לתאריך ה-PFS ETD החדש). "
+        + "ליצוא מהודו, תאריך היישום הוא תמיד תאריך קבלת המטען (CRD).</p>"
+        + "<p>תוספת משקל כבד ל-20׳ (HWS, לפי משקל המטען נטו / payload): 0–13.99 טון 0$; 14–17.99 טון 300$; 18–27 טון 600$ — מותנה במשקל, לא נוסף לסה״כ.</p>"
+        + "<p><strong>שיטת חישוב demurrage ליבוא לישראל</strong> (חשוב): החיוב לפי מספר ימי השימוש במכולה. "
+        + "תעריף הסטנדרט של ONE: 7 ימים חינם ל-DV ולציוד מיוחד, ו-3 ימים חינם למכולות ריפר (RF). "
+        + "יותר מ-7 ימים חינם (DV/מיוחד) או יותר מ-3 ימים חינם (RF) נחשב לתנאים מיוחדים, ומחושב לפי ימי שימוש. "
+        + "למכולות ריפר (R2, R5) עם 7 ימים חינם (תנאים מיוחדים), הסולם בדולר: Over day 1–10: 20FT 72$, 40FT 109$, H/C 109$; Over day 11+: 20FT 103$, 40FT 160$, H/C 160$. "
+        + "תעריפי demurrage לא נוספים לסה״כ ההובלה.</p>"
+        + "<p>חיובים מקומיים ליבוא מוצגים בבלוק נפרד לפי המטבע שצוין במחירון, ולא נכללים בסה״כ ההובלה. "
+        + "לרבות REFFER HANDING FEE (90 ₪ לשטר מטען) ו-MONITORING (145$ למכולה ל-3 ימים + חיבור/ניתוק; אחרי 3 ימים 30$/יום, שבת/חג 50$/יום; Graph Temp. 100$; plug נוסף 25$). "
+        + "דמי סוכנות (0.3%, מינימום 80 ₪) ודמי העברה (0.6%, מינימום 55 ₪) מחושבים מאחוז מההובלה והתוספות — לא הומרו לשקלים (אין שער). "
+        + "דמי הובלה יבשתית (6%, מינימום 58 ₪) לא נוספו כי אין במחירון תעריף inland.</p>"
+        + "<p>קישור AppSheet לשאילתת תעריפים של ONE (כפי שנשלח): "
+        + ltrHtml("https://www.appsheet.com/start/091549b4-429e-43cb-a356-a31a7ca16cee#appName=ONEMRG3-5104532&page=form&row=&table=FiltersData&view=User+Query+Form")
+        + ".</p>"
+        + '<details class="notice-original"><summary>נוסח מקורי (אנגלית)</summary><div class="notice-original-text" dir="ltr">'
+        + "ONE RATES FROM FAR EAST TO ASH/HFA FOR REEFER CONTAINERS. Valid From 16.11.2026 (UPDATED) / Valid To 30.11.2026. Commodities: FAK. "
+        + "Japan ports: Valid until 31 Dec 2026.<br><br>"
+        + "UPDATE B/L Rating date will be “Proforma ETD” (Schedule at the time of booking).<br>"
+        + "Please note that some wording clarification has been added to the Global B/L Freight Rule. "
+        + "In case we face some vessel delays, we do NOT change any PFS ETD date since Proforma ETD is not moving ETD. "
+        + "However, if a vessel slides to a later week or if the assigned week for a vessel was changed for some reason, a new PFS ETD may apply. "
+        + "Effectively it means that the application date will only change if the PFS ETD date is updated in the system. "
+        + "For a sliding or week-changing vessel, the application date will be automatically adjusted to match the new PFS ETD date when it is updated in the system. "
+        + "Application Date: For exports from India, the application date will always be the same as the cargo receiving date (CRD). "
+        + "In case cargo is being loaded onto barge/feeder, “Proforma ETD” of the barge/feeder is to be taken as B/L Rating date.<br><br>"
+        + "SCT is applicable only when cargo is in transit through the Suez canal (USD 18 / 20' and USD 36 / 40' RH).<br><br>"
+        + "General notes for billing free days: The demurrage tariff charges are based on the number of usage days of the container. "
+        + "ONE’S standard tariff for demurrage for import to Israel is based on 7 free days for DV + Special Equipment containers &amp; 3 free days for reefer (RF) containers. "
+        + "If the customer has more than 7 free days for DV &amp; Special Equipment or more than 3 free days for RF it is considered as special terms. "
+        + "RF containers (R2, R5) with 7 free days (special terms), USD: Over day 1–10: 20FT 72, 40FT 109, H/C 109; Over day 11+: 20FT 103, 40FT 160, H/C 160.<br><br>"
+        + "Rates are valid for commodities: General cargo / Non IMCO ONLY. Rates are valid for freight collect, subject to filing before booking. "
+        + "Subject to Food Grade Premium (FGP) — no amount stated on this sheet. "
+        + "Above rate is subject to ONE standard routing and not applicable for non-standard routing. "
+        + "For clients without credit terms — cash payment in NIS currency.<br><br>"
+        + "20' Heavy Weight Surcharge (HWS), net weight (payload): 0–13.99 tons USD 0; 14–17.99 tons USD 300; 18–27 tons USD 600.<br><br>"
+        + "LSF INCL only from China, S. Korea &amp; Taiwan. ISL USD 32/container from Australia only. "
+        + "Inclusive: CAF, CSS, EFS, IFP, MBS (and LSF where stated). Added in this calculator: OBS 455/910, CMD 21, DTHC 305/435, plus ISL 32 from Australia. PSS listed 0/0 on the November sheet; Japan PSS from 01.12.2026 per ONE notice."
+        + "</div></details>";
       }
       return head
         + "<p>מחירון יבוא מצפון אירופה, הבלטיק וסקנדינביה לחיפה/אשדוד. תוקף 01.11.2026–30.11.2026. הונפק / נשלח ב-25.10.2026. "
@@ -3644,7 +3707,7 @@
       for (const it of lc.items) {
         let amt = it.quantum || "";
         if (it.amount20 != null) {
-          const n = quoteRate.typ === "DV20" ? it.amount20 : it.amount40;
+          const n = isTwentyFootTyp(quoteRate.typ) ? it.amount20 : it.amount40;
           amt = money(n, it.currency) + " למכולה" + (qty > 1 ? " · " + money(n * qty, it.currency) + " למשלוח" : "");
         } else if (it.amount != null) {
           const perBl = (it.basis || "").indexOf("B/L") >= 0;
@@ -3759,7 +3822,7 @@
     }
     return new Promise(function (resolve, reject) {
       const s = document.createElement("script");
-      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=toptrans-20261126";
+      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=one-rf-20261126";
       s.async = true;
       s.onload = function () {
         const pack = window.AGENT_PACK && window.AGENT_PACK[meta.id];

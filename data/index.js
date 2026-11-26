@@ -831,6 +831,111 @@ window.QUOTE_INDEX =
       }
     },
     {
+      "id": "one-rf-2026-11-16",
+      "carrierId": "one",
+      "file": "data/one/2026-11-16_rf.js",
+      "version": "",
+      "party": "Crown Shipping, as general agent for ONE",
+      "vf": 5,
+      "vt": 50,
+      "issued": "2026-11-26",
+      "issuedApprox": true,
+      "added": "2026-11-26",
+      "sourceFile": "one-update-20261126.xlsx",
+      "sourceNote": "התקבל ב-26.11.2026 (לא צורף מייל חברת הספנות לקובץ, ולא צוין תאריך הנפקה מודפס במחירון; תאריך ההנפקה צוין כמשוער). כותרת המחירון: ONE RATES FROM FAR EAST TO ASH/HFA FOR REEFER CONTAINERS. תוקף לפי הגיליון המודפס: Valid From 16.11.2026 (UPDATED) / Valid To 30.11.2026 לכל הטבלה; ליפן צוין Valid until 31 Dec 2026. במייל נכתב: FE 16.11–30.11.2026 מעודכן; אוקיאניה 01.11–30.11.2026 ללא שינוי; הודו הארכה 16.11–30.11.2026 — התוקף במחשבון לפי התאריכים המודפסים בגיליון. לא צוין מספר הסכם / quotation / filing במחירון, ולא הומצא. הובלה בדולר. FAK / general cargo / non IMCO ONLY. סוגים: 20RF ו-40RH בלבד. מחירון חלקי (ריפר בלבד; אין בו תעריפי יבש או צפון אירופה). SCT (18/36) לא נוסף אוטומטית: חל רק במעבר בתעלת סואץ, ובמחירון לא צוין ניתוב דרך סואץ. FGP מצוין כ-Subject to בלי סכום, ולא נוסף. HWS ל-20׳ לפי משקל נטו — הערה בלבד, לא נוסף לסה״כ. PSS בגיליון 0/0 לחלון נובמבר; מ-01.12 חלה הודעת PSS ליבוא מיפן.",
+      "label": "יבוא ריפר מהמזרח הרחוק / אוקיאניה / הודו",
+      "offerTitle": "ONE RATES FROM FAR EAST TO ASH/HFA FOR REEFER CONTAINERS",
+      "partialCoverage": true,
+      "website": "https://www.one-line.com",
+      "agent": "Crown Shipping, as general agent for ONE",
+      "paymentTerms": "Freight collect, subject to filing before booking. Clients without credit: cash payment in NIS.",
+      "frtCurrency": "USD",
+      "localCharges": {
+        "title": "Local Charges for Import",
+        "items": [
+          {
+            "name": "AGENCY FEE",
+            "basis": "PER B/L",
+            "currency": "NIS",
+            "quantum": "0.3% with minimum 80",
+            "remarks": "(% from freight + surcharge). לא חושב לסה״כ: הרצפה בשקלים — אין שער במחירון."
+          },
+          {
+            "name": "CONTAINER ADMIN. FEE",
+            "basis": "PER CONTAINER",
+            "currency": "USD",
+            "quantum": "10/20' & 14/40'",
+            "amount20": 10,
+            "amount40": 14
+          },
+          {
+            "name": "COMMUNICATIONS FEE",
+            "basis": "PER B/L",
+            "currency": "NIS",
+            "amount": 75
+          },
+          {
+            "name": "ISPS",
+            "basis": "PER CONTAINER",
+            "currency": "USD",
+            "amount": 22
+          },
+          {
+            "name": "INLAND TRANSPORT FEE",
+            "basis": "PER TEU",
+            "currency": "NIS",
+            "quantum": "6% with minimum 58",
+            "remarks": "(% from inland transport). לא נוסף: במחירון זה אין תעריף הובלה יבשתית."
+          },
+          {
+            "name": "IT CHARGE",
+            "basis": "PER B/L",
+            "currency": "NIS",
+            "amount": 190
+          },
+          {
+            "name": "TRANSFER FEES",
+            "basis": "PER B/L",
+            "currency": "NIS",
+            "quantum": "0.6% with minimum 55",
+            "remarks": "(% from freight + surcharge). לא חושב לסה״כ — אין שער במחירון."
+          },
+          {
+            "name": "WORLD GATE FEE",
+            "basis": "PER B/L",
+            "currency": "NIS",
+            "amount": 45
+          },
+          {
+            "name": "IMCO HANDING FEE",
+            "basis": "PER B/L",
+            "currency": "NIS",
+            "amount": 90,
+            "remarks": "כך במחירון (Handing). חל על מטען IMCO/מסוכן — לא נוסף אוטומטית (המחירון: general cargo / non imco ONLY)."
+          },
+          {
+            "name": "REFFER HANDING FEE",
+            "basis": "PER B/L",
+            "currency": "NIS",
+            "amount": 90,
+            "remarks": "כך במחירון (Reffer). חל על ריפר. מוצג בנפרד, לא נוסף לסה״כ ההובלה."
+          },
+          {
+            "name": "MONITORING",
+            "basis": "PER CONTAINER",
+            "currency": "USD",
+            "amount": 145,
+            "remarks": "3 days of monitoring + connect/disconnect. לריפר. מוצג בנפרד, לא נוסף לסה״כ ההובלה."
+          }
+        ],
+        "notes": [
+          "Monitoring: After 3 days – USD 30/day. Saturday/Holiday – USD 50/day",
+          "Graph Temp.: USD 100 per graph",
+          "Additional Plug in/out: USD 25 per additional action"
+        ]
+      }
+    },
+    {
       "id": "evergreen-fak-2026-11-15",
       "carrierId": "evergreen",
       "file": "data/evergreen/2026-11-15_fak.js",
@@ -1207,7 +1312,9 @@ window.QUOTE_INDEX =
     "FL20",
     "FL40",
     "OT20",
-    "OT40"
+    "OT40",
+    "RF20",
+    "RH40"
   ],
   "modes": [
     "Port",
@@ -1243,7 +1350,11 @@ window.QUOTE_INDEX =
     "FAK, General cargo / Non IMCO only. יעדים: אשדוד וחיפה, אותו מחיר. כותרת המחירון: DESTINATION ASHDOD and HAIFA - MD1 SERVICE (טבלת התוספות תחת הכותרת MD3-WB). תוקף: המזרח הרחוק, הודו וסרי לנקה 01.11.2026–15.11.2026; אוסטרליה 01.11.2026–30.11.2026. Inclusive במחיר ההובלה: CAF, MBS, CSS, PSS, EFS. LSF מצוין כ-0 ולא נוסף. נוספו לסה״כ לפי המחירון (Valid for all import bookings): OBS 275$/20׳ ו-550$/40׳–40HC; CMD 21$ למכולה; FGP (Food Grade Premium) 100$ למכולה; ו-THC ביעד (במחירון: THC; טופל כ-DTHC כמו במחירון ONE מצפון אירופה, כי הסכומים 270$/20׳ ו-390$/40׳–40HC הם תעריף היעד) 270$/20׳ ו-390$/40׳–40HC. מאוסטרליה נוסף גם ISL (International security fee) 32$ למכולה (Only from Australia). SCT (Suez Canal Transit) 18$/20׳ ו-36$/40׳–40HC חל רק אם המטען עובר בתעלת סואץ. במחירון לא צוין ניתוב דרך סואץ לאף קו, ולכן לא נוסף אוטומטית. Cochin, Mangalore ו-Visakhapatnam מתומחרים לפי תעריף Mundra ומוצגים כ-via Mundra, לפי המייל; ל-Tuticorin ול-Kattupalli נשארו התעריפים הנפרדים שבמחירון. תוספת משקל כבד ל-20׳ (HEA, לפי משקל המטען נטו): 0–13.99 טון 0$; 14–17.99 טון 300$; 18–27 טון 600$ — מותנה במשקל, לא נוסף לסה״כ. GOH (Garment On Hanger) צוין במייל כחל על כל היבוא — לא צוין סכום, לא נוסף. כפוף לכל התוספות התקפות במועד השילוח. Freight collect, בכפוף להגשת תעריף (filing) לפני הזמנה. תאריך דירוג ה-B/L: Proforma ETD (לוח הזמנים במועד ההזמנה). ליצוא מהודו: תאריך היישום הוא תאריך קבלת המטען (CRD). ניתוב סטנדרטי בלבד. ללקוחות ללא אשראי: תשלום במזומן בשקלים.",
     "FAK, General cargo / Non IMCO only. יעדים: אשדוד וחיפה, אותו מחיר. כותרת המחירון: DESTINATION ASHDOD and HAIFA - MD1 SERVICE (טבלת התוספות תחת הכותרת MD3-WB). תוקף: המזרח הרחוק, הודו וסרי לנקה 01.12.2026–15.12.2026. אוסטרליה (Oceania) לא נכללה במחירון זה (במייל ובמחירון: not yet available). Inclusive במחיר ההובלה: CAF, MBS, CSS, PSS, EFS. LSF מצוין כ-0 ולא נוסף. נוספו לסה״כ לפי המחירון (Valid for all import bookings): OBS 275$/20׳ ו-550$/40׳–40HC; CMD 21$ למכולה; FGP (Food Grade Premium) 100$ למכולה; ו-THC ביעד (במחירון: THC; טופל כ-DTHC כמו במחירון ONE מצפון אירופה, כי הסכומים 270$/20׳ ו-390$/40׳–40HC הם תעריף היעד) 270$/20׳ ו-390$/40׳–40HC. SCT (Suez Canal Transit) 18$/20׳ ו-36$/40׳–40HC חל רק אם המטען עובר בתעלת סואץ. במחירון לא צוין ניתוב דרך סואץ לאף קו, ולכן לא נוסף אוטומטית. Cochin, Mangalore ו-Visakhapatnam מתומחרים לפי תעריף Mundra ומוצגים כ-via Mundra, לפי המייל; ל-Tuticorin ול-Kattupalli נשארו התעריפים הנפרדים שבמחירון. תוספת משקל כבד ל-20׳ (HEA, לפי משקל המטען נטו): 0–13.99 טון 0$; 14–17.99 טון 300$; 18–27 טון 600$ — מותנה במשקל, לא נוסף לסה״כ. GOH (Garment On Hanger) צוין במייל כחל על כל היבוא — לא צוין סכום, לא נוסף. אין תעריף למכולות יבשות מיפן (כתוב לפנות לסוכן). כפוף לכל התוספות התקפות במועד השילוח. Freight collect, בכפוף להגשת תעריף (filing) לפני הזמנה. תאריך דירוג ה-B/L: Proforma ETD (לוח הזמנים במועד ההזמנה). ליצוא מהודו: תאריך היישום הוא תאריך קבלת המטען (CRD). ניתוב סטנדרטי בלבד. ללקוחות ללא אשראי: תשלום במזומן בשקלים.",
     "F.A.K. HARMLESS. מספר חוזה: R26824020000093 (FAK). חוזה COIR: R26825020000029 (מכותרת המייל מ-22.11.2026; אין במחירון תעריף COIR). תוקף 19.11.2026–15.12.2026 (*Effective last container Received for export at train depots, terminals or POL'S). המחירון עודכן 23.11.26; תאריך ההנפקה לפי המייל: 24.11.2026. DTHC ו-EFS נוספו לסה״כ לפי הטבלה: DTHC 275$/20׳ ו-400$/40׳; EFS IN USD - NOV/DEC = 167/168$ × TEU (בנובמבר 167$/20׳ ו-334$/40׳; בדצמבר 168$/20׳ ו-336$/40׳). OVW כלול בתעריף ל-20׳. 14 ימי demurrage חינם ביעד, אלא אם איש המכירות ציין אחרת. אחסנה ו-demurrage ביעד אינם כלולים מעבר לימי הפטור. Origin THC משולם על ידי השולח ולא נוסף. כפוף לדמי D/O ולהוצאות מקומיות — סכומים לא צוינו במחירון ולא הומצאו. כפוף לתוספות נוספות במועד השילוח. לא כולל תוספות למשקל יתר, ציוד מיוחד ומטען מסוכן. כפוף לביקורת בכל נמל שטעון. לא מקבלים Granite Blocks. לא נוספו אוטומטית (מותנים): EIS 50$/מכולה ל-Coir pith/Flammable (הסכם נפרד) ולמטען harmless עם סכנת בעירה ספונטנית/חימום עצמי; FTS 14$/TEU ל-FlexiTank/FlexiBag; SWB FEE 35$ לסוכן/שולח ב-POL שאינו אשראי; דמי HAZ ב-POL (בלי VIZAK ו-GOA): HIGH RISK PG 1 500$/TEU, LOW RISK PG 3 150$/TEU, MEDIUM RISK PG 2 250$/TEU; OTS 500$ ל-20׳ Open Top ו-1000$ ל-40׳ Open Top/High; Israel THC למטען מסוכן/ציוד מיוחד 320$/20׳ ו-460$/40׳; SOC FEE 500$ × TEU. ביטול הזמנה: 200$/מכולה. תנאי ההובלה: https://www.msc.com/che/contract-of-carriage. הובלה יבשתית עד מחסן הלקוח הוצעה במייל מ-22.11.2026 באותו שרשור, ולא תומחרה במחירון. זמני מעבר (מאותו מייל מ-22.11.2026): Mundra 48–49 ימים, Nhava Sheva 47–48, Tuticorin 44–45, Kolkata 53–54, Colombo (Sri Lanka) 37–38, ליעדי אשדוד וחיפה.",
-    "SPOT HARMLESS ליעדי אשדוד (HCT) וחיפה (אותו מחיר). תוקף 01.12.2026–14.12.2026 (Effective as of 1.12.2026 until further notice but not beyond 14.12.2026). כותרת המחירון: SPOT rate offer. המחירון הקודם לאותו חלון תוקף (הונפק 15.11.2026) נקרא FAK rate offer. תאריך ההנפקה 25.11.2026. תעריף 20׳ DV חל רק על מטען במשקל ברוטו עד 22.9 טון (20DV OVW TILL 22.9 TONS) — למטען כבד יותר חלות תוספות, אבל הסכום לא צוין בגיליון ולא הומצא. THC במחירון (THC IN USD) 275$/20׳ ו-400$/40׳ נוסף לסה״כ כטיפול יעד (Origin THC משולם ע״י השולח). PRS 55$/110$ ו-SCS 36$/72$ (20׳/40׳) נוספו לפי הטבלה. CLS 20$/40$ נוסף רק בשורות שבהן צוין (נמלי סין היבשתית). CRS 131$/262$ נוסף רק בשורות שבהן צוין (הונג קונג ושאר המוצאים שאינם סין היבשתית). EFS לא מופיע במחירון הזה ולא נוסף. מספר SCT: 2361-88888-ST. יש לאמת את קוד ה-SCT מול משרד MSC לפני ההזמנה. אחרי שההזמנה הוצבה לא ניתן לשנות את הקוד, ושינוי יגרור קנס של 3,500$ למכולה; הזמנה שאושרה עם קוד SCT שגוי ובלי תעריף — יחולו תעריפי FAK. אם המכולות הריקות טרם שוחררו, ניתן לשנות את קוד ה-SCT בלי קנס. הובלה מנמלי בסיס לפי תאריך יציאת הפרופורמה (scheduled vessel departure = proforma sailing date), לא לפי היציאה בפועל ולא לפי כניסת המכולה לטרמינל; מנמלי out (Sihanoukville, Makassar, Songkhla ונמלי out בסין) לפי היציאה בפועל; בנגקוק לפי פרופורמת Laem Chabang. 12 ימי demurrage חינם ביעד. אחסנה ו-demurrage ביעד אינם כלולים מעבר לימי הפטור. כפוף לדמי D/O ולהוצאות מקומיות (טבלת Locals מוצגת בנפרד, לא בסה״כ ההובלה). כפוף לתוספות במועד השילוח, לזמינות מקום וציוד, ולתנאי MSC Israel (https://www.msc.com/che/contract-of-carriage). החברה אינה מתחייבת לטעינה באונייה, בתאריך או בשעה מסוימים; לוחות הזמנים הם הערכות בלבד. לא נוספו אוטומטית: Flexi/Flexibag 14$ למכולה; מטען עם בעירה ספונטנית/חימום עצמי 50$/מכולה (גיליון SCF); דמי מועמדות למכולה כבדה בהונג קונג ודרום סין (RMB/HKD לפי הגיליון, לא הומרו); תעריפי pre-carriage / TAO-PRE וסין inland (גיליונות נפרדים) — להוסיף מעל תעריף נמל האם, לא נכללו בסה״כ. הערות מהגיליונות האלה (בלי התעריפים) מופיעות בהודעת MSC של המחירון."
+    "SPOT HARMLESS ליעדי אשדוד (HCT) וחיפה (אותו מחיר). תוקף 01.12.2026–14.12.2026 (Effective as of 1.12.2026 until further notice but not beyond 14.12.2026). כותרת המחירון: SPOT rate offer. המחירון הקודם לאותו חלון תוקף (הונפק 15.11.2026) נקרא FAK rate offer. תאריך ההנפקה 25.11.2026. תעריף 20׳ DV חל רק על מטען במשקל ברוטו עד 22.9 טון (20DV OVW TILL 22.9 TONS) — למטען כבד יותר חלות תוספות, אבל הסכום לא צוין בגיליון ולא הומצא. THC במחירון (THC IN USD) 275$/20׳ ו-400$/40׳ נוסף לסה״כ כטיפול יעד (Origin THC משולם ע״י השולח). PRS 55$/110$ ו-SCS 36$/72$ (20׳/40׳) נוספו לפי הטבלה. CLS 20$/40$ נוסף רק בשורות שבהן צוין (נמלי סין היבשתית). CRS 131$/262$ נוסף רק בשורות שבהן צוין (הונג קונג ושאר המוצאים שאינם סין היבשתית). EFS לא מופיע במחירון הזה ולא נוסף. מספר SCT: 2361-88888-ST. יש לאמת את קוד ה-SCT מול משרד MSC לפני ההזמנה. אחרי שההזמנה הוצבה לא ניתן לשנות את הקוד, ושינוי יגרור קנס של 3,500$ למכולה; הזמנה שאושרה עם קוד SCT שגוי ובלי תעריף — יחולו תעריפי FAK. אם המכולות הריקות טרם שוחררו, ניתן לשנות את קוד ה-SCT בלי קנס. הובלה מנמלי בסיס לפי תאריך יציאת הפרופורמה (scheduled vessel departure = proforma sailing date), לא לפי היציאה בפועל ולא לפי כניסת המכולה לטרמינל; מנמלי out (Sihanoukville, Makassar, Songkhla ונמלי out בסין) לפי היציאה בפועל; בנגקוק לפי פרופורמת Laem Chabang. 12 ימי demurrage חינם ביעד. אחסנה ו-demurrage ביעד אינם כלולים מעבר לימי הפטור. כפוף לדמי D/O ולהוצאות מקומיות (טבלת Locals מוצגת בנפרד, לא בסה״כ ההובלה). כפוף לתוספות במועד השילוח, לזמינות מקום וציוד, ולתנאי MSC Israel (https://www.msc.com/che/contract-of-carriage). החברה אינה מתחייבת לטעינה באונייה, בתאריך או בשעה מסוימים; לוחות הזמנים הם הערכות בלבד. לא נוספו אוטומטית: Flexi/Flexibag 14$ למכולה; מטען עם בעירה ספונטנית/חימום עצמי 50$/מכולה (גיליון SCF); דמי מועמדות למכולה כבדה בהונג קונג ודרום סין (RMB/HKD לפי הגיליון, לא הומרו); תעריפי pre-carriage / TAO-PRE וסין inland (גיליונות נפרדים) — להוסיף מעל תעריף נמל האם, לא נכללו בסה״כ. הערות מהגיליונות האלה (בלי התעריפים) מופיעות בהודעת MSC של המחירון.",
+    "via Shekou",
+    "via Shanghai",
+    "via Singapore",
+    "Valid until 31 Dec 2026"
   ],
   "incl": [
     "CNS/AGC/SSD/WR/THC",
@@ -1274,7 +1385,9 @@ window.QUOTE_INDEX =
     "BAF/War/Detention",
     "BAF/War/V. ISPS/Detention/ES",
     "CNS/AGC/SSD/WR/IPS",
-    "CAF/MBS/CSS/PSS/EFS"
+    "CAF/MBS/CSS/PSS/EFS",
+    "CAF/CSS/LSF/EFS/IFP/MBS",
+    "CAF/CSS/EFS/IFP/MBS"
   ],
   "codes": [
     "GFS",
@@ -2460,7 +2573,9 @@ window.QUOTE_INDEX =
     "FL20": "20׳ פלט (FL20)",
     "FL40": "40׳ פלט (FL40)",
     "OT20": "20׳ גג פתוח (OT20)",
-    "OT40": "40׳ גג פתוח (OT40)"
+    "OT40": "40׳ גג פתוח (OT40)",
+    "RF20": "20׳ ריפר (20RF / R2)",
+    "RH40": "40׳ ריפר הייקיוב (40RH / R5)"
   },
   "surchargeHe": {
     "AIS": "תוספת איזון לאשדוד",
