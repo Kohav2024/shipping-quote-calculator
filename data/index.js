@@ -2545,7 +2545,8 @@ window.QUOTE_INDEX =
 
 window.QUOTE_INDEX.agents = [
   { id: "utrust", name: "UTRUST", nameHe: "UTRUST" },
-  { id: "winpax", name: "WINPAX", nameHe: "WINPAX" }
+  { id: "winpax", name: "WINPAX", nameHe: "WINPAX" },
+  { id: "unitex", name: "UNITEX", nameHe: "UNITEX" }
 ];
 window.QUOTE_INDEX.agentVersions = [
   {
@@ -2561,6 +2562,15 @@ window.QUOTE_INDEX.agentVersions = [
     id: "winpax-2026-11-26",
     agentId: "winpax",
     file: "data/agents/winpax/2026-11-26.js",
+    received: "2026-11-26",
+    issued: "2026-11-26",
+    issuedApprox: true,
+    added: "2026-11-26"
+  },
+  {
+    id: "unitex-2026-11-26",
+    agentId: "unitex",
+    file: "data/agents/unitex/2026-11-26.js",
     received: "2026-11-26",
     issued: "2026-11-26",
     issuedApprox: true,

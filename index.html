@@ -1134,10 +1134,10 @@
     <footer class="note">כלי פנימי להצעת מחיר ממחירון. התעריפים כפופים לתוקף, למקום פנוי ולתנאי החברה.</footer>
   </div>
   <noscript><p class="wrap">יש להפעיל JavaScript כדי להשתמש במחשבון.</p></noscript>
-  <script src="data/index.js?v=winpax-20261126"></script>
-  <script src="data/notices.js?v=winpax-20261126"></script>
-  <script src="data/spots.js?v=winpax-20261126"></script>
-  <script src="data/schedules.js?v=winpax-20261126"></script>
+  <script src="data/index.js?v=unitex-20261126"></script>
+  <script src="data/notices.js?v=unitex-20261126"></script>
+  <script src="data/spots.js?v=unitex-20261126"></script>
+  <script src="data/schedules.js?v=unitex-20261126"></script>
   <script>
 (function () {
   const DATA = window.QUOTE_INDEX;
@@ -2236,7 +2236,7 @@
     }
     return new Promise(function (resolve, reject) {
       const s = document.createElement("script");
-      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=winpax-20261126";
+      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=unitex-20261126";
       s.async = true;
       s.onload = function () {
         const pack = window.QUOTE_PACK && window.QUOTE_PACK[meta.id];
@@ -3758,7 +3758,7 @@
     }
     return new Promise(function (resolve, reject) {
       const s = document.createElement("script");
-      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=winpax-20261126";
+      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=unitex-20261126";
       s.async = true;
       s.onload = function () {
         const pack = window.AGENT_PACK && window.AGENT_PACK[meta.id];
@@ -3899,8 +3899,8 @@
       offer: offer,
       rate: rate,
       agent: agent,
-      rowId: pack.agentId + "-" + offer.carrierId,
-      nameHe: offer.carrierName + " · דרך סוכן " + agentName,
+      rowId: pack.agentId + "-" + (offer.id || offer.carrierId),
+      nameHe: (offer.nameHe || offer.carrierName) + " · דרך סוכן " + agentName,
       of: of,
       fee: fee,
       feeCcy: feeCcy,
@@ -3949,6 +3949,7 @@
     if (offer.freeDaysHe) bits.push(offer.freeDaysHe);
     if (offer.confirmFirst) bits.push("יאושר מול הסוכן קודם");
     if (offer.serviceHe) bits.push(offer.serviceHe);
+    if (offer.weightLimitHe) bits.push(offer.weightLimitHe);
     if (priced.rate && priced.rate.etd) bits.push("ETD: " + priced.rate.etd);
     bits.push(agentBasisShort(priced));
     return bits;
@@ -4007,8 +4008,17 @@
     if (offer.owsNoteHe && !(offer.ows && offer.ows.length)) {
       html += '<div class="callout info"><strong>OWS / מגבלת משקל</strong>' + esc(offer.owsNoteHe) + "</div>";
     }
+    if (offer.weightLimitHe) {
+      html += '<div class="callout info"><strong>מגבלת משקל</strong>' + esc(offer.weightLimitHe) + "</div>";
+    }
+    if (offer.extraNoteHe) {
+      html += '<div class="callout warn"><strong>תוספת שלא נוספה לסה״כ</strong>' + esc(offer.extraNoteHe) + "</div>";
+    }
     if (offer.notesHe) {
       html += '<div class="callout info"><strong>הערות הסוכן</strong>' + esc(offer.notesHe) + "</div>";
+    }
+    if (pack.notesHe) {
+      html += '<div class="callout info"><strong>הערות כלליות</strong>' + esc(pack.notesHe) + "</div>";
     }
     if (pack.originalEn) {
       html += '<details class="terms agent-original"><summary>המקור באנגלית</summary><div class="terms-inner"><pre class="agent-original-text">' + esc(pack.originalEn) + "</pre></div></details>";
@@ -4039,9 +4049,16 @@
     if (priced.qty > 1) lines.push("ל־" + priced.qty + " מכולות: " + money(priced.perCtr * priced.qty, "USD"));
     if (priced.markup) lines.push("רווח למכולה: " + money(priced.markup, "USD") + " · סה״כ מכירה למכולה: " + money(priced.perCtr + priced.markup, "USD"));
     lines.push("");
+    if (offer.weightLimitHe) lines.push(offer.weightLimitHe);
+    if (offer.extraNoteHe) lines.push(offer.extraNoteHe);
+    if (offer.owsNoteHe && !priced.ows) lines.push(offer.owsNoteHe);
     if (offer.notesHe) {
       lines.push("הערות:");
       lines.push(offer.notesHe);
+      lines.push("");
+    }
+    if (pack.notesHe) {
+      lines.push(pack.notesHe);
       lines.push("");
     }
     if (pack.originalEn) {
