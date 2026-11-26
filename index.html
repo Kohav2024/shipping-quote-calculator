@@ -1134,10 +1134,10 @@
     <footer class="note">כלי פנימי להצעת מחיר ממחירון. התעריפים כפופים לתוקף, למקום פנוי ולתנאי החברה.</footer>
   </div>
   <noscript><p class="wrap">יש להפעיל JavaScript כדי להשתמש במחשבון.</p></noscript>
-  <script src="data/index.js?v=source-toggle-20261125"></script>
-  <script src="data/notices.js?v=source-toggle-20261125"></script>
-  <script src="data/spots.js?v=source-toggle-20261125"></script>
-  <script src="data/schedules.js?v=source-toggle-20261125"></script>
+  <script src="data/index.js?v=winpax-20261126"></script>
+  <script src="data/notices.js?v=winpax-20261126"></script>
+  <script src="data/spots.js?v=winpax-20261126"></script>
+  <script src="data/schedules.js?v=winpax-20261126"></script>
   <script>
 (function () {
   const DATA = window.QUOTE_INDEX;
@@ -2236,7 +2236,7 @@
     }
     return new Promise(function (resolve, reject) {
       const s = document.createElement("script");
-      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=source-toggle-20261125";
+      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=winpax-20261126";
       s.async = true;
       s.onload = function () {
         const pack = window.QUOTE_PACK && window.QUOTE_PACK[meta.id];
@@ -3709,6 +3709,37 @@
 
   const AGENT_BASIS_LABEL = "הובלה + עמלת סוכן בלבד (לא כולל מקומיים)";
   const TIANJIN_KEYS = ["XINGANG", "TIANJIN", "TIANJIN XINGANG PT", "TIANJIN XINGANG"];
+  function agentBasisLabel(priced) {
+    const offer = priced && priced.offer;
+    const pack = priced && priced.pack;
+    return (offer && offer.basisHe) || (pack && pack.basisHe) || AGENT_BASIS_LABEL;
+  }
+  function agentBasisShort(priced) {
+    const offer = priced && priced.offer;
+    if (offer && offer.basisShortHe) return offer.basisShortHe;
+    if (priced && priced.fee) return "הובלה + עמלת סוכן בלבד";
+    return agentBasisLabel(priced);
+  }
+  function agentBreakdownLine(priced) {
+    let s = "הובלה " + money(priced.of, "USD");
+    if (priced.fee) s += " + סוכן " + money(priced.fee, priced.feeCcy);
+    if (priced.ows) s += " + OWS " + money(priced.owsAmt, priced.ows.ccy || "USD");
+    return s;
+  }
+  function agentSectionHint(selectedAgent, rows) {
+    if (selectedAgent) {
+      const seen = {};
+      const labels = [];
+      (rows || []).forEach(function (r) {
+        const l = agentBasisLabel(r);
+        if (!seen[l]) { seen[l] = true; labels.push(l); }
+      });
+      const basis = labels.length ? labels.join(" · ") : AGENT_BASIS_LABEL;
+      return "מהזול ליקר, לפי הסכום המוצג למכולה. כל השורות הן מגיליון סוכן " + selectedAgent.name + ": " + basis + ".";
+    }
+    return "אותו מסלול, סוג מכולה ותאריך. הסכום בכל שורת סוכן הוא לפי הבסיס שצוין באותה שורה (לא בהכרח All-in, ולא בהכרח כולל עמלת סוכן).";
+  }
+  const COMPARE_MIXED_HINT = "מהזול ליקר, לפי הסכום המוצג למכולה. שורות סוכן: לפי הבסיס שצוין בכל שורה (הובלה בלבד, או הובלה + רכיבים שצוינו — לא בהכרח All-in, ולא בהכרח כולל עמלת סוכן). שורות ישירות: סה״כ All-in מהמחירון. הבסיסים שונים — אין להשוות אחד-לאחד בלי לבדוק את הרכיבים. לחצו על שורה לפירוט.";
   const agentPackCache = {};
 
   function agentById(id) {
@@ -3727,7 +3758,7 @@
     }
     return new Promise(function (resolve, reject) {
       const s = document.createElement("script");
-      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=source-toggle-20261125";
+      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=winpax-20261126";
       s.async = true;
       s.onload = function () {
         const pack = window.AGENT_PACK && window.AGENT_PACK[meta.id];
@@ -3846,6 +3877,7 @@
   }
   function owsNoteText(offer) {
     if (!offer) return "";
+    if (offer.owsNoteHe) return offer.owsNoteHe;
     if (offer.noOws) return "למכולת 20GP אין OWS.";
     if (!offer.ows || !offer.ows.length) return "";
     const parts = offer.ows.map(function (b) {
@@ -3916,7 +3948,9 @@
     if (offer.spaceOpen) bits.push(offer.confirmFirst ? "מקום פתוח להזמנה" : "מקום פתוח");
     if (offer.freeDaysHe) bits.push(offer.freeDaysHe);
     if (offer.confirmFirst) bits.push("יאושר מול הסוכן קודם");
-    bits.push("הובלה + עמלת סוכן בלבד");
+    if (offer.serviceHe) bits.push(offer.serviceHe);
+    if (priced.rate && priced.rate.etd) bits.push("ETD: " + priced.rate.etd);
+    bits.push(agentBasisShort(priced));
     return bits;
   }
   function agentCardHtml(priced, opts) {
@@ -3938,13 +3972,21 @@
     html += '<p class="meta-line"><span>סוכן</span> ' + esc(pack.agentName) +
       (agentIssuedText(pack) ? " · " + esc(agentIssuedText(pack)) : "") + "</p>";
     html += '<p class="meta-line"><span>תוקף</span> ' + ltrHtml(fmtDate(offer.vf) + "–" + fmtDate(offer.vt)) + "</p>";
+    if (offer.serviceHe) {
+      html += '<p class="meta-line"><span>שירות</span> ' + esc(offer.serviceHe) + "</p>";
+    }
+    if (priced.rate && priced.rate.etd) {
+      html += '<p class="meta-line"><span>ETD</span> ' + ltrHtml(priced.rate.etd) + "</p>";
+    }
     html += '<div class="table-wrap"><table><thead><tr><th>חיוב</th><th>סכום</th><th>בסיס</th></tr></thead><tbody>';
     html += "<tr><td>הובלה ימית (OF)</td><td class='num'>" + esc(money(priced.of, "USD")) + "</td><td>למכולה</td></tr>";
-    html += "<tr><td>עמלת סוכן</td><td class='num'>" + esc(money(priced.fee, priced.feeCcy)) + "</td><td>למכולה</td></tr>";
+    if (priced.fee) {
+      html += "<tr><td>עמלת סוכן</td><td class='num'>" + esc(money(priced.fee, priced.feeCcy)) + "</td><td>למכולה</td></tr>";
+    }
     if (priced.ows) {
       html += "<tr><td>OWS (משקל יתר)</td><td class='num'>" + esc(money(priced.owsAmt, priced.ows.ccy || "USD")) + "</td><td>למכולה</td></tr>";
     }
-    html += "<tr><td><strong>" + esc(AGENT_BASIS_LABEL) + "</strong></td><td class='num'><strong>" + esc(money(priced.perCtr, "USD")) + "</strong></td><td>למכולה</td></tr>";
+    html += "<tr><td><strong>" + esc(agentBasisLabel(priced)) + "</strong></td><td class='num'><strong>" + esc(money(priced.perCtr, "USD")) + "</strong></td><td>למכולה</td></tr>";
     html += "</tbody></table></div>";
     if (qty > 1) {
       html += "<p>ל־" + qty + " מכולות: " + esc(money(priced.perCtr * qty, "USD")) + ".</p>";
@@ -3962,6 +4004,9 @@
     } else if (offer.noOws && priced.rate.typ === "DV20") {
       html += '<div class="callout info"><strong>OWS</strong>' + esc(owsNoteText(offer)) + "</div>";
     }
+    if (offer.owsNoteHe && !(offer.ows && offer.ows.length)) {
+      html += '<div class="callout info"><strong>OWS / מגבלת משקל</strong>' + esc(offer.owsNoteHe) + "</div>";
+    }
     if (offer.notesHe) {
       html += '<div class="callout info"><strong>הערות הסוכן</strong>' + esc(offer.notesHe) + "</div>";
     }
@@ -3977,16 +4022,18 @@
     const lines = [];
     lines.push(priced.nameHe);
     if (priced.priceWatch) lines.push("*** מחיר בשינוי – לאשר מול הסוכן ***");
-    lines.push(AGENT_BASIS_LABEL);
+    lines.push(agentBasisLabel(priced));
     lines.push("מסלול: " + routePlain(origin, destName));
     lines.push("סוג מכולה: " + (TYPE_HE[priced.rate.typ] || priced.rate.typ));
     lines.push("תאריך BL: " + fmtDate(shipDate));
     lines.push(agentValidityText(offer));
     const issued = agentIssuedText(pack);
     if (issued) lines.push(issued);
+    if (offer.serviceHe) lines.push("שירות: " + offer.serviceHe);
+    if (priced.rate && priced.rate.etd) lines.push("ETD: " + priced.rate.etd);
     lines.push("");
     lines.push("הובלה: " + money(priced.of, "USD") + " למכולה");
-    lines.push("עמלת סוכן: " + money(priced.fee, priced.feeCcy) + " למכולה");
+    if (priced.fee) lines.push("עמלת סוכן: " + money(priced.fee, priced.feeCcy) + " למכולה");
     if (priced.ows) lines.push("OWS: " + money(priced.owsAmt, priced.ows.ccy || "USD") + " למכולה");
     lines.push("סה״כ למכולה: " + money(priced.perCtr, "USD"));
     if (priced.qty > 1) lines.push("ל־" + priced.qty + " מכולות: " + money(priced.perCtr * priced.qty, "USD"));
@@ -4021,8 +4068,7 @@
         : "";
       const usdClass = "compare-row-usd" + (priced.priceWatch ? " price-red" : "");
       const meta = agentMetaBits(priced);
-      const basis = "הובלה " + money(priced.of, "USD") + " + סוכן " + money(priced.fee, priced.feeCcy) +
-        (priced.ows ? " + OWS " + money(priced.owsAmt, priced.ows.ccy || "USD") : "");
+      const basis = agentBreakdownLine(priced);
       html += '<div class="compare-item' + (open ? " is-open" : "") + '" id="compare-item-' + esc(priced.rowId) + '">';
       html += '<button type="button" class="compare-row" data-compare-open="' + esc(priced.rowId) + '" aria-expanded="' + (open ? "true" : "false") + '" aria-controls="compare-detail-' + esc(priced.rowId) + '">';
       html += '<span class="compare-row-main"><span class="compare-row-name">' + esc(priced.nameHe) + tagRed + "</span>";
@@ -4438,7 +4484,7 @@
         ? '<span class="compare-row-other">' + otherCcys.map(function (cur) {
             return "+" + money(tot.perCtr[cur], cur);
           }).join(" · ") + "</span>"
-        : (isAgent ? '<span class="compare-row-basis">' + esc("הובלה " + money(priced.of, "USD") + " + סוכן " + money(priced.fee, priced.feeCcy) + (priced.ows ? " + OWS " + money(priced.owsAmt, priced.ows.ccy || "USD") : "")) + "</span>" : "");
+        : (isAgent ? '<span class="compare-row-basis">' + esc(agentBreakdownLine(priced)) + "</span>" : "");
       const usdHtml = usd != null ? moneyHtml(usd, "USD") : "—";
       const usdClass = "compare-row-usd" + (isAgent && priced.priceWatch ? " price-red" : "");
       return '<div class="compare-item' + (open ? " is-open" : "") + '" id="compare-item-' + esc(c.id) + '">' +
@@ -4478,7 +4524,7 @@
           (compareEntries.length ? '<button type="button" class="btn' + (copiedAll ? " ok" : "") + '" id="copy-compare-btn">' + (copiedAll ? "ההשוואה הועתקה" : "העתק השוואה") + "</button>" : "") +
           "</div>" + (carrierMeta ? '<p class="meta-line">' + carrierMeta + "</p>" : "") + routeLine + "</div>" +
           (compareEntries.length ? '<p class="compare-hint">' + esc(compareEntries.some(function (e) { return e.kind === "agent"; })
-            ? "מהזול ליקר, לפי הסכום המוצג למכולה. שורות סוכן: " + AGENT_BASIS_LABEL + ". שורות ישירות: סה״כ All-in מהמחירון. הבסיסים שונים — אין להשוות אחד-לאחד בלי לבדוק את הרכיבים. לחצו על שורה לפירוט."
+            ? COMPARE_MIXED_HINT
             : "מהזול ליקר, לפי סה״כ למכולה. לחצו על שורה לפירוט.") + '</p><div class="compare-list" id="compare-list">' + compareEntries.map(compareRowHtml).join("") + "</div>" : '<div class="card"><div class="callout warn"><strong>אין תעריף לאף חברה</strong>למסלול, סוג המכולה והתאריך שנבחרו אין שורה במחירונים שנטענו.</div></div>') +
           (compareMissing.length ? '<p class="compare-missing">אין תעריף אצל: ' + esc(compareMissing.map(function (c) { return c.nameHe; }).join(" · ")) + ".</p>" : "") +
           copyFallbackHtml +
@@ -4500,7 +4546,7 @@
         } else {
           parts.push(agentListSectionHtml(
             "הצעות סוכן " + selectedAgent.name,
-            "מהזול ליקר, לפי הסכום המוצג למכולה. כל השורות הן מגיליון סוכן " + selectedAgent.name + ": " + AGENT_BASIS_LABEL + ".",
+            agentSectionHint(selectedAgent, agentLaneRows),
             agentLaneRows,
             selectedOrigin,
             state.dest,
@@ -4510,7 +4556,7 @@
       } else if (agentLaneRows.length) {
         parts.push(agentListSectionHtml(
           "גם דרך סוכן",
-          "אותו מסלול, סוג מכולה ותאריך. הסכום כאן הוא " + AGENT_BASIS_LABEL + ".",
+          agentSectionHint(null, agentLaneRows),
           agentLaneRows,
           selectedOrigin,
           state.dest,

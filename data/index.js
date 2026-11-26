@@ -75,6 +75,16 @@ window.QUOTE_INDEX =
       "name": "MSK",
       "nameHe": "מארסק (MSK / Maersk)",
       "website": "https://www.maersk.com"
+    },
+    {
+      "id": "hpl",
+      "name": "HPL",
+      "nameHe": "הפג-לויד (HPL / Hapag-Lloyd)"
+    },
+    {
+      "id": "cosco",
+      "name": "COSCO",
+      "nameHe": "COSCO"
     }
   ],
   "versions": [
@@ -2534,7 +2544,8 @@ window.QUOTE_INDEX =
 };
 
 window.QUOTE_INDEX.agents = [
-  { id: "utrust", name: "UTRUST", nameHe: "UTRUST" }
+  { id: "utrust", name: "UTRUST", nameHe: "UTRUST" },
+  { id: "winpax", name: "WINPAX", nameHe: "WINPAX" }
 ];
 window.QUOTE_INDEX.agentVersions = [
   {
@@ -2545,5 +2556,14 @@ window.QUOTE_INDEX.agentVersions = [
     issued: "2026-11-25",
     issuedApprox: true,
     added: "2026-11-25"
+  },
+  {
+    id: "winpax-2026-11-26",
+    agentId: "winpax",
+    file: "data/agents/winpax/2026-11-26.js",
+    received: "2026-11-26",
+    issued: "2026-11-26",
+    issuedApprox: true,
+    added: "2026-11-26"
   }
 ];
