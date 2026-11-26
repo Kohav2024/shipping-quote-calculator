@@ -1134,10 +1134,10 @@
     <footer class="note">כלי פנימי להצעת מחיר ממחירון. התעריפים כפופים לתוקף, למקום פנוי ולתנאי החברה.</footer>
   </div>
   <noscript><p class="wrap">יש להפעיל JavaScript כדי להשתמש במחשבון.</p></noscript>
-  <script src="data/index.js?v=unitex-20261126"></script>
-  <script src="data/notices.js?v=unitex-20261126"></script>
-  <script src="data/spots.js?v=unitex-20261126"></script>
-  <script src="data/schedules.js?v=unitex-20261126"></script>
+  <script src="data/index.js?v=toptrans-20261126"></script>
+  <script src="data/notices.js?v=toptrans-20261126"></script>
+  <script src="data/spots.js?v=toptrans-20261126"></script>
+  <script src="data/schedules.js?v=toptrans-20261126"></script>
   <script>
 (function () {
   const DATA = window.QUOTE_INDEX;
@@ -2236,7 +2236,7 @@
     }
     return new Promise(function (resolve, reject) {
       const s = document.createElement("script");
-      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=unitex-20261126";
+      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=toptrans-20261126";
       s.async = true;
       s.onload = function () {
         const pack = window.QUOTE_PACK && window.QUOTE_PACK[meta.id];
@@ -3722,6 +3722,7 @@
   }
   function agentBreakdownLine(priced) {
     let s = "הובלה " + money(priced.of, "USD");
+    if (priced.addon) s += " + " + (priced.addonLabel || "HAIFA ADDON") + " " + money(priced.addon, "USD");
     if (priced.fee) s += " + סוכן " + money(priced.fee, priced.feeCcy);
     if (priced.ows) s += " + OWS " + money(priced.owsAmt, priced.ows.ccy || "USD");
     return s;
@@ -3758,7 +3759,7 @@
     }
     return new Promise(function (resolve, reject) {
       const s = document.createElement("script");
-      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=unitex-20261126";
+      s.src = meta.file + (meta.file.indexOf("?") >= 0 ? "&" : "?") + "v=toptrans-20261126";
       s.async = true;
       s.onload = function () {
         const pack = window.AGENT_PACK && window.AGENT_PACK[meta.id];
@@ -3891,7 +3892,9 @@
     const ows = applyAgentOws(offer, rate.typ, wt);
     const owsAmt = ows ? ows.amount : 0;
     const of = rate.of;
-    const perCtr = of + fee + owsAmt;
+    const addon = rate.addon || 0;
+    const addonLabel = rate.addonLabelHe || rate.addonLabel || (addon ? "HAIFA ADDON" : "");
+    const perCtr = of + addon + fee + owsAmt;
     const agent = agentById(pack.agentId) || { id: pack.agentId, name: pack.agentName, nameHe: pack.agentName };
     const agentName = agent.name || pack.agentName || pack.agentId;
     return {
@@ -3902,6 +3905,8 @@
       rowId: pack.agentId + "-" + (offer.id || offer.carrierId),
       nameHe: (offer.nameHe || offer.carrierName) + " · דרך סוכן " + agentName,
       of: of,
+      addon: addon,
+      addonLabel: addonLabel,
       fee: fee,
       feeCcy: feeCcy,
       ows: ows,
@@ -3946,7 +3951,8 @@
     const offer = priced.offer;
     const bits = [agentValidityText(offer)];
     if (offer.spaceOpen) bits.push(offer.confirmFirst ? "מקום פתוח להזמנה" : "מקום פתוח");
-    if (offer.freeDaysHe) bits.push(offer.freeDaysHe);
+    const freeDays = (priced.rate && priced.rate.freeDaysHe) || offer.freeDaysHe;
+    if (freeDays) bits.push(freeDays);
     if (offer.confirmFirst) bits.push("יאושר מול הסוכן קודם");
     if (offer.serviceHe) bits.push(offer.serviceHe);
     if (offer.weightLimitHe) bits.push(offer.weightLimitHe);
@@ -3979,8 +3985,15 @@
     if (priced.rate && priced.rate.etd) {
       html += '<p class="meta-line"><span>ETD</span> ' + ltrHtml(priced.rate.etd) + "</p>";
     }
+    const freeDays = (priced.rate && priced.rate.freeDaysHe) || offer.freeDaysHe;
+    if (freeDays) {
+      html += '<p class="meta-line"><span>שהייה חופשית</span> ' + esc(freeDays) + "</p>";
+    }
     html += '<div class="table-wrap"><table><thead><tr><th>חיוב</th><th>סכום</th><th>בסיס</th></tr></thead><tbody>';
     html += "<tr><td>הובלה ימית (OF)</td><td class='num'>" + esc(money(priced.of, "USD")) + "</td><td>למכולה</td></tr>";
+    if (priced.addon) {
+      html += "<tr><td>" + esc(priced.addonLabel || "HAIFA ADDON") + "</td><td class='num'>" + esc(money(priced.addon, "USD")) + "</td><td>למכולה</td></tr>";
+    }
     if (priced.fee) {
       html += "<tr><td>עמלת סוכן</td><td class='num'>" + esc(money(priced.fee, priced.feeCcy)) + "</td><td>למכולה</td></tr>";
     }
@@ -4041,8 +4054,11 @@
     if (issued) lines.push(issued);
     if (offer.serviceHe) lines.push("שירות: " + offer.serviceHe);
     if (priced.rate && priced.rate.etd) lines.push("ETD: " + priced.rate.etd);
+    const qFree = (priced.rate && priced.rate.freeDaysHe) || offer.freeDaysHe;
+    if (qFree) lines.push("שהייה חופשית: " + qFree);
     lines.push("");
     lines.push("הובלה: " + money(priced.of, "USD") + " למכולה");
+    if (priced.addon) lines.push((priced.addonLabel || "HAIFA ADDON") + ": " + money(priced.addon, "USD") + " למכולה");
     if (priced.fee) lines.push("עמלת סוכן: " + money(priced.fee, priced.feeCcy) + " למכולה");
     if (priced.ows) lines.push("OWS: " + money(priced.owsAmt, priced.ows.ccy || "USD") + " למכולה");
     lines.push("סה״כ למכולה: " + money(priced.perCtr, "USD"));
